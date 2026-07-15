@@ -1,4 +1,4 @@
-# N3BL NBA Game Simulator — Official Rulebook
+# NBA Game Simulator — Official Rulebook
 
 A possession-by-possession NBA game simulation played with physical dice and a stat sheet. Two teams of 15 players compete across four 12-minute quarters, with 5-minute overtime periods as needed.
 
@@ -731,4 +731,4 @@ Remove the shooter first, then sort the remaining four teammates by PV lowest-to
 
 ---
 
-*N3BL NBA Game Simulator — 2026 Edition*
+*NBA Game Simulator — 2026 Edition*
