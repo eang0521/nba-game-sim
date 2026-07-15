@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rulebook — NBA Game Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header + nav (shared with index.html) ──────── */
+    header {
+      background: #141929;
+      border-bottom: 3px solid #3b5bdb;
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.9rem; }
+    header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+    .badge {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #748ffc;
+      background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
+    }
+    .header-nav { display: flex; gap: 0.25rem; }
+    .nav-link {
+      color: #748ffc; text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 6px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-link:hover { background: #1e2d5a; color: #c5d0fc; }
+    .nav-link.active { background: #3b5bdb; color: #fff; }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .container { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    /* ── Loading / error states ─────────────────────── */
+    .status {
+      color: #748ffc; font-size: 0.88rem;
+      padding: 2rem 0; text-align: center;
+    }
+    .status.error { color: #f87171; }
+
+    /* ── Rendered Markdown ───────────────────────────── */
+    .md-body { line-height: 1.75; }
+
+    .md-body h1 {
+      font-size: 1.9rem; font-weight: 900; color: #fff;
+      margin: 0 0 1.5rem; padding-bottom: 0.6rem;
+      border-bottom: 3px solid #3b5bdb;
+      letter-spacing: 0.02em;
+    }
+    .md-body h2 {
+      font-size: 1.2rem; font-weight: 800; color: #c5d0fc;
+      margin: 2.5rem 0 0.9rem; padding-bottom: 0.35rem;
+      border-bottom: 1px solid #1e2d5a;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .md-body h3 {
+      font-size: 1rem; font-weight: 700; color: #748ffc;
+      margin: 1.75rem 0 0.6rem; letter-spacing: 0.03em;
+    }
+    .md-body h4 {
+      font-size: 0.9rem; font-weight: 700; color: #94a3b8;
+      margin: 1.25rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    .md-body p { margin: 0 0 1rem; color: #cbd5e1; }
+
+    .md-body ul, .md-body ol {
+      margin: 0 0 1rem 1.5rem; color: #cbd5e1;
+    }
+    .md-body li { margin-bottom: 0.3rem; }
+    .md-body li > ul, .md-body li > ol { margin-top: 0.3rem; margin-bottom: 0; }
+
+    .md-body strong { color: #e2e8f0; font-weight: 700; }
+    .md-body em { color: #94a3b8; font-style: italic; }
+
+    .md-body hr {
+      border: none; border-top: 1px solid #1e2d5a;
+      margin: 2rem 0;
+    }
+
+    /* ── Tables ─────────────────────────────────────── */
+    .md-body table {
+      width: 100%; border-collapse: collapse;
+      margin: 1rem 0 1.5rem; font-size: 0.85rem;
+      overflow-x: auto; display: block;
+    }
+    .md-body th, .md-body td {
+      padding: 0.5rem 0.85rem;
+      border: 1px solid #1e2d5a;
+      text-align: left;
+    }
+    .md-body th {
+      background: #0f1117; color: #748ffc;
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .md-body td { color: #cbd5e1; }
+    .md-body tr:nth-child(even) td { background: #141929; }
+    .md-body tr:hover td { background: #172035; }
+
+    /* ── Code ───────────────────────────────────────── */
+    .md-body code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.83em;
+      background: #1a2035; color: #69db7c;
+      padding: 0.15em 0.4em; border-radius: 4px;
+      border: 1px solid #1e2d5a;
+    }
+    .md-body pre {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; padding: 1rem 1.25rem;
+      overflow-x: auto; margin: 0 0 1.25rem;
+    }
+    .md-body pre code {
+      background: none; border: none; padding: 0;
+      color: #a5f3c7; font-size: 0.82rem; line-height: 1.65;
+    }
+
+    /* ── Blockquotes (used for tips/notes) ──────────── */
+    .md-body blockquote {
+      border-left: 3px solid #3b5bdb;
+      background: #141929;
+      margin: 0 0 1.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+    }
+    .md-body blockquote p {
+      margin: 0; color: #94a3b8; font-size: 0.88rem;
+    }
+
+    /* ── Table of contents links ────────────────────── */
+    .md-body a { color: #748ffc; text-decoration: none; }
+    .md-body a:hover { color: #c5d0fc; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Simulator</a>
+    <a href="rulebook.html" class="nav-link active">Rulebook</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div id="content">
+    <p class="status" id="status">Loading rulebook…</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  marked.use({ gfm: true, breaks: false });
+
+  fetch('RULEBOOK.md')
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    })
+    .then(md => {
+      const div = document.createElement('div');
+      div.className = 'md-body';
+      div.innerHTML = marked.parse(md);
+      const content = document.getElementById('content');
+      content.innerHTML = '';
+      content.appendChild(div);
+    })
+    .catch(err => {
+      const el = document.getElementById('status');
+      el.className = 'status error';
+      el.textContent = 'Could not load RULEBOOK.md. Make sure it is in the same folder as this page.';
+    });
+</script>
+</body>
+</html>

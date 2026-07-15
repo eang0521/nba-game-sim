@@ -20,14 +20,25 @@
       padding: 1.1rem 2rem;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 0.9rem;
     }
+    .header-brand { display: flex; align-items: center; gap: 0.9rem; }
     header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
     .badge {
       font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
       letter-spacing: 0.12em; color: #748ffc;
       background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
     }
+    .header-nav { display: flex; gap: 0.25rem; }
+    .nav-link {
+      color: #748ffc; text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 6px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-link:hover { background: #1e2d5a; color: #c5d0fc; }
+    .nav-link.active { background: #3b5bdb; color: #fff; }
 
     .container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem; }
 
@@ -163,8 +174,14 @@
 <body>
 
 <header>
-  <h1>NBA Game Simulator</h1>
-  <span class="badge">2026 Season</span>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link active">Simulator</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+  </nav>
 </header>
 
 <div class="container">
