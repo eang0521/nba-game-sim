@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NBA Game Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #141929;
+      border-bottom: 3px solid #3b5bdb;
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+    .badge {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #748ffc;
+      background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
+    }
+
+    .container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Form ─────────────────────────────── */
+    .form-card {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 10px; padding: 1.25rem 1.75rem; margin-bottom: 2rem;
+    }
+    .form-card h2 {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc; margin-bottom: 1rem;
+    }
+    .form-row { display: flex; gap: 0.9rem; align-items: flex-end; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #64748b;
+    }
+    select {
+      background: #0f1117; color: #e2e8f0;
+      border: 1px solid #2d3f6e; border-radius: 6px;
+      padding: 0.5rem 0.75rem; font-size: 0.88rem; min-width: 130px; cursor: pointer;
+    }
+    select:focus { outline: 2px solid #748ffc; outline-offset: 1px; }
+    .btn {
+      background: #3b5bdb; color: #fff; border: none; border-radius: 6px;
+      padding: 0.55rem 1.5rem; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; letter-spacing: 0.03em;
+    }
+    .btn:hover  { background: #4c6ef5; }
+    .btn:active { background: #2f4ac0; }
+    .btn:disabled { background: #2d3a5c; cursor: default; }
+
+    .error {
+      color: #fca5a5; background: #2d1616; border: 1px solid #7f1d1d;
+      border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 0.88rem;
+    }
+
+    /* ── Scoreboard ───────────────────────── */
+    .scoreboard {
+      background: #141929; border: 1px solid #1e2d5a; border-radius: 10px;
+      padding: 2rem 1.5rem 1.5rem; margin-bottom: 1.5rem; text-align: center;
+    }
+    .score-teams {
+      display: flex; justify-content: center; align-items: center;
+      gap: 2.5rem; margin-bottom: 0.5rem;
+    }
+    .score-team { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .team-abbr { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.12em; color: #c5d0fc; }
+    .team-score { font-size: 4.5rem; font-weight: 900; line-height: 1.05; color: #fff; }
+    .team-score.winner { color: #69db7c; }
+    .score-sep { font-size: 2.5rem; color: #2d3a5c; padding-top: 1rem; }
+    .final-label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #64748b; margin-bottom: 1.5rem;
+    }
+
+    /* ── Linescore ────────────────────────── */
+    .linescore-wrap { overflow-x: auto; }
+    .linescore { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .linescore th, .linescore td { padding: 0.45rem 0.8rem; text-align: center; border: 1px solid #1e2d5a; }
+    .linescore th { background: #0f1117; color: #748ffc; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+    .linescore td:first-child { text-align: left; font-weight: 700; color: #fff; }
+    .linescore .total { font-weight: 800; font-size: 1rem; color: #fff; }
+
+    /* ── Section headings ─────────────────── */
+    section { margin-bottom: 2.25rem; }
+    section > h2 {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc;
+      margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid #1e2d5a;
+    }
+
+    /* ── Play-by-play ─────────────────────── */
+    .pbp-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    details {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; overflow: hidden;
+    }
+    details[open] { border-color: #3b5bdb; }
+    summary {
+      padding: 0.7rem 1rem; cursor: pointer; font-weight: 700;
+      font-size: 0.88rem; color: #c5d0fc; user-select: none;
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '▸'; color: #748ffc; font-size: 0.75rem; }
+    details[open] summary::after { content: '▾'; }
+    .play-count { color: #475569; font-size: 0.72rem; font-weight: 400; }
+    .pbp-log {
+      padding: 0.6rem 1rem 0.8rem; border-top: 1px solid #1e2d5a;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.76rem; line-height: 1.85; max-height: 400px; overflow-y: auto;
+    }
+    .pbp-log span { display: block; }
+    .ev-make    { color: #69db7c; }
+    .ev-miss    { color: #4b5e7a; }
+    .ev-foul    { color: #ffa94d; }
+    .ev-steal   { color: #4dabf7; }
+    .ev-block   { color: #da77f2; }
+    .ev-reb     { color: #38d9a9; }
+    .ev-misc    { color: #748ffc; font-style: italic; }
+    .ev-neutral { color: #94a3b8; }
+
+    /* ── Box score ────────────────────────── */
+    .box-team { margin-bottom: 1.75rem; }
+    .box-team h3 {
+      font-size: 0.8rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #c5d0fc; margin-bottom: 0.5rem;
+    }
+    .box-wrap { overflow-x: auto; border: 1px solid #1e2d5a; border-radius: 8px; }
+    .box-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 680px; }
+    .box-table th, .box-table td {
+      padding: 0.45rem 0.7rem; text-align: center;
+      border-bottom: 1px solid #1a2235; white-space: nowrap;
+    }
+    .box-table th {
+      background: #0f1117; color: #748ffc; font-size: 0.68rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .box-table td:first-child { text-align: left; color: #e2e8f0; padding-left: 1rem; }
+    .box-table tbody tr:hover td { background: #172035; }
+    .box-table .totals-row td {
+      background: #111827; border-top: 2px solid #3b5bdb;
+      border-bottom: none; font-weight: 700; color: #fff;
+    }
+    .box-table .totals-row td:first-child { color: #748ffc; }
+    .pos-tag { color: #475569; font-size: 0.68rem; margin-left: 0.3rem; }
+    .pm-pos { color: #69db7c; font-weight: 700; }
+    .pm-neg { color: #f87171; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>NBA Game Simulator</h1>
+  <span class="badge">2026 Season</span>
+</header>
+
+<div class="container">
+  <div class="form-card">
+    <h2>Simulate a Game</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="t1">Home Team</label>
+        <select id="t1"></select>
+      </div>
+      <div class="form-group">
+        <label for="t2">Away Team</label>
+        <select id="t2"></select>
+      </div>
+      <button class="btn" id="simBtn" onclick="runSim()">Simulate</button>
+    </div>
+    <div id="errorMsg" class="error" style="display:none"></div>
+  </div>
+  <div id="results"></div>
+</div>
+
+<script>
+'use strict';
+
+// ── Globals ─────────────────────────────────────────────────────────
+let teamsData = {};
+
+// ── Utilities ────────────────────────────────────────────────────────
+function rollD(sides, num = 1) {
+  let t = 0;
+  for (let i = 0; i < num; i++) t += Math.floor(Math.random() * sides) + 1;
+  return t;
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
+
+function logCss(line) {
+  const lo = line.toLowerCase();
+  if (lo.includes('makes') || lo.includes('and-1')) return 'ev-make';
+  if (lo.includes('misses'))                         return 'ev-miss';
+  if (lo.includes('steal'))                          return 'ev-steal';
+  if (lo.includes('block'))                          return 'ev-block';
+  if (lo.includes('foul') || lo.includes('free throw')) return 'ev-foul';
+  if (lo.includes('rebound'))                        return 'ev-reb';
+  if (lo.includes('sub:') || lo.includes('wins the')) return 'ev-misc';
+  return 'ev-neutral';
+}
+
+// ── Player ───────────────────────────────────────────────────────────
+class Player {
+  constructor(name, t_2pt, t_3pt, t_def, t_reb) {
+    this.name  = name;
+    this.t_2pt = t_2pt; this.t_3pt = t_3pt;
+    this.t_def = t_def; this.t_reb = t_reb;
+
+    this.ovr = t_2pt + t_3pt + t_def + t_reb;
+    this.pv  = t_reb - t_3pt + 0.01 * t_2pt + 0.0001 * t_def;
+    this.off = t_2pt + t_3pt + 0.01 * this.ovr;
+    this.ft_chance = Math.max(1, Math.min(90, Math.round(50 + t_2pt * 0.4 + t_3pt * 1.0)));
+
+    // Per-game stats
+    this.seconds_played = 0; this.points      = 0;
+    this.fg_made        = 0; this.fg_attempted = 0;
+    this.tpt_made       = 0; this.tpt_attempted = 0;
+    this.ft_made        = 0; this.ft_attempted  = 0;
+    this.rebounds = 0; this.assists = 0;
+    this.steals   = 0; this.blocks  = 0;
+    this.fouls    = 0; this.plus_minus = 0;
+
+    // State
+    this.on_court       = false;
+    this.fouled_out     = false;
+    this.positions_played = {1:0, 2:0, 3:0, 4:0, 5:0};
+    this.current_position = null;
+    this.team_ref         = null;
+  }
+
+  primaryPos() {
+    const total = Object.values(this.positions_played).reduce((a, b) => a + b, 0);
+    if (!total) return 'BN';
+    let best = 1;
+    for (let i = 2; i <= 5; i++)
+      if (this.positions_played[i] > this.positions_played[best]) best = i;
+    return ['PG','SG','SF','PF','C'][best - 1];
+  }
+}
+
+// ── Team ─────────────────────────────────────────────────────────────
+class Team {
+  constructor(abbr, playerData) {
+    this.abbr    = abbr;
+    this.players = playerData.map(p => new Player(p.name, p.t_2pt, p.t_3pt, p.t_def, p.t_reb));
+    this.score   = 0;
+    this.court   = [];
+    this.defensive_fouls_qtr  = 0;
+    this.foul_in_last_2_mins  = false;
+  }
+
+  byPv() {
+    const s = [...this.court].sort((a, b) => a.pv - b.pv);
+    s.forEach((p, i) => p.current_position = i + 1);
+    return s;
+  }
+
+  byOff() { return [...this.court].sort((a, b) => b.off - a.off); }
+}
+
+// ── Game ─────────────────────────────────────────────────────────────
+class Game {
+  constructor(t1, t2) {
+    this.t1 = t1; this.t2 = t2;
+    this.quarter = 0; this.clock = 0;
+    this.possession = null; this.jumpball_winner = null;
+    this.subs_waiting = false;
+    this.t1_q_scores = []; this.t2_q_scores = [];
+    this.t1_last = 0; this.t2_last = 0;
+    this.logs = {};
+  }
+
+  fmt() {
+    const m = Math.floor(this.clock / 60), s = this.clock % 60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  log(msg) {
+    const scored = msg.includes('makes') || msg.includes('scores');
+    const tag = scored ? ` [${this.t1.abbr} ${this.t1.score} – ${this.t2.abbr} ${this.t2.score}]` : '';
+    if (!this.logs[this.quarter]) this.logs[this.quarter] = [];
+    this.logs[this.quarter].push(`${this.fmt()} ${msg}${tag}`.trim());
+  }
+
+  pm(scoringTeam, pts) {
+    const other = scoringTeam === this.t1 ? this.t2 : this.t1;
+    scoringTeam.court.forEach(p => p.plus_minus += pts);
+    other.court.forEach(p => p.plus_minus -= pts);
+  }
+
+  // ── Lineup selection ─────────────────────────────────────────────
+  startLineups() {
+    for (const team of [this.t1, this.t2]) {
+      team.court = [];
+      team.players.forEach(p => p.on_court = false);
+
+      for (let s = 0; s < 5; s++) {
+        const bench = [...team.players]
+          .filter(p => !p.on_court && !p.fouled_out)
+          .sort((a, b) => b.ovr - a.ovr);
+        if (!bench.length) break;
+
+        const r = rollD(20);
+        const idx = r <= 6  ? 0
+          : r <= 11 ? Math.min(1, bench.length - 1)
+          : r <= 15 ? Math.min(2, bench.length - 1)
+          : r <= 18 ? Math.min(3, bench.length - 1)
+          :           Math.min(4, bench.length - 1);
+
+        bench[idx].on_court = true;
+        team.court.push(bench[idx]);
+      }
+    }
+  }
+
+  // ── D20 threshold table ──────────────────────────────────────────
+  thresh(roll, sz) {
+    const t = sz >= 5 ? [6,11,15,18,20]
+      : sz === 4 ? [8,14,18,20]
+      : sz === 3 ? [9,16,20]
+      : sz === 2 ? [13,20] : [20];
+    for (let i = 0; i < t.length; i++) if (roll <= t[i]) return i;
+    return t.length - 1;
+  }
+
+  // ── Substitutions ────────────────────────────────────────────────
+  subs(ftShooter = null, forced = []) {
+    for (const team of [this.t1, this.t2]) {
+      const forcedTeam = forced.filter(p => team.players.includes(p) && p.on_court);
+      if (!this.subs_waiting && !forcedTeam.length) continue;
+
+      let n = (forcedTeam.length && !this.subs_waiting)
+        ? 1
+        : Math.min(5, this.thresh(rollD(20), 5) + 1);
+      n = Math.max(n, forcedTeam.length);
+
+      const courtPool  = [...team.court].sort((a, b) => a.ovr - b.ovr);
+      const initBench  = team.players.filter(p => !p.on_court && !p.fouled_out);
+      const maxSubs    = Math.min(n, courtPool.length, initBench.length);
+
+      const outList = [], inList = [];
+
+      for (let i = 0; i < maxSubs; i++) {
+        let outP;
+        if (i < forcedTeam.length) {
+          outP = forcedTeam[i];
+        } else {
+          const validOut = courtPool.filter(p => !outList.includes(p) && p !== ftShooter);
+          if (!validOut.length) break;
+          outP = validOut[this.thresh(rollD(20), validOut.length)];
+        }
+
+        const validIn = [...team.players]
+          .filter(p => !p.on_court && !p.fouled_out && !inList.includes(p))
+          .sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+        if (!validIn.length) break;
+
+        let idxIn = this.thresh(rollD(20), 5);
+        idxIn = Math.min(idxIn, validIn.length - 1);
+
+        outList.push(outP);
+        inList.push(validIn[idxIn]);
+      }
+
+      for (let i = 0; i < outList.length; i++) {
+        const op = outList[i], ip = inList[i];
+        op.on_court = false;
+        team.court = team.court.filter(p => p !== op);
+        ip.on_court = true;
+        team.court.push(ip);
+        this.log(`SUB: ${ip.name} in for ${op.name}`);
+      }
+    }
+
+    this.subs_waiting = false;
+    this.t1.byPv();
+    this.t2.byPv();
+  }
+
+  // ── Clock ────────────────────────────────────────────────────────
+  tick(dice) {
+    const t = rollD(6, dice);
+    this.clock = Math.max(0, this.clock - t);
+    for (const team of [this.t1, this.t2])
+      for (const p of team.court) {
+        p.seconds_played += t;
+        if (p.current_position) p.positions_played[p.current_position] += t;
+      }
+    return this.clock > 0;
+  }
+
+  // ── Bonus check ──────────────────────────────────────────────────
+  bonus(defTeam) {
+    return defTeam.defensive_fouls_qtr >= 4
+      || (this.clock <= 120 && defTeam.foul_in_last_2_mins);
+  }
+
+  // ── Foul recording ───────────────────────────────────────────────
+  foulOn(player) {
+    player.fouls++;
+    const f = [];
+    if (player.fouls >= 6) {
+      player.fouled_out = true; f.push(player);
+      this.log(`${player.name} fouled out!`);
+    } else if (player.fouls >= this.quarter + 2) {
+      f.push(player);
+      this.log(`${player.name} is in foul trouble (${player.fouls} fouls) and must sub out.`);
+    }
+    return f;
+  }
+
+  // ── Free throws ──────────────────────────────────────────────────
+  fts(shooter, n) {
+    if (!n) return true;
+    let madeLast = false;
+    for (let i = 0; i < n; i++) {
+      shooter.ft_attempted++;
+      if (rollD(100) <= shooter.ft_chance) {
+        shooter.points++; shooter.ft_made++;
+        shooter.team_ref.score++;
+        this.pm(shooter.team_ref, 1);
+        this.log(`${shooter.name} makes free throw ${i+1}/${n}`);
+        madeLast = (i === n - 1);
+      } else {
+        this.log(`${shooter.name} misses free throw ${i+1}/${n}`);
+        if (i === n - 1) madeLast = false;
+      }
+    }
+    return madeLast;
+  }
+
+  // ── Assist resolution ────────────────────────────────────────────
+  assist(offPv, shooter) {
+    const r = rollD(100);
+    let idx = -1;
+    if (r <= 24) idx = 0; else if (r <= 42) idx = 1;
+    else if (r <= 54) idx = 2; else if (r <= 60) idx = 3;
+    if (idx >= 0) {
+      const mates = offPv.filter(p => p !== shooter);
+      if (idx < mates.length) { mates[idx].assists++; return mates[idx]; }
+    }
+    return null;
+  }
+
+  // ── Rebound cycle ────────────────────────────────────────────────
+  rebCycle(offTeam, defTeam, skipped) {
+    const offPv = offTeam.byPv();
+    const defPv = defTeam.byPv();
+    let cycle = 1;
+
+    while (this.clock > 0) {
+      const order = [...defPv].reverse().concat([...offPv].reverse());
+      let grabbed = false;
+
+      for (const p of order) {
+        if (cycle === 1 && p === skipped) continue;
+        const rating = Math.max(1, p.t_reb) + (cycle === 1 && defPv.includes(p) ? 3 : 0);
+        if (rollD(100) <= rating) {
+          p.rebounds++;
+          this.log(`${p.name} Rebound`);
+          if (defPv.includes(p)) {
+            this.possession = defTeam;
+          } else {
+            this.possession = offTeam;
+            this.poss(2);
+          }
+          grabbed = true; break;
+        }
+      }
+
+      if (grabbed) break;
+      this.clock--; cycle++;
+    }
+  }
+
+  // ── Possession ───────────────────────────────────────────────────
+  poss(dice = 4) {
+    if (this.clock <= 0) return;
+    if (!this.tick(dice)) return;
+
+    const off = this.possession;
+    const def = off === this.t1 ? this.t2 : this.t1;
+    off.court.forEach(p => p.team_ref = off);
+    def.court.forEach(p => p.team_ref = def);
+
+    let ev = rollD(6);
+    const offPv = off.byPv();
+    const defPv = def.byPv();
+
+    // ── 1: Steal ──────────────────────────────────────────────────
+    if (ev === 1) {
+      let stolen = false;
+      for (const d of defPv) {
+        if (rollD(100) <= Math.max(1, d.t_def)) {
+          d.steals++; this.log(`${d.name} Steal`);
+          this.possession = def; stolen = true; break;
+        }
+      }
+      if (stolen) return;
+      ev = Math.floor(Math.random() * 4) + 3; // re-roll as 3-6
+    }
+
+    // ── 2: Foul ───────────────────────────────────────────────────
+    if (ev === 2) {
+      const foulType = rollD(10);
+      const foulPos  = Math.floor((rollD(10) - 1) / 2);
+
+      if (foulType === 1) {
+        // Offensive foul
+        const fouler = offPv[foulPos];
+        const forced = this.foulOn(fouler);
+        this.log(`${fouler.name} offensive foul`);
+        if (this.bonus(off)) {
+          const shooter = def.court[Math.floor(Math.random() * def.court.length)];
+          this.subs(shooter, forced);
+          if (!this.fts(shooter, 2)) this.rebCycle(def, off, shooter);
+          else this.possession = off;
+        } else {
+          this.subs(null, forced);
+          this.possession = def;
+        }
+
+      } else {
+        // Defensive foul
+        const fouler = defPv[foulPos];
+        const forced = this.foulOn(fouler);
+        def.defensive_fouls_qtr++;
+        if (this.clock <= 120) def.foul_in_last_2_mins = true;
+
+        if (foulType <= 6) {
+          // Non-shooting defensive foul
+          this.log(`${fouler.name} defensive foul`);
+          if (this.bonus(def)) {
+            const shooter = off.court[Math.floor(Math.random() * off.court.length)];
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, 2)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          } else {
+            this.subs(null, forced);
+            this.poss(2);
+          }
+
+        } else {
+          // Shooting foul
+          this.log(`${fouler.name} shooting foul`);
+          const offOff   = off.byOff();
+          const shooter  = offOff[this.thresh(rollD(20), 5)];
+          const s2 = Math.max(1, shooter.t_2pt), s3 = Math.max(1, shooter.t_3pt);
+          const ratio = Math.round((s2 * 3) / ((s2 * 3) + (s3 * 2)) * 100);
+          let is2 = rollD(100) <= ratio;
+          if (!is2 && rollD(6) <= 4) is2 = true;
+          const pts = is2 ? 2 : 3;
+          const defender = defPv[shooter.current_position - 1];
+          const diff = (is2 ? shooter.t_2pt : shooter.t_3pt) - defender.t_def;
+          const target = Math.round(diff * (is2 ? 2/3 : 0.5)) + (is2 ? 54 : 36);
+
+          // Two rolls: both must pass for the basket to count (And-1)
+          const m1 = rollD(100) <= target, m2 = rollD(100) <= target;
+          if (m1 && m2) {
+            shooter.fg_attempted++; shooter.fg_made++;
+            if (!is2) { shooter.tpt_attempted++; shooter.tpt_made++; }
+            shooter.points += pts; off.score += pts; this.pm(off, pts);
+            const ast = this.assist(offPv, shooter);
+            this.log(`${shooter.name} makes ${pts} (And-1!)${ast ? ` (${ast.name} Assist)` : ''}`);
+            if (rollD(10) <= pts) this.subs_waiting = true;
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, 1)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          } else {
+            this.log(`${shooter.name} misses ${pts} on foul`);
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, pts)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          }
+        }
+      }
+      return;
+    }
+
+    // ── 3-6: Shot ─────────────────────────────────────────────────
+    const offOff  = off.byOff();
+    const shooter = offOff[this.thresh(rollD(20), 5)];
+    const s2 = Math.max(1, shooter.t_2pt), s3 = Math.max(1, shooter.t_3pt);
+    const ratio = Math.round((s2 * 3) / ((s2 * 3) + (s3 * 2)) * 100);
+    const is2 = rollD(100) <= ratio;
+    const pts = is2 ? 2 : 3;
+    const defender = defPv[shooter.current_position - 1];
+    const diff = (is2 ? shooter.t_2pt : shooter.t_3pt) - defender.t_def;
+    const target = Math.round(diff * (is2 ? 2/3 : 0.5)) + (is2 ? 54 : 36);
+
+    shooter.fg_attempted++;
+    if (!is2) shooter.tpt_attempted++;
+
+    if (rollD(100) <= target) {
+      shooter.fg_made++;
+      if (!is2) shooter.tpt_made++;
+      shooter.points += pts; off.score += pts; this.pm(off, pts);
+      const ast = this.assist(offPv, shooter);
+      this.log(`${shooter.name} makes ${pts}${ast ? ` (${ast.name} Assist)` : ''}`);
+      if (rollD(10) <= pts) this.subs_waiting = true;
+      this.possession = def;
+    } else {
+      let blocked = false;
+      if (rollD(100) <= Math.max(1, defender.t_def)) {
+        if (rollD(6) <= defender.current_position + 1) {
+          blocked = true; defender.blocks++;
+          this.log(`${shooter.name} misses ${pts} (Blocked by ${defender.name}!)`);
+        }
+      }
+      if (!blocked) this.log(`${shooter.name} misses ${pts}`);
+      this.rebCycle(off, def, shooter);
+    }
+  }
+
+  // ── Quarter ───────────────────────────────────────────────────────
+  playQuarter(mins) {
+    this.subs_waiting = false;
+    this.clock = mins * 60;
+    this.t1.defensive_fouls_qtr = 0; this.t2.defensive_fouls_qtr = 0;
+    this.t1.foul_in_last_2_mins = false; this.t2.foul_in_last_2_mins = false;
+
+    this.startLineups();
+    this.t1.byPv(); this.t2.byPv(); // initialise current_position
+
+    if (this.quarter === 1 || mins === 5) {
+      const c1 = this.t1.byPv()[4], c2 = this.t2.byPv()[4];
+      const r1 = Math.max(1, c1.t_reb), r2 = Math.max(1, c2.t_reb);
+      if (rollD(r1 + r2) <= r1) {
+        this.possession = this.t1;
+        if (this.quarter === 1) this.jumpball_winner = this.t1;
+        this.log(`${c1.name} wins the jumpball for ${this.t1.abbr}`);
+      } else {
+        this.possession = this.t2;
+        if (this.quarter === 1) this.jumpball_winner = this.t2;
+        this.log(`${c2.name} wins the jumpball for ${this.t2.abbr}`);
+      }
+    } else if (this.quarter === 2 || this.quarter === 3) {
+      this.possession = this.jumpball_winner === this.t1 ? this.t2 : this.t1;
+    } else {
+      this.possession = this.jumpball_winner;
+    }
+
+    while (this.clock > 0) this.poss();
+
+    this.t1_q_scores.push(this.t1.score - this.t1_last);
+    this.t2_q_scores.push(this.t2.score - this.t2_last);
+    this.t1_last = this.t1.score;
+    this.t2_last = this.t2.score;
+  }
+
+  // ── Full game ─────────────────────────────────────────────────────
+  run() {
+    for (let q = 1; q <= 4; q++) { this.quarter = q; this.playQuarter(12); }
+    let ot = 1;
+    while (this.t1.score === this.t2.score) {
+      this.quarter = 4 + ot; this.playQuarter(5); ot++;
+    }
+  }
+}
+
+// ── Rendering ────────────────────────────────────────────────────────
+function boxTable(team) {
+  const rows = [...team.players]
+    .filter(p => p.seconds_played > 0)
+    .sort((a, b) => b.seconds_played - a.seconds_played);
+
+  let tMin=0,tPts=0,tFgm=0,tFga=0,t3m=0,t3a=0,tFtm=0,tFta=0,
+      tReb=0,tAst=0,tStl=0,tBlk=0,tPf=0,tPm=0;
+
+  const playerRows = rows.map(p => {
+    const mp = Math.round(p.seconds_played / 60);
+    const pm = p.plus_minus > 0 ? `+${p.plus_minus}` : `${p.plus_minus}`;
+    const pmCls = p.plus_minus > 0 ? 'pm-pos' : (p.plus_minus < 0 ? 'pm-neg' : '');
+    tMin+=mp; tPts+=p.points; tFgm+=p.fg_made; tFga+=p.fg_attempted;
+    t3m+=p.tpt_made; t3a+=p.tpt_attempted; tFtm+=p.ft_made; tFta+=p.ft_attempted;
+    tReb+=p.rebounds; tAst+=p.assists; tStl+=p.steals;
+    tBlk+=p.blocks; tPf+=p.fouls; tPm+=p.plus_minus;
+    return `<tr>
+      <td>${esc(p.name)}<span class="pos-tag">(${p.primaryPos()})</span></td>
+      <td>${mp}</td><td>${p.points}</td>
+      <td>${p.fg_made}-${p.fg_attempted}</td>
+      <td>${p.tpt_made}-${p.tpt_attempted}</td>
+      <td>${p.ft_made}-${p.ft_attempted}</td>
+      <td>${p.rebounds}</td><td>${p.assists}</td>
+      <td>${p.steals}</td><td>${p.blocks}</td>
+      <td>${p.fouls}</td>
+      <td class="${pmCls}">${pm}</td>
+    </tr>`;
+  }).join('');
+
+  const tPmStr = tPm > 0 ? `+${tPm}` : `${tPm}`;
+  return `
+  <div class="box-team">
+    <h3>${esc(team.abbr)}</h3>
+    <div class="box-wrap">
+      <table class="box-table">
+        <thead><tr>
+          <th>Player</th><th>MIN</th><th>PTS</th><th>FG</th><th>3PT</th><th>FT</th>
+          <th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>PF</th><th>+/-</th>
+        </tr></thead>
+        <tbody>
+          ${playerRows}
+          <tr class="totals-row">
+            <td>TOTALS</td>
+            <td>${tMin}</td><td>${tPts}</td>
+            <td>${tFgm}-${tFga}</td><td>${t3m}-${t3a}</td><td>${tFtm}-${tFta}</td>
+            <td>${tReb}</td><td>${tAst}</td><td>${tStl}</td><td>${tBlk}</td>
+            <td>${tPf}</td><td>${tPmStr}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderResults(game) {
+  const t1w = game.t1.score > game.t2.score;
+  const n   = game.t1_q_scores.length;
+
+  // Linescore
+  let lsHead = '<tr><th>Team</th>';
+  for (let i = 0; i < n; i++) lsHead += `<th>${periodLabel(i+1)}</th>`;
+  lsHead += '<th>T</th></tr>';
+
+  const lsRow = (team, scores) => {
+    let r = `<tr><td>${esc(team.abbr)}</td>`;
+    scores.forEach(s => r += `<td>${s}</td>`);
+    return r + `<td class="total">${team.score}</td></tr>`;
+  };
+
+  // Play-by-play
+  const quarters = Object.keys(game.logs).map(Number).sort((a,b) => a-b);
+  const pbp = quarters.map((q, i) => {
+    const lines = game.logs[q];
+    const open  = i === quarters.length - 1 ? ' open' : '';
+    const body  = lines.map(l => `<span class="${logCss(l)}">${esc(l)}</span>`).join('');
+    return `<details${open}>
+      <summary>${periodLabel(q)} <span class="play-count">${lines.length} plays</span></summary>
+      <div class="pbp-log">${body}</div>
+    </details>`;
+  }).join('');
+
+  const otLabel = n > 4 ? ` / ${n - 4}OT` : '';
+
+  document.getElementById('results').innerHTML = `
+    <div class="scoreboard">
+      <div class="score-teams">
+        <div class="score-team">
+          <div class="team-abbr">${esc(game.t1.abbr)}</div>
+          <div class="team-score${t1w ? ' winner' : ''}">${game.t1.score}</div>
+        </div>
+        <div class="score-sep">–</div>
+        <div class="score-team">
+          <div class="team-abbr">${esc(game.t2.abbr)}</div>
+          <div class="team-score${!t1w ? ' winner' : ''}">${game.t2.score}</div>
+        </div>
+      </div>
+      <div class="final-label">Final${otLabel}</div>
+      <div class="linescore-wrap" style="margin-top:1.25rem;">
+        <table class="linescore">
+          <thead>${lsHead}</thead>
+          <tbody>${lsRow(game.t1, game.t1_q_scores)}${lsRow(game.t2, game.t2_q_scores)}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <section>
+      <h2>Play-by-Play</h2>
+      <div class="pbp-list">${pbp}</div>
+    </section>
+
+    <section>
+      <h2>Box Score</h2>
+      ${[game.t1, game.t2].map(boxTable).join('')}
+    </section>`;
+
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── UI ───────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = msg ? '' : 'none';
+}
+
+function runSim() {
+  showError('');
+  const t1 = document.getElementById('t1').value;
+  const t2 = document.getElementById('t2').value;
+  if (t1 === t2) { showError('Please select two different teams.'); return; }
+
+  const btn = document.getElementById('simBtn');
+  btn.textContent = 'Simulating…'; btn.disabled = true;
+
+  // defer one tick so the browser can paint the button state first
+  setTimeout(() => {
+    const game = new Game(new Team(t1, teamsData[t1]), new Team(t2, teamsData[t2]));
+    game.run();
+    renderResults(game);
+    btn.textContent = 'Simulate'; btn.disabled = false;
+  }, 20);
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────
+fetch('nba_teams26.json')
+  .then(r => r.json())
+  .then(data => {
+    teamsData = data;
+    const abbrs = Object.keys(data).sort();
+    ['t1','t2'].forEach((id, i) => {
+      const sel = document.getElementById(id);
+      abbrs.forEach(abbr => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = abbr;
+        if (abbr === abbrs[i]) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    });
+  })
+  .catch(() => showError('Could not load nba_teams26.json. Make sure it is in the same folder as this page.'));
+</script>
+</body>
+</html>
