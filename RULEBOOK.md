@@ -381,17 +381,21 @@ Roll **d100**: if result ≤ Make Chance → **Made basket**.
 
 ## 12. Assists
 
-After every made **field goal** (not free throws), roll **d100** to determine if an assist was recorded:
+After every made **field goal** (not free throws), roll **d100** to determine if an assist was recorded.
 
-| d100 Roll | Assisting Player |
-|-----------|-----------------|
-| 1–24 | Player in PG slot (PV rank 1) |
-| 25–42 | Player in SG slot (PV rank 2) |
-| 43–54 | Player in SF slot (PV rank 3) |
-| 55–60 | Player in PF slot (PV rank 4) |
+First, **remove the shooter from the list** and sort the remaining four teammates by **PV, lowest first**. This gives you four ranked teammates: the smallest (lowest PV), the second smallest, the third smallest, and the biggest (highest PV).
+
+| d100 Roll | Assisting Teammate |
+|-----------|-------------------|
+| 1–24 | Teammate #1 — smallest remaining (lowest PV) |
+| 25–42 | Teammate #2 — second smallest |
+| 43–54 | Teammate #3 — third smallest |
+| 55–60 | Teammate #4 — biggest remaining (highest PV) |
 | 61–100 | No assist |
 
-If the result points to the **shooter's own position slot**, no assist is recorded. Record **+1 AST** for the assisting player.
+**Example:** If the PG shoots, the four teammates are SG (#1), SF (#2), PF (#3), and C (#4). A roll of 30 would credit the SG with an assist. If the SF shoots, teammates are PG (#1), SG (#2), PF (#3), and C (#4).
+
+Record **+1 AST** for the credited teammate.
 
 ---
 
@@ -671,12 +675,14 @@ TOTALS               |     |     |      |      |      |     |     |     |     | 
 
 ### Assist Table (d100)
 
-| d100 | Assisting Slot |
-|------|---------------|
-| 1–24 | PG |
-| 25–42 | SG |
-| 43–54 | SF |
-| 55–60 | PF |
+Remove the shooter first, then sort the remaining four teammates by PV lowest-to-highest.
+
+| d100 | Assisting Teammate |
+|------|-------------------|
+| 1–24 | Teammate #1 (smallest remaining) |
+| 25–42 | Teammate #2 |
+| 43–54 | Teammate #3 |
+| 55–60 | Teammate #4 (biggest remaining) |
 | 61–100 | No assist |
 
 ---
