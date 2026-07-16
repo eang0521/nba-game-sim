@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How This Works — NBA Game Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #141929;
+      border-bottom: 3px solid #3b5bdb;
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.9rem; }
+    header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+    .badge {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #748ffc;
+      background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
+    }
+    .header-nav { display: flex; gap: 0.25rem; }
+    .nav-link {
+      color: #748ffc; text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 6px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-link:hover { background: #1e2d5a; color: #c5d0fc; }
+    .nav-link.active { background: #3b5bdb; color: #fff; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    /* ── Section layout ─────────────────────────────── */
+    .page-title {
+      font-size: 1.9rem; font-weight: 900; color: #fff;
+      margin: 0 0 0.4rem; letter-spacing: 0.02em;
+    }
+    .page-subtitle {
+      color: #64748b; font-size: 0.92rem; margin-bottom: 2.5rem;
+      padding-bottom: 1.25rem; border-bottom: 3px solid #3b5bdb;
+    }
+
+    .section { margin-bottom: 2.5rem; }
+    .section-title {
+      font-size: 1.05rem; font-weight: 800; color: #c5d0fc;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      margin-bottom: 0.85rem; padding-bottom: 0.35rem;
+      border-bottom: 1px solid #1e2d5a;
+    }
+
+    p { color: #cbd5e1; line-height: 1.75; margin-bottom: 0.85rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Steps ──────────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 0.85rem; }
+    .step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; padding: 1rem 1.25rem;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 2rem; height: 2rem;
+      background: #3b5bdb; color: #fff;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800;
+    }
+    .step-body { flex: 1; }
+    .step-body strong { color: #e2e8f0; display: block; margin-bottom: 0.2rem; font-size: 0.95rem; }
+    .step-body span { color: #94a3b8; font-size: 0.88rem; line-height: 1.6; }
+
+    /* ── Stat cards ─────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 0.75rem;
+    }
+    .stat-card {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; padding: 1rem 1.1rem;
+    }
+    .stat-card .stat-name {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc; margin-bottom: 0.35rem;
+    }
+    .stat-card .stat-abbr {
+      font-size: 1.15rem; font-weight: 900; color: #fff; margin-bottom: 0.3rem;
+    }
+    .stat-card p { font-size: 0.82rem; color: #94a3b8; line-height: 1.55; margin: 0; }
+
+    /* ── Event table ─────────────────────────────────── */
+    .event-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.84rem; border: 1px solid #1e2d5a; border-radius: 8px; overflow: hidden;
+    }
+    .event-table th, .event-table td {
+      padding: 0.55rem 0.9rem; text-align: left; border-bottom: 1px solid #1a2235;
+    }
+    .event-table th {
+      background: #0f1117; color: #748ffc;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .event-table td { color: #cbd5e1; }
+    .event-table tr:last-child td { border-bottom: none; }
+    .event-table tr:hover td { background: #172035; }
+    .roll-val {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      color: #69db7c; font-weight: 700;
+    }
+
+    /* ── Callout ────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #3b5bdb; background: #141929;
+      border-radius: 0 6px 6px 0; padding: 0.85rem 1.1rem;
+      margin-top: 1rem;
+    }
+    .callout p { font-size: 0.88rem; color: #94a3b8; margin: 0; }
+    .callout strong { color: #c5d0fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Simulator</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="how-it-works.html" class="nav-link active">How This Works</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <h1 class="page-title">How This Works</h1>
+  <p class="page-subtitle">A quick guide to running a simulation and understanding what the numbers mean.</p>
+
+  <!-- ── Running a Simulation ───────────────────── -->
+  <div class="section">
+    <div class="section-title">Running a Simulation</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Pick two teams</strong>
+          <span>Use the Home Team and Away Team dropdowns on the Simulator page. All 30 teams from the 2026 season are available. You cannot simulate a team against itself.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Click Simulate</strong>
+          <span>The engine plays out all four quarters (and overtime if needed) instantly. There are no inputs to make mid-game — the whole thing runs automatically based on player ratings and dice rolls.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Read the results</strong>
+          <span>You'll see a final scoreboard with linescore, a quarter-by-quarter play-by-play log, and a full box score for both teams. Click any quarter header in the play-by-play to expand it.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Simulate again</strong>
+          <span>Because outcomes are random, the same matchup will produce a different result every time. Run it multiple times to get a feel for which team has the edge.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Player Ratings ─────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Player Ratings</div>
+    <p>Every player has four ratings that drive the simulation. Higher is always better. Ratings can be negative for weak players in a given category.</p>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-name">2-Point Score</div>
+        <div class="stat-abbr">2PS</div>
+        <p>Controls how often a player makes shots inside the arc. Also raises free throw percentage alongside 3PS.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-name">3-Point Score</div>
+        <div class="stat-abbr">3PS</div>
+        <p>Controls how often a player makes three-pointers and influences how often they attempt them relative to twos.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-name">Defense</div>
+        <div class="stat-abbr">DEF</div>
+        <p>Used for steals, blocks, and reducing the shooting percentage of the opposing player matched up against them.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-name">Rebounding</div>
+        <div class="stat-abbr">REB</div>
+        <p>Determines how often a player secures a missed shot. Also factors into the jump ball at the start of each period.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <p><strong>Free throw chance</strong> is derived from ratings, not stored directly: <code>50 + (2PS × 0.4) + (3PS × 1.0)</code>, capped between 1% and 90%.</p>
+    </div>
+  </div>
+
+  <!-- ── How a Possession Works ─────────────────── -->
+  <div class="section">
+    <div class="section-title">How a Possession Works</div>
+    <p>Each possession starts with a 6-sided die roll to determine the type of play. Time is consumed by rolling multiple 6-sided dice, so the clock varies naturally each possession.</p>
+    <table class="event-table">
+      <thead>
+        <tr><th>Roll (d6)</th><th>Event</th><th>What happens</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="roll-val">1</td>
+          <td>Steal attempt</td>
+          <td>Each defender rolls against their DEF rating. If anyone succeeds, the defense gets the ball. If no one steals, the possession re-rolls as a 3–6.</td>
+        </tr>
+        <tr>
+          <td class="roll-val">2</td>
+          <td>Foul</td>
+          <td>A 10-sided die decides offensive vs. defensive foul, and whether it's a shooting foul. Shooting fouls send the fouled player to the line for 2 or 3 free throws.</td>
+        </tr>
+        <tr>
+          <td class="roll-val">3–6</td>
+          <td>Shot attempt</td>
+          <td>A shooter is selected weighted by offensive rating. Whether they take a 2 or 3 is decided by their 2PS/3PS ratio. Their shot chance is compared against the matched-up defender's DEF rating.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <p>A <strong>missed shot</strong> triggers a rebound cycle — each player on the court gets a chance to grab the ball, with defenders getting a bonus on the first cycle. If the offense rebounds, they immediately get another possession.</p>
+    </div>
+  </div>
+
+  <!-- ── Lineups & Substitutions ────────────────── -->
+  <div class="section">
+    <div class="section-title">Lineups &amp; Substitutions</div>
+    <p>At the start of each quarter, 5 players are selected per team using a weighted random draw that favors higher-rated players but isn't guaranteed to pick the top 5. The same applies to substitutions during the game.</p>
+    <p>Position is assigned by each player's position value (PV): a higher REB pushes a player toward the 4 or 5, while a higher 3PS pushes them toward the 1 or 2. A pure shooter with low rebounding will line up as a guard; a high-rebounding big with no three-point game will play center.</p>
+    <p>Substitutions only happen at foul stoppages. A made basket can queue up a substitution (the probability scales with how many points were scored), but that sub won't go in until the next foul stops play. Players can also be forced off the court for foul trouble or fouling out.</p>
+    <p>The position shown in the box score reflects where the player spent the most time during the game.</p>
+  </div>
+
+  <!-- ── Reading the Results ────────────────────── -->
+  <div class="section">
+    <div class="section-title">Reading the Results</div>
+    <p><strong style="color:#e2e8f0;">Scoreboard &amp; Linescore</strong> — The final score and a quarter-by-quarter breakdown. Overtime periods appear as OT1, OT2, etc. if the game goes to overtime.</p>
+    <p><strong style="color:#e2e8f0;">Play-by-Play</strong> — Every event logged during the game, organized by quarter. Each entry shows the game clock at the time of the event. Scoring plays include a running score in brackets. Click a quarter to expand or collapse it.</p>
+    <p><strong style="color:#e2e8f0;">Box Score</strong> — Standard per-player stats for both teams. MIN is minutes played (rounded). +/- reflects how the score moved while that player was on the court.</p>
+  </div>
+
+</div>
+</body>
+</html>

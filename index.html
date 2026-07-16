@@ -180,6 +180,8 @@
   </div>
   <nav class="header-nav">
     <a href="index.html" class="nav-link active">Simulator</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="how-it-works.html" class="nav-link">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
   </nav>
 </header>
@@ -769,7 +771,7 @@ function renderResults(game) {
   const quarters = Object.keys(game.logs).map(Number).sort((a,b) => a-b);
   const pbp = quarters.map((q, i) => {
     const lines = game.logs[q];
-    const open  = i === quarters.length - 1 ? ' open' : '';
+    const open  = '';
     const body  = lines.map(l => `<span class="${logCss(l)}">${esc(l)}</span>`).join('');
     return `<details${open}>
       <summary>${periodLabel(q)} <span class="play-count">${lines.length} plays</span></summary>
@@ -811,7 +813,6 @@ function renderResults(game) {
       ${[game.t1, game.t2].map(boxTable).join('')}
     </section>`;
 
-  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── UI ───────────────────────────────────────────────────────────────
@@ -840,7 +841,7 @@ function runSim() {
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────
-fetch('nba_teams26.json')
+fetch('nba_rosters26_v2.json')
   .then(r => r.json())
   .then(data => {
     teamsData = data;
@@ -855,7 +856,7 @@ fetch('nba_teams26.json')
       });
     });
   })
-  .catch(() => showError('Could not load nba_teams26.json. Make sure it is in the same folder as this page.'));
+  .catch(() => showError('Could not load nba_rosters26_v2.json. Make sure it is in the same folder as this page.'));
 </script>
 </body>
 </html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams — NBA Game Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #141929;
+      border-bottom: 3px solid #3b5bdb;
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.9rem; }
+    header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+    .badge {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #748ffc;
+      background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
+    }
+    .header-nav { display: flex; gap: 0.25rem; }
+    .nav-link {
+      color: #748ffc; text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 6px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-link:hover { background: #1e2d5a; color: #c5d0fc; }
+    .nav-link.active { background: #3b5bdb; color: #fff; }
+
+    .container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── Page header ─────────────────────────────── */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
+    }
+    .page-title { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: 0.02em; }
+    .page-subtitle { color: #64748b; font-size: 0.88rem; margin-top: 0.2rem; }
+
+    /* ── Search bar ──────────────────────────────── */
+    .search-wrap { position: relative; }
+    #teamSearch {
+      background: #141929; color: #e2e8f0;
+      border: 1px solid #2d3f6e; border-radius: 6px;
+      padding: 0.5rem 0.75rem 0.5rem 2.1rem;
+      font-size: 0.88rem; width: 220px;
+    }
+    #teamSearch:focus { outline: 2px solid #748ffc; outline-offset: 1px; }
+    .search-icon {
+      position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%);
+      color: #475569; font-size: 0.85rem; pointer-events: none;
+    }
+
+    /* ── Conference dividers ─────────────────────── */
+    .conference-label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #748ffc;
+      margin-bottom: 0.75rem; padding-bottom: 0.4rem;
+      border-bottom: 1px solid #1e2d5a;
+    }
+    .conference-block { margin-bottom: 2rem; }
+
+    /* ── Team grid ───────────────────────────────── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    /* ── Team card (details/summary) ─────────────── */
+    details.team-card {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 10px; overflow: hidden;
+    }
+    details.team-card[open] { border-color: #3b5bdb; }
+
+    summary.team-summary {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.85rem 1.1rem; cursor: pointer;
+      user-select: none; list-style: none;
+    }
+    summary.team-summary::-webkit-details-marker { display: none; }
+
+    .team-logo {
+      width: 48px; height: 48px; object-fit: contain; flex-shrink: 0;
+      border-radius: 4px;
+    }
+    .team-logo-placeholder {
+      width: 48px; height: 48px; flex-shrink: 0; border-radius: 4px;
+      background: #1e2d5a; display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; color: #748ffc; letter-spacing: 0.05em;
+    }
+
+    .team-meta { flex: 1; min-width: 0; }
+    .team-fullname {
+      font-size: 0.97rem; font-weight: 800; color: #fff;
+    }
+    .team-abbr-badge {
+      display: inline-block; margin-top: 0.2rem;
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc;
+      background: #1e2d5a; padding: 0.15rem 0.5rem; border-radius: 999px;
+    }
+
+    .chevron {
+      color: #748ffc; font-size: 0.75rem; flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    details.team-card[open] .chevron { transform: rotate(90deg); }
+
+    /* ── Roster table ────────────────────────────── */
+    .roster-wrap {
+      padding: 0 1.1rem 1.1rem;
+      border-top: 1px solid #1e2d5a;
+    }
+    .roster-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.78rem; margin-top: 0.75rem;
+    }
+    .roster-table th, .roster-table td {
+      padding: 0.4rem 0.6rem; text-align: center;
+      border-bottom: 1px solid #1a2235;
+    }
+    .roster-table th {
+      background: #0f1117; color: #748ffc;
+      font-size: 0.67rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .roster-table td:first-child { text-align: left; color: #e2e8f0; }
+    .roster-table tbody tr:hover td { background: #172035; }
+    .roster-table tbody tr:last-child td { border-bottom: none; }
+    .roster-table .totals-row td {
+      background: #111827; border-top: 2px solid #3b5bdb;
+      border-bottom: none; font-weight: 700; color: #94a3b8;
+      font-size: 0.7rem;
+    }
+
+    .stat-hi { color: #69db7c; font-weight: 700; }
+
+    /* ── No-results state ────────────────────────── */
+    #noResults {
+      display: none; text-align: center; padding: 3rem 0;
+      color: #475569; font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Simulator</a>
+    <a href="teams.html" class="nav-link active">Teams</a>
+    <a href="how-it-works.html" class="nav-link">How This Works</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Teams</div>
+      <div class="page-subtitle">2026 season rosters with full player ratings</div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">&#9906;</span>
+      <input id="teamSearch" type="text" placeholder="Search teams…" oninput="filterTeams()" autocomplete="off">
+    </div>
+  </div>
+
+  <div id="conferenceContainer"></div>
+  <div id="noResults">No teams match your search.</div>
+</div>
+
+<script>
+'use strict';
+
+// ── Team metadata ─────────────────────────────────────────────────────
+const TEAM_INFO = {
+  ATL: { name: 'Atlanta Hawks',           espn: 'atl',  conf: 'East', div: 'Southeast' },
+  BKN: { name: 'Brooklyn Nets',           espn: 'bkn',  conf: 'East', div: 'Atlantic'  },
+  BOS: { name: 'Boston Celtics',          espn: 'bos',  conf: 'East', div: 'Atlantic'  },
+  CHA: { name: 'Charlotte Hornets',       espn: 'cha',  conf: 'East', div: 'Southeast' },
+  CHI: { name: 'Chicago Bulls',           espn: 'chi',  conf: 'East', div: 'Central'   },
+  CLE: { name: 'Cleveland Cavaliers',     espn: 'cle',  conf: 'East', div: 'Central'   },
+  DAL: { name: 'Dallas Mavericks',        espn: 'dal',  conf: 'West', div: 'Southwest' },
+  DEN: { name: 'Denver Nuggets',          espn: 'den',  conf: 'West', div: 'Northwest' },
+  DET: { name: 'Detroit Pistons',         espn: 'det',  conf: 'East', div: 'Central'   },
+  GSW: { name: 'Golden State Warriors',   espn: 'gs',   conf: 'West', div: 'Pacific'   },
+  HOU: { name: 'Houston Rockets',         espn: 'hou',  conf: 'West', div: 'Southwest' },
+  IND: { name: 'Indiana Pacers',          espn: 'ind',  conf: 'East', div: 'Central'   },
+  LAC: { name: 'LA Clippers',             espn: 'lac',  conf: 'West', div: 'Pacific'   },
+  LAL: { name: 'Los Angeles Lakers',      espn: 'lal',  conf: 'West', div: 'Pacific'   },
+  MEM: { name: 'Memphis Grizzlies',       espn: 'mem',  conf: 'West', div: 'Southwest' },
+  MIA: { name: 'Miami Heat',              espn: 'mia',  conf: 'East', div: 'Southeast' },
+  MIL: { name: 'Milwaukee Bucks',         espn: 'mil',  conf: 'East', div: 'Central'   },
+  MIN: { name: 'Minnesota Timberwolves',  espn: 'min',  conf: 'West', div: 'Northwest' },
+  NOP: { name: 'New Orleans Pelicans',    espn: 'no',   conf: 'West', div: 'Southwest' },
+  NYK: { name: 'New York Knicks',         espn: 'ny',   conf: 'East', div: 'Atlantic'  },
+  OKC: { name: 'Oklahoma City Thunder',   espn: 'okc',  conf: 'West', div: 'Northwest' },
+  ORL: { name: 'Orlando Magic',           espn: 'orl',  conf: 'East', div: 'Southeast' },
+  PHI: { name: 'Philadelphia 76ers',      espn: 'phi',  conf: 'East', div: 'Atlantic'  },
+  PHX: { name: 'Phoenix Suns',            espn: 'phx',  conf: 'West', div: 'Pacific'   },
+  POR: { name: 'Portland Trail Blazers',  espn: 'por',  conf: 'West', div: 'Northwest' },
+  SAC: { name: 'Sacramento Kings',        espn: 'sac',  conf: 'West', div: 'Pacific'   },
+  SAS: { name: 'San Antonio Spurs',       espn: 'sa',   conf: 'West', div: 'Southwest' },
+  TOR: { name: 'Toronto Raptors',         espn: 'tor',  conf: 'East', div: 'Atlantic'  },
+  UTA: { name: 'Utah Jazz',               espn: 'utah', conf: 'West', div: 'Northwest' },
+  WAS: { name: 'Washington Wizards',      espn: 'wsh',  conf: 'East', div: 'Southeast' },
+};
+
+function logoUrl(espn) {
+  return `https://a.espncdn.com/i/teamlogos/nba/500/${espn}.png`;
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function ftChance(t_2pt, t_3pt) {
+  return Math.max(1, Math.min(90, Math.round(50 + t_2pt * 0.4 + t_3pt * 1.0)));
+}
+
+function pv(p) { return p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def; }
+
+function posLabel(p) {
+  const v = pv(p);
+  if (v >= 20)  return 'C';
+  if (v >= 10)  return 'PF';
+  if (v >= 0)   return 'SF';
+  if (v >= -10) return 'SG';
+  return 'PG';
+}
+
+// Find the max value per stat across all players in the roster for highlighting
+function statMaxes(players) {
+  const keys = ['t_2pt','t_3pt','t_def','t_reb'];
+  const maxes = {};
+  keys.forEach(k => maxes[k] = Math.max(...players.map(p => p[k])));
+  return maxes;
+}
+
+function buildRosterTable(players) {
+  const sorted = [...players].sort((a, b) => {
+    const ovrA = a.t_2pt + a.t_3pt + a.t_def + a.t_reb;
+    const ovrB = b.t_2pt + b.t_3pt + b.t_def + b.t_reb;
+    return ovrB - ovrA;
+  });
+  const maxes = statMaxes(players);
+
+  const hi = (val, key) => val === maxes[key] ? ' class="stat-hi"' : '';
+
+  const rows = sorted.map(p => {
+    const ovr = p.t_2pt + p.t_3pt + p.t_def + p.t_reb;
+    const ft  = ftChance(p.t_2pt, p.t_3pt);
+    const pos = posLabel(p);
+    return `<tr>
+      <td>${esc(p.name)} <span style="color:#475569;font-size:0.68rem">(${pos})</span></td>
+      <td${hi(p.t_2pt,'t_2pt')}>${p.t_2pt}</td>
+      <td${hi(p.t_3pt,'t_3pt')}>${p.t_3pt}</td>
+      <td${hi(p.t_def,'t_def')}>${p.t_def}</td>
+      <td${hi(p.t_reb,'t_reb')}>${p.t_reb}</td>
+      <td>${ovr}</td>
+      <td>${ft}%</td>
+    </tr>`;
+  }).join('');
+
+  return `<table class="roster-table">
+    <thead><tr>
+      <th>Player</th><th>2PS</th><th>3PS</th><th>DEF</th><th>REB</th><th>OVR</th><th>FT%</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function buildTeamCard(abbr, players) {
+  const info = TEAM_INFO[abbr];
+  const url  = logoUrl(info.espn);
+  return `
+  <details class="team-card" data-name="${info.name.toLowerCase()} ${abbr.toLowerCase()}">
+    <summary class="team-summary">
+      <img class="team-logo" src="${esc(url)}" alt="${esc(info.name)} logo"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="team-logo-placeholder" style="display:none">${esc(abbr)}</div>
+      <div class="team-meta">
+        <div class="team-fullname">${esc(info.name)}</div>
+        <span class="team-abbr-badge">${esc(abbr)}</span>
+      </div>
+      <span class="chevron">&#9658;</span>
+    </summary>
+    <div class="roster-wrap">${buildRosterTable(players)}</div>
+  </details>`;
+}
+
+// ── Render by conference ─────────────────────────────────────────────
+function render(teamsData) {
+  const abbrs = Object.keys(teamsData).sort((a, b) =>
+    TEAM_INFO[a].name.localeCompare(TEAM_INFO[b].name)
+  );
+
+  const east = abbrs.filter(a => TEAM_INFO[a].conf === 'East');
+  const west = abbrs.filter(a => TEAM_INFO[a].conf === 'West');
+
+  function section(label, list) {
+    const cards = list.map(a => buildTeamCard(a, teamsData[a])).join('');
+    return `<div class="conference-block">
+      <div class="conference-label">${label}</div>
+      <div class="team-grid">${cards}</div>
+    </div>`;
+  }
+
+  document.getElementById('conferenceContainer').innerHTML =
+    section('Eastern Conference', east) + section('Western Conference', west);
+}
+
+// ── Search / filter ───────────────────────────────────────────────────
+function filterTeams() {
+  const q = document.getElementById('teamSearch').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('details.team-card');
+  let visible = 0;
+
+  cards.forEach(card => {
+    const match = !q || card.dataset.name.includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+
+  // Hide conference labels that have no visible teams
+  document.querySelectorAll('.conference-block').forEach(block => {
+    const anyVisible = [...block.querySelectorAll('details.team-card')]
+      .some(c => c.style.display !== 'none');
+    block.style.display = anyVisible ? '' : 'none';
+  });
+
+  document.getElementById('noResults').style.display = visible === 0 ? '' : 'none';
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────
+fetch('nba_rosters26_v2.json')
+  .then(r => r.json())
+  .then(data => render(data))
+  .catch(() => {
+    document.getElementById('conferenceContainer').innerHTML =
+      '<p style="color:#f87171;padding:2rem 0">Could not load nba_rosters26_v2.json.</p>';
+  });
+</script>
+</body>
+</html>
