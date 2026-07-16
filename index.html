@@ -171,6 +171,21 @@
     .pos-tag { color: #475569; font-size: 0.68rem; margin-left: 0.3rem; }
     .pm-pos { color: #69db7c; font-weight: 700; }
     .pm-neg { color: #f87171; font-weight: 700; }
+
+    /* ── Game recap ───────────────────────────────── */
+    .summary-body {
+      background: #141929; border: 1px solid #1e2d5a; border-radius: 8px;
+      padding: 1.25rem 1.5rem; color: #cbd5e1; line-height: 1.8; font-size: 0.88rem;
+    }
+    .summary-body p { margin-bottom: 0.75rem; }
+    .summary-body p:last-child { margin-bottom: 0; }
+    .summary-regen {
+      margin-top: 0.6rem; background: none; border: 1px solid #2d3f6e;
+      color: #748ffc; border-radius: 6px; padding: 0.3rem 0.85rem;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .summary-regen:hover { background: #1e2d5a; color: #c5d0fc; }
   </style>
 </head>
 <body>
@@ -212,6 +227,7 @@
 
 // ── Globals ─────────────────────────────────────────────────────────
 let teamsData = {};
+let _lastGame  = null;
 
 // ── Utilities ────────────────────────────────────────────────────────
 function rollD(sides, num = 1) {
@@ -760,6 +776,7 @@ function boxTable(team) {
 }
 
 function renderResults(game) {
+  _lastGame = game;
   const t1w = game.t1.score > game.t2.score;
   const n   = game.t1_q_scores.length;
 
@@ -813,6 +830,12 @@ function renderResults(game) {
     </div>
 
     <section>
+      <h2>Game Recap</h2>
+      <div class="summary-body" id="summaryBody">${generateSummary(game)}</div>
+      <button class="summary-regen" onclick="regenerateSummary()">↻ Regenerate</button>
+    </section>
+
+    <section>
       <h2>Play-by-Play</h2>
       <div class="pbp-list">${pbp}</div>
     </section>
@@ -822,6 +845,190 @@ function renderResults(game) {
       ${[game.t1, game.t2].map(boxTable).join('')}
     </section>`;
 
+}
+
+// ── Game Recap ───────────────────────────────────────────────────────
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// Pulls every fact the summary needs out of the game object.
+// Both the rule-based writer and the future Gemini prompt consume this.
+function extractGameData(game) {
+  const t1w    = game.t1.score > game.t2.score;
+  const winner = t1w ? game.t1 : game.t2;
+  const loser  = t1w ? game.t2 : game.t1;
+  const margin = Math.abs(game.t1.score - game.t2.score);
+  const periods = game.t1_q_scores.length;
+  const ot      = periods > 4;
+  const otCount = periods - 4;
+
+  const winnerQ = t1w ? game.t1_q_scores : game.t2_q_scores;
+  const loserQ  = t1w ? game.t2_q_scores : game.t1_q_scores;
+  const winnerHalf = winnerQ[0] + winnerQ[1];
+  const loserHalf  = loserQ[0]  + loserQ[1];
+
+  function leaders(team) {
+    const played = team.players.filter(p => p.seconds_played > 0);
+    return {
+      scorer:    [...played].sort((a, b) => b.points   - a.points)[0],
+      rebounder: [...played].sort((a, b) => b.rebounds - a.rebounds)[0],
+      playmaker: [...played].sort((a, b) => b.assists  - a.assists)[0],
+    };
+  }
+
+  // Scan play logs for notable events
+  let andOnes = 0, foulOuts = [];
+  Object.values(game.logs).flat().forEach(line => {
+    if (line.includes('And-1'))     andOnes++;
+    if (line.includes('fouled out')) {
+      const m = line.match(/\d+:\d+\s+(.+?)\s+fouled out/);
+      if (m) foulOuts.push(m[1]);
+    }
+  });
+
+  return {
+    winner, loser, margin, ot, otCount,
+    winnerQ, loserQ, winnerHalf, loserHalf,
+    trailingAtHalf: winnerHalf < loserHalf,
+    winnerLeaders: leaders(winner),
+    loserLeaders:  leaders(loser),
+    andOnes, foulOuts,
+  };
+}
+
+function rulebasedSummary(d) {
+  const { winner, loser, margin, ot, otCount,
+          winnerHalf, loserHalf, trailingAtHalf,
+          winnerLeaders, loserLeaders, andOnes, foulOuts } = d;
+
+  // ── Paragraph 1: game narrative ──────────────────────────────────
+  let p1;
+  if (ot) {
+    const otStr = otCount > 1 ? `${otCount} overtimes` : 'overtime';
+    p1 = pick([
+      `The ${winner.abbr} outlasted the ${loser.abbr} in ${otStr}, winning ${winner.score}–${loser.score}.`,
+      `It took ${otStr} to settle it, but the ${winner.abbr} came away with a ${winner.score}–${loser.score} victory over the ${loser.abbr}.`,
+      `In a dramatic ${otStr} finish, the ${winner.abbr} defeated the ${loser.abbr} ${winner.score}–${loser.score}.`,
+    ]);
+  } else if (margin >= 20) {
+    p1 = pick([
+      `The ${winner.abbr} dominated the ${loser.abbr} from wire to wire, winning ${winner.score}–${loser.score}.`,
+      `It was never close — the ${winner.abbr} cruised past the ${loser.abbr} ${winner.score}–${loser.score}.`,
+      `The ${winner.abbr} put together a dominant performance, rolling over the ${loser.abbr} ${winner.score}–${loser.score}.`,
+    ]);
+  } else if (margin <= 4) {
+    p1 = pick([
+      `The ${winner.abbr} escaped with a narrow ${winner.score}–${loser.score} victory over the ${loser.abbr}.`,
+      `In a tight contest, the ${winner.abbr} held on to defeat the ${loser.abbr} ${winner.score}–${loser.score}.`,
+      `The ${winner.abbr} edged the ${loser.abbr} ${winner.score}–${loser.score} in a game that came down to the wire.`,
+    ]);
+  } else {
+    p1 = pick([
+      `The ${winner.abbr} defeated the ${loser.abbr} ${winner.score}–${loser.score}.`,
+      `The ${winner.abbr} topped the ${loser.abbr} by a score of ${winner.score}–${loser.score}.`,
+      `The ${winner.abbr} took down the ${loser.abbr}, ${winner.score}–${loser.score}.`,
+    ]);
+  }
+
+  if (trailingAtHalf && !ot) {
+    p1 += ' ' + pick([
+      `${winner.abbr} trailed ${loserHalf}–${winnerHalf} at halftime before rallying in the second half.`,
+      `Down ${loserHalf}–${winnerHalf} at the break, ${winner.abbr} turned it around after halftime.`,
+      `The victory was a comeback — ${winner.abbr} was behind ${loserHalf}–${winnerHalf} going into the locker room.`,
+    ]);
+  } else if (!trailingAtHalf && winnerHalf !== loserHalf && margin <= 6 && !ot) {
+    p1 += ` ${winner.abbr} led ${winnerHalf}–${loserHalf} at halftime and managed to hold on.`;
+  }
+
+  if (foulOuts.length > 0)
+    p1 += ` ${foulOuts[0]} fouled out during the game.`;
+
+  // ── Paragraph 2: performances ────────────────────────────────────
+  const ws = winnerLeaders.scorer;
+  const ls = loserLeaders.scorer;
+  const wr = winnerLeaders.rebounder;
+  const wa = winnerLeaders.playmaker;
+
+  let p2 = pick([
+    `${ws.name} led ${winner.abbr} with ${ws.points} points`,
+    `${ws.name} paced ${winner.abbr} with a game-high ${ws.points} points`,
+    `${ws.name} topped all scorers with ${ws.points} points`,
+  ]);
+
+  if (ws.rebounds >= 10 && ws.assists >= 8) {
+    p2 += `, recording ${ws.rebounds} rebounds and ${ws.assists} assists to go with it.`;
+  } else if (ws.rebounds >= 10) {
+    p2 += `, adding ${ws.rebounds} rebounds.`;
+  } else if (ws.assists >= 7) {
+    p2 += `, dishing out ${ws.assists} assists.`;
+  } else {
+    p2 += '.';
+  }
+
+  p2 += ' ' + pick([
+    `For ${loser.abbr},`,
+    `On the other side,`,
+    `${loser.abbr} was paced by`,
+  ]);
+  if (!p2.endsWith('by')) p2 += ` ${ls.name}`;
+  else                    p2 += ` ${ls.name}`;
+  p2 += ' ' + pick(['finished with', 'contributed', 'scored']) + ` ${ls.points} points`;
+  const lsExtras = [];
+  if (ls.rebounds >= 9) lsExtras.push(`${ls.rebounds} rebounds`);
+  if (ls.assists  >= 6) lsExtras.push(`${ls.assists} assists`);
+  p2 += lsExtras.length ? ` and ${lsExtras.join(' and ')}` : '';
+  p2 += ' in a losing effort.';
+
+  if (wr !== ws && wr.rebounds >= 11)
+    p2 += ` ${wr.name} was a force on the glass, pulling down ${wr.rebounds} rebounds.`;
+  else if (wa !== ws && wa.assists >= 9)
+    p2 += ` ${wa.name} ran the offense with ${wa.assists} assists.`;
+
+  if (andOnes >= 3)
+    p2 += ` The game featured ${andOnes} and-one opportunities.`;
+
+  return `<p>${p1}</p><p>${p2}</p>`;
+}
+
+// ── Future Gemini integration ─────────────────────────────────────────
+// Set GEMINI_API_KEY and flip generateSummary to call geminiSummary(d).
+//
+// const GEMINI_API_KEY = 'YOUR_KEY_HERE';
+//
+// async function geminiSummary(d) {
+//   const prompt = [
+//     `Write a 2-paragraph NBA game recap (no headers, plain prose).`,
+//     `Final: ${d.winner.abbr} ${d.winner.score}–${d.loser.abbr} ${d.loser.score}`,
+//     `Halftime: ${d.winner.abbr} ${d.winnerHalf}–${d.loser.abbr} ${d.loserHalf}`,
+//     `${d.winner.abbr} leaders: ${d.winnerLeaders.scorer.name} ${d.winnerLeaders.scorer.points}pts, ` +
+//       `${d.winnerLeaders.rebounder.name} ${d.winnerLeaders.rebounder.rebounds}reb, ` +
+//       `${d.winnerLeaders.playmaker.name} ${d.winnerLeaders.playmaker.assists}ast`,
+//     `${d.loser.abbr} leaders: ${d.loserLeaders.scorer.name} ${d.loserLeaders.scorer.points}pts, ` +
+//       `${d.loserLeaders.rebounder.name} ${d.loserLeaders.rebounder.rebounds}reb, ` +
+//       `${d.loserLeaders.playmaker.name} ${d.loserLeaders.playmaker.assists}ast`,
+//     d.ot ? `Overtime periods: ${d.otCount}` : '',
+//     d.foulOuts.length ? `Fouled out: ${d.foulOuts.join(', ')}` : '',
+//     d.andOnes >= 2 ? `And-one plays: ${d.andOnes}` : '',
+//   ].filter(Boolean).join('\n');
+//
+//   const res = await fetch(
+//     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+//     { method: 'POST', headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
+//   );
+//   const json = await res.json();
+//   return json.candidates[0].content.parts[0].text
+//     .split('\n').filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
+// }
+
+function generateSummary(game) {
+  return rulebasedSummary(extractGameData(game));
+  // Swap the line above for: return geminiSummary(extractGameData(game));
+}
+
+function regenerateSummary() {
+  if (!_lastGame) return;
+  document.getElementById('summaryBody').innerHTML = generateSummary(_lastGame);
 }
 
 // ── UI ───────────────────────────────────────────────────────────────
