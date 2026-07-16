@@ -71,6 +71,12 @@
     .btn:hover  { background: #4c6ef5; }
     .btn:active { background: #2f4ac0; }
     .btn:disabled { background: #2d3a5c; cursor: default; }
+    .btn-secondary {
+      background: none; color: #748ffc; border: 1px solid #2d3f6e; border-radius: 6px;
+      padding: 0.55rem 1rem; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .btn-secondary:hover { background: #1e2d5a; color: #c5d0fc; }
 
     .error {
       color: #fca5a5; background: #2d1616; border: 1px solid #7f1d1d;
@@ -215,6 +221,7 @@
         <label for="t2">Home Team</label>
         <select id="t2"></select>
       </div>
+      <button class="btn-secondary" onclick="randomize()">🎲 Random</button>
       <button class="btn" id="simBtn" onclick="runSim()">Simulate</button>
     </div>
     <div id="errorMsg" class="error" style="display:none"></div>
@@ -1075,6 +1082,16 @@ function showError(msg) {
   const el = document.getElementById('errorMsg');
   el.textContent = msg;
   el.style.display = msg ? '' : 'none';
+}
+
+function randomize() {
+  const abbrs = Object.keys(teamsData);
+  if (abbrs.length < 2) return;
+  const i = Math.floor(Math.random() * abbrs.length);
+  let j;
+  do { j = Math.floor(Math.random() * abbrs.length); } while (j === i);
+  document.getElementById('t1').value = abbrs[i];
+  document.getElementById('t2').value = abbrs[j];
 }
 
 function runSim() {
