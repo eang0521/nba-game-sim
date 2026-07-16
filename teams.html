@@ -241,13 +241,13 @@ function ftChance(t_2pt, t_3pt) {
 
 function pv(p) { return p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def; }
 
-function posLabel(p) {
-  const v = pv(p);
-  if (v >= 20)  return 'C';
-  if (v >= 10)  return 'PF';
-  if (v >= 0)   return 'SF';
-  if (v >= -10) return 'SG';
-  return 'PG';
+// Sort the roster by PV and divide into 5 equal bands → PG/SG/SF/PF/C
+function assignPositions(players) {
+  const labels = ['PG', 'SG', 'SF', 'PF', 'C'];
+  const sorted = [...players].sort((a, b) => pv(a) - pv(b));
+  const posMap = new Map();
+  sorted.forEach((p, i) => posMap.set(p, labels[Math.floor(i * 5 / sorted.length)]));
+  return posMap;
 }
 
 // Find the max value per stat across all players in the roster for highlighting
@@ -264,14 +264,15 @@ function buildRosterTable(players) {
     const ovrB = b.t_2pt + b.t_3pt + b.t_def + b.t_reb;
     return ovrB - ovrA;
   });
-  const maxes = statMaxes(players);
+  const maxes  = statMaxes(players);
+  const posMap = assignPositions(players);
 
   const hi = (val, key) => val === maxes[key] ? ' class="stat-hi"' : '';
 
   const rows = sorted.map(p => {
     const ovr = p.t_2pt + p.t_3pt + p.t_def + p.t_reb;
     const ft  = ftChance(p.t_2pt, p.t_3pt);
-    const pos = posLabel(p);
+    const pos = posMap.get(p);
     return `<tr>
       <td>${esc(p.name)} <span style="color:#475569;font-size:0.68rem">(${pos})</span></td>
       <td${hi(p.t_2pt,'t_2pt')}>${p.t_2pt}</td>
