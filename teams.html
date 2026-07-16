@@ -115,6 +115,19 @@
       background: #1e2d5a; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
+    .team-rating {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 0.2rem; flex-shrink: 0; margin-right: 0.25rem;
+    }
+    .rating-val {
+      font-size: 1.15rem; font-weight: 900; color: #fff; line-height: 1;
+    }
+    .rank-badge {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      color: #748ffc; background: #1e2d5a;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+    }
+
     .chevron {
       color: #748ffc; font-size: 0.75rem; flex-shrink: 0;
       transition: transform 0.15s;
@@ -241,6 +254,21 @@ function ftChance(t_2pt, t_3pt) {
 
 function pv(p) { return p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def; }
 
+// Weighted average OVR: best player gets weight N, 2nd gets N-1, … last gets 1
+function teamRating(players) {
+  const sorted = [...players].sort((a, b) =>
+    (b.t_2pt + b.t_3pt + b.t_def + b.t_reb) - (a.t_2pt + a.t_3pt + a.t_def + a.t_reb)
+  );
+  const n = sorted.length;
+  let weightedSum = 0, totalWeight = 0;
+  sorted.forEach((p, i) => {
+    const w = n - i;
+    weightedSum += (p.t_2pt + p.t_3pt + p.t_def + p.t_reb) * w;
+    totalWeight += w;
+  });
+  return weightedSum / totalWeight;
+}
+
 // Sort the roster by PV and divide into 5 equal bands → PG/SG/SF/PF/C
 function assignPositions(players) {
   const labels = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -292,7 +320,7 @@ function buildRosterTable(players) {
   </table>`;
 }
 
-function buildTeamCard(abbr, players) {
+function buildTeamCard(abbr, players, rating, rank) {
   const info = TEAM_INFO[abbr];
   const url  = logoUrl(info.espn);
   return `
@@ -305,6 +333,10 @@ function buildTeamCard(abbr, players) {
         <div class="team-fullname">${esc(info.name)}</div>
         <span class="team-abbr-badge">${esc(abbr)}</span>
       </div>
+      <div class="team-rating">
+        <span class="rating-val">${rating.toFixed(1)}</span>
+        <span class="rank-badge">#${rank} overall</span>
+      </div>
       <span class="chevron">&#9658;</span>
     </summary>
     <div class="roster-wrap">${buildRosterTable(players)}</div>
@@ -313,6 +345,15 @@ function buildTeamCard(abbr, players) {
 
 // ── Render by conference ─────────────────────────────────────────────
 function render(teamsData) {
+  // Compute weighted ratings and league-wide ranks
+  const ratings = {};
+  for (const [abbr, players] of Object.entries(teamsData))
+    ratings[abbr] = teamRating(players);
+
+  const ranked = Object.keys(ratings).sort((a, b) => ratings[b] - ratings[a]);
+  const ranks = {};
+  ranked.forEach((abbr, i) => ranks[abbr] = i + 1);
+
   const abbrs = Object.keys(teamsData).sort((a, b) =>
     TEAM_INFO[a].name.localeCompare(TEAM_INFO[b].name)
   );
@@ -321,7 +362,7 @@ function render(teamsData) {
   const west = abbrs.filter(a => TEAM_INFO[a].conf === 'West');
 
   function section(label, list) {
-    const cards = list.map(a => buildTeamCard(a, teamsData[a])).join('');
+    const cards = list.map(a => buildTeamCard(a, teamsData[a], ratings[a], ranks[a])).join('');
     return `<div class="conference-block">
       <div class="conference-label">${label}</div>
       <div class="team-grid">${cards}</div>
