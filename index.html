@@ -178,20 +178,22 @@
     .pm-pos { color: #69db7c; font-weight: 700; }
     .pm-neg { color: #f87171; font-weight: 700; }
 
-    /* ── Game recap ───────────────────────────────── */
-    .summary-body {
+    /* ── Game leaders ─────────────────────────────── */
+    .leaders-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem;
       background: #141929; border: 1px solid #1e2d5a; border-radius: 8px;
-      padding: 1.25rem 1.5rem; color: #cbd5e1; line-height: 1.8; font-size: 0.88rem;
+      overflow: hidden;
     }
-    .summary-body p { margin-bottom: 0.75rem; }
-    .summary-body p:last-child { margin-bottom: 0; }
-    .summary-regen {
-      margin-top: 0.6rem; background: none; border: 1px solid #2d3f6e;
-      color: #748ffc; border-radius: 6px; padding: 0.3rem 0.85rem;
-      font-size: 0.75rem; font-weight: 600; cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+    .leaders-table th {
+      background: #1e2d5a; color: #748ffc; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.55rem 1rem; text-align: left;
     }
-    .summary-regen:hover { background: #1e2d5a; color: #c5d0fc; }
+    .leaders-table th:not(:first-child) { text-align: center; }
+    .leaders-table td { padding: 0.6rem 1rem; color: #cbd5e1; border-top: 1px solid #1e2d5a; }
+    .leaders-table td:not(:first-child) { text-align: center; font-weight: 700; color: #e2e8f0; }
+    .leaders-table .team-row td:first-child { color: #748ffc; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .leaders-table .stat-leader { color: #c5d0fc; }
   </style>
 </head>
 <body>
@@ -234,7 +236,6 @@
 
 // ── Globals ─────────────────────────────────────────────────────────
 let teamsData = {};
-let _lastGame  = null;
 
 // ── Utilities ────────────────────────────────────────────────────────
 function rollD(sides, num = 1) {
@@ -783,7 +784,6 @@ function boxTable(team) {
 }
 
 function renderResults(game) {
-  _lastGame = game;
   const t1w = game.t1.score > game.t2.score;
   const n   = game.t1_q_scores.length;
 
@@ -837,9 +837,8 @@ function renderResults(game) {
     </div>
 
     <section>
-      <h2>Game Recap</h2>
-      <div class="summary-body" id="summaryBody">${generateSummary(game)}</div>
-      <button class="summary-regen" onclick="regenerateSummary()">↻ Regenerate</button>
+      <h2>Game Leaders</h2>
+      ${gameLeaders(game)}
     </section>
 
     <section>
@@ -854,35 +853,9 @@ function renderResults(game) {
 
 }
 
-// ── Game Recap ───────────────────────────────────────────────────────
+// ── Game Leaders ──────────────────────────────────────────────────────
 
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-const TEAM_NICKNAMES = {
-  ATL:'Hawks',    BKN:'Nets',         BOS:'Celtics',      CHA:'Hornets',
-  CHI:'Bulls',    CLE:'Cavaliers',    DAL:'Mavericks',    DEN:'Nuggets',
-  DET:'Pistons',  GSW:'Warriors',     HOU:'Rockets',      IND:'Pacers',
-  LAC:'Clippers', LAL:'Lakers',       MEM:'Grizzlies',    MIA:'Heat',
-  MIL:'Bucks',    MIN:'Timberwolves', NOP:'Pelicans',     NYK:'Knicks',
-  OKC:'Thunder',  ORL:'Magic',        PHI:'76ers',        PHX:'Suns',
-  POR:'Trail Blazers', SAC:'Kings',   SAS:'Spurs',        TOR:'Raptors',
-  UTA:'Jazz',     WAS:'Wizards',
-};
-
-function extractGameData(game) {
-  const t1w    = game.t1.score > game.t2.score;
-  const winner = t1w ? game.t1 : game.t2;
-  const loser  = t1w ? game.t2 : game.t1;
-  const margin = Math.abs(game.t1.score - game.t2.score);
-  const periods = game.t1_q_scores.length;
-  const ot      = periods > 4;
-  const otCount = periods - 4;
-
-  const winnerQ = t1w ? game.t1_q_scores : game.t2_q_scores;
-  const loserQ  = t1w ? game.t2_q_scores : game.t1_q_scores;
-  const winnerHalf = winnerQ[0] + winnerQ[1];
-  const loserHalf  = loserQ[0]  + loserQ[1];
-
+function gameLeaders(game) {
   function leaders(team) {
     const played = team.players.filter(p => p.seconds_played > 0);
     return {
@@ -892,189 +865,35 @@ function extractGameData(game) {
     };
   }
 
-  // Scan all logs for foul-outs
-  let foulOuts = [];
-  Object.values(game.logs).flat().forEach(line => {
-    if (line.includes('fouled out')) {
-      const m = line.match(/\d+:\d+\s+(.+?)\s+fouled out/);
-      if (m) foulOuts.push(m[1]);
-    }
-  });
+  const l1 = leaders(game.t1), l2 = leaders(game.t2);
 
-  // Clutch makes in Q4/OT last 2 minutes with margin ≤ 7
-  const lastPeriod = Math.max(...Object.keys(game.logs).map(Number));
-  const winnerNames = new Set(winner.players.map(p => p.name));
-  const lateHeroics = [];
-  (game.logs[lastPeriod] || []).forEach(line => {
-    if (!line.includes('makes')) return;
-    const timeM = line.match(/^(\d+):(\d+)/);
-    if (!timeM) return;
-    const secs = parseInt(timeM[1]) * 60 + parseInt(timeM[2]);
-    if (secs > 120) return;
-    const scoreM = line.match(/\[(?:[A-Z]+) (\d+) – (?:[A-Z]+) (\d+)\]/);
-    if (!scoreM) return;
-    if (Math.abs(parseInt(scoreM[1]) - parseInt(scoreM[2])) > 7) return;
-    const makeM = line.match(/^\d+:\d+\s+(.+?)\s+makes\s+(\d+)/);
-    if (!makeM) return;
-    if (!winnerNames.has(makeM[1])) return;
-    lateHeroics.push({ player: makeM[1], pts: parseInt(makeM[2]), secs });
-  });
+  const row = (label, p1, p2, stat) => `
+    <tr>
+      <td>${esc(label)}</td>
+      <td class="stat-leader">${esc(p1.name)}</td>
+      <td>${p1[stat]}</td>
+      <td class="stat-leader">${esc(p2.name)}</td>
+      <td>${p2[stat]}</td>
+    </tr>`;
 
-  return {
-    winner, loser, margin, ot, otCount,
-    winnerNick: TEAM_NICKNAMES[winner.abbr] || winner.abbr,
-    loserNick:  TEAM_NICKNAMES[loser.abbr]  || loser.abbr,
-    winnerQ, loserQ, winnerHalf, loserHalf,
-    trailingAtHalf: winnerHalf < loserHalf,
-    winnerLeaders: leaders(winner),
-    loserLeaders:  leaders(loser),
-    foulOuts, lateHeroics,
-  };
-}
-
-function rulebasedSummary(d) {
-  const { winner, loser, margin, ot, otCount,
-          winnerNick: wn, loserNick: ln,
-          winnerHalf, loserHalf, trailingAtHalf,
-          winnerLeaders, loserLeaders, foulOuts, lateHeroics } = d;
-
-  // ── Paragraph 1: game narrative ──────────────────────────────────
-  let p1;
-  if (ot) {
-    const otStr = otCount > 1 ? `${otCount} overtimes` : 'overtime';
-    p1 = pick([
-      `The ${wn} outlasted the ${ln} in ${otStr}, winning ${winner.score}–${loser.score}.`,
-      `It took ${otStr} to settle it, but the ${wn} came away with a ${winner.score}–${loser.score} victory over the ${ln}.`,
-      `In a dramatic ${otStr} finish, the ${wn} defeated the ${ln} ${winner.score}–${loser.score}.`,
-      `The ${wn} and ${ln} needed ${otStr} to determine a winner, with the ${wn} coming out on top ${winner.score}–${loser.score}.`,
-    ]);
-  } else if (margin >= 20) {
-    p1 = pick([
-      `The ${wn} dominated the ${ln} from wire to wire, winning ${winner.score}–${loser.score}.`,
-      `It was never close — the ${wn} cruised past the ${ln} ${winner.score}–${loser.score}.`,
-      `The ${wn} put together a dominant performance, rolling over the ${ln} ${winner.score}–${loser.score}.`,
-      `The ${ln} had no answers for the ${wn}, who pulled away for a ${winner.score}–${loser.score} victory.`,
-      `In a lopsided affair, the ${wn} handled the ${ln} with ease, winning ${winner.score}–${loser.score}.`,
-    ]);
-  } else if (margin <= 4) {
-    p1 = pick([
-      `The ${wn} escaped with a narrow ${winner.score}–${loser.score} victory over the ${ln}.`,
-      `In a tight contest, the ${wn} held on to defeat the ${ln} ${winner.score}–${loser.score}.`,
-      `The ${wn} edged the ${ln} ${winner.score}–${loser.score} in a game that came down to the wire.`,
-      `It wasn't easy, but the ${wn} found a way past the ${ln}, winning ${winner.score}–${loser.score}.`,
-      `The ${wn} survived a late push from the ${ln} to take it ${winner.score}–${loser.score}.`,
-    ]);
-  } else {
-    p1 = pick([
-      `The ${wn} defeated the ${ln} ${winner.score}–${loser.score}.`,
-      `The ${wn} topped the ${ln} by a score of ${winner.score}–${loser.score}.`,
-      `The ${wn} took down the ${ln}, ${winner.score}–${loser.score}.`,
-      `The ${wn} moved into the win column with a ${winner.score}–${loser.score} decision over the ${ln}.`,
-      `In a solid effort, the ${wn} beat the ${ln} ${winner.score}–${loser.score}.`,
-    ]);
-  }
-
-  if (trailingAtHalf && !ot) {
-    p1 += ' ' + pick([
-      `The ${wn} trailed ${loserHalf}–${winnerHalf} at halftime before rallying in the second half.`,
-      `Down ${loserHalf}–${winnerHalf} at the break, the ${wn} turned it around after halftime.`,
-      `The victory was a comeback — the ${wn} were down ${loserHalf}–${winnerHalf} going into the locker room.`,
-      `After falling behind ${loserHalf}–${winnerHalf} at the half, the ${wn} outscored the ${ln} in the second half to take it.`,
-    ]);
-  } else if (!trailingAtHalf && winnerHalf !== loserHalf && margin <= 6 && !ot) {
-    p1 += ' ' + pick([
-      `The ${wn} led ${winnerHalf}–${loserHalf} at halftime and managed to hold on.`,
-      `A ${winnerHalf}–${loserHalf} halftime edge was just enough for the ${wn} to see it through.`,
-      `The ${wn} built a ${winnerHalf}–${loserHalf} halftime lead and protected it down the stretch.`,
-    ]);
-  }
-
-  // Late heroics in close games
-  if (lateHeroics.length > 0 && margin <= 6) {
-    const hero = lateHeroics[lateHeroics.length - 1];
-    const timeStr = hero.secs <= 10  ? `with ${hero.secs} seconds remaining`
-                  : hero.secs <= 30  ? `with under 30 seconds to go`
-                  : hero.secs <= 60  ? `with under a minute left`
-                  :                    `with about a minute to play`;
-    const shotStr = hero.pts === 3 ? 'three-pointer' : 'bucket';
-    p1 += ' ' + pick([
-      `${hero.player} hit a clutch ${shotStr} ${timeStr} to help seal it.`,
-      `A late ${shotStr} from ${hero.player} ${timeStr} proved to be the difference.`,
-      `${hero.player} came up huge ${timeStr}, draining a ${shotStr} to ice the game.`,
-    ]);
-  }
-
-  if (foulOuts.length > 0)
-    p1 += ` ${foulOuts[0]} fouled out in the process.`;
-
-  // ── Paragraph 2: performances ────────────────────────────────────
-  const ws = winnerLeaders.scorer;
-  const ls = loserLeaders.scorer;
-  const wr = winnerLeaders.rebounder;
-  const wa = winnerLeaders.playmaker;
-
-  let p2 = pick([
-    `${ws.name} led the ${wn} with ${ws.points} points`,
-    `${ws.name} paced the ${wn} with a game-high ${ws.points} points`,
-    `${ws.name} topped all scorers with ${ws.points} points for the ${wn}`,
-    `The ${wn} were fueled by ${ws.name}, who finished with ${ws.points} points`,
-    `${ws.name} was the standout performer for the ${wn}, dropping ${ws.points} points`,
-  ]);
-
-  if (ws.rebounds >= 10 && ws.assists >= 8) {
-    p2 += pick([
-      `, along with ${ws.rebounds} rebounds and ${ws.assists} assists.`,
-      `, adding ${ws.rebounds} rebounds and ${ws.assists} assists in a complete performance.`,
-    ]);
-  } else if (ws.rebounds >= 10) {
-    p2 += pick([
-      ` and ${ws.rebounds} rebounds.`,
-      `, pulling down ${ws.rebounds} boards to go with it.`,
-    ]);
-  } else if (ws.assists >= 7) {
-    p2 += pick([
-      ` and ${ws.assists} assists.`,
-      `, dishing out ${ws.assists} assists as well.`,
-    ]);
-  } else {
-    p2 += '.';
-  }
-
-  if (wr !== ws && wr.rebounds >= 11) {
-    p2 += ' ' + pick([
-      `${wr.name} was a force on the glass, pulling down ${wr.rebounds} rebounds.`,
-      `${wr.name} controlled the boards with ${wr.rebounds} rebounds.`,
-      `${wr.name} had a big game on the glass, finishing with ${wr.rebounds} rebounds.`,
-    ]);
-  } else if (wa !== ws && wa.assists >= 9) {
-    p2 += ' ' + pick([
-      `${wa.name} ran the offense effectively, dishing out ${wa.assists} assists.`,
-      `${wa.name} orchestrated the attack with ${wa.assists} assists.`,
-    ]);
-  }
-
-  const lossIntro = pick([
-    `For the ${ln}, ${ls.name}`,
-    `On the other side, ${ls.name}`,
-    `${ls.name} led the ${ln}`,
-  ]);
-  const lossVerb = pick(['finished with', 'contributed', 'scored', 'put up']);
-  const lsExtras = [];
-  if (ls.rebounds >= 9) lsExtras.push(`${ls.rebounds} rebounds`);
-  if (ls.assists  >= 6) lsExtras.push(`${ls.assists} assists`);
-  const lsExtra = lsExtras.length ? ` and ${lsExtras.join(' and ')}` : '';
-  p2 += ` ${lossIntro} ${lossVerb} ${ls.points} points${lsExtra} in a losing effort.`;
-
-  return `<p>${p1}</p><p>${p2}</p>`;
-}
-
-function generateSummary(game) {
-  return rulebasedSummary(extractGameData(game));
-}
-
-function regenerateSummary() {
-  if (!_lastGame) return;
-  document.getElementById('summaryBody').innerHTML = generateSummary(_lastGame);
+  return `
+    <table class="leaders-table">
+      <thead><tr>
+        <th></th>
+        <th colspan="2">${esc(game.t1.abbr)}</th>
+        <th colspan="2">${esc(game.t2.abbr)}</th>
+      </tr>
+      <tr>
+        <th>Category</th>
+        <th>Player</th><th>Total</th>
+        <th>Player</th><th>Total</th>
+      </tr></thead>
+      <tbody>
+        ${row('Points',   l1.scorer,    l2.scorer,    'points')}
+        ${row('Rebounds', l1.rebounder, l2.rebounder, 'rebounds')}
+        ${row('Assists',  l1.playmaker, l2.playmaker, 'assists')}
+      </tbody>
+    </table>`;
 }
 
 // ── UI ───────────────────────────────────────────────────────────────
