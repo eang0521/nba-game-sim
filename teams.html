@@ -308,13 +308,12 @@ function buildRosterTable(players) {
       <td${hi(p.t_def,'t_def')}>${p.t_def}</td>
       <td${hi(p.t_reb,'t_reb')}>${p.t_reb}</td>
       <td>${ovr}</td>
-      <td>${ft}%</td>
     </tr>`;
   }).join('');
 
   return `<table class="roster-table">
     <thead><tr>
-      <th>Player</th><th>2PS</th><th>3PS</th><th>DEF</th><th>REB</th><th>OVR</th><th>FT%</th>
+      <th>Player</th><th>2PS</th><th>3PS</th><th>DEF</th><th>REB</th><th>OVR</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
