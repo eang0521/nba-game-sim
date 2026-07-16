@@ -186,6 +186,16 @@
       transition: background 0.15s, color 0.15s;
     }
     .summary-regen:hover { background: #1e2d5a; color: #c5d0fc; }
+    .recap-loading { color: #748ffc; font-style: italic; font-size: 0.85rem; }
+    .recap-error   { color: #f87171; font-size: 0.85rem; }
+    .api-key-btn {
+      background: none; border: 1px solid #2d3f6e; color: #94a3b8;
+      border-radius: 6px; padding: 0.25rem 0.7rem; font-size: 0.72rem;
+      cursor: pointer; margin-left: 0.5rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .api-key-btn:hover { background: #1e2d5a; color: #c5d0fc; }
+    .api-key-set { border-color: #22c55e; color: #86efac; }
   </style>
 </head>
 <body>
@@ -775,7 +785,7 @@ function boxTable(team) {
   </div>`;
 }
 
-function renderResults(game) {
+async function renderResults(game) {
   _lastGame = game;
   const t1w = game.t1.score > game.t2.score;
   const n   = game.t1_q_scores.length;
@@ -830,8 +840,10 @@ function renderResults(game) {
     </div>
 
     <section>
-      <h2>Game Recap</h2>
-      <div class="summary-body" id="summaryBody">${generateSummary(game)}</div>
+      <h2>Game Recap
+        <button class="api-key-btn" id="apiKeyBtn" onclick="promptApiKey()" title="Set Gemini API key"></button>
+      </h2>
+      <div class="summary-body" id="summaryBody"><em class="recap-loading">Generating recap…</em></div>
       <button class="summary-regen" onclick="regenerateSummary()">↻ Regenerate</button>
     </section>
 
@@ -845,6 +857,15 @@ function renderResults(game) {
       ${[game.t1, game.t2].map(boxTable).join('')}
     </section>`;
 
+  // Populate the recap asynchronously (Gemini or rule-based fallback)
+  updateApiKeyBtn();
+  generateSummary(game).then(html => {
+    const el = document.getElementById('summaryBody');
+    if (el) el.innerHTML = html;
+  }).catch(e => {
+    const el = document.getElementById('summaryBody');
+    if (el) el.innerHTML = `<span class="recap-error">Recap unavailable: ${esc(e.message)}</span>`;
+  });
 }
 
 // ── Game Recap ───────────────────────────────────────────────────────
@@ -990,45 +1011,78 @@ function rulebasedSummary(d) {
   return `<p>${p1}</p><p>${p2}</p>`;
 }
 
-// ── Future Gemini integration ─────────────────────────────────────────
-// Set GEMINI_API_KEY and flip generateSummary to call geminiSummary(d).
-//
-// const GEMINI_API_KEY = 'YOUR_KEY_HERE';
-//
-// async function geminiSummary(d) {
-//   const prompt = [
-//     `Write a 2-paragraph NBA game recap (no headers, plain prose).`,
-//     `Final: ${d.winner.abbr} ${d.winner.score}–${d.loser.abbr} ${d.loser.score}`,
-//     `Halftime: ${d.winner.abbr} ${d.winnerHalf}–${d.loser.abbr} ${d.loserHalf}`,
-//     `${d.winner.abbr} leaders: ${d.winnerLeaders.scorer.name} ${d.winnerLeaders.scorer.points}pts, ` +
-//       `${d.winnerLeaders.rebounder.name} ${d.winnerLeaders.rebounder.rebounds}reb, ` +
-//       `${d.winnerLeaders.playmaker.name} ${d.winnerLeaders.playmaker.assists}ast`,
-//     `${d.loser.abbr} leaders: ${d.loserLeaders.scorer.name} ${d.loserLeaders.scorer.points}pts, ` +
-//       `${d.loserLeaders.rebounder.name} ${d.loserLeaders.rebounder.rebounds}reb, ` +
-//       `${d.loserLeaders.playmaker.name} ${d.loserLeaders.playmaker.assists}ast`,
-//     d.ot ? `Overtime periods: ${d.otCount}` : '',
-//     d.foulOuts.length ? `Fouled out: ${d.foulOuts.join(', ')}` : '',
-//     d.andOnes >= 2 ? `And-one plays: ${d.andOnes}` : '',
-//   ].filter(Boolean).join('\n');
-//
-//   const res = await fetch(
-//     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-//     { method: 'POST', headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
-//   );
-//   const json = await res.json();
-//   return json.candidates[0].content.parts[0].text
-//     .split('\n').filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
-// }
+// ── Gemini API key management ─────────────────────────────────────────
+function getApiKey() { return localStorage.getItem('gemini_api_key') || ''; }
 
-function generateSummary(game) {
-  return rulebasedSummary(extractGameData(game));
-  // Swap the line above for: return geminiSummary(extractGameData(game));
+function promptApiKey() {
+  const current = getApiKey();
+  const val = prompt('Enter your Gemini API key (stored locally in your browser only):', current);
+  if (val === null) return;
+  if (val.trim()) {
+    localStorage.setItem('gemini_api_key', val.trim());
+  } else {
+    localStorage.removeItem('gemini_api_key');
+  }
+  updateApiKeyBtn();
 }
 
-function regenerateSummary() {
+function updateApiKeyBtn() {
+  const btn = document.getElementById('apiKeyBtn');
+  if (!btn) return;
+  const hasKey = !!getApiKey();
+  btn.textContent = hasKey ? '⚙ API Key ✓' : '⚙ Set API Key';
+  btn.classList.toggle('api-key-set', hasKey);
+}
+
+// ── Gemini summary ────────────────────────────────────────────────────
+async function geminiSummary(d) {
+  const key = getApiKey();
+  if (!key) throw new Error('No API key');
+
+  const prompt = [
+    'Write a 2-paragraph NBA game recap in plain prose (no headers, no markdown). Be specific and use basketball terminology.',
+    `Final score: ${d.winner.abbr} ${d.winner.score}, ${d.loser.abbr} ${d.loser.score}`,
+    `Halftime: ${d.winner.abbr} ${d.winnerHalf}, ${d.loser.abbr} ${d.loserHalf}`,
+    `${d.winner.abbr} leaders — ${d.winnerLeaders.scorer.name}: ${d.winnerLeaders.scorer.points} pts / ${d.winnerLeaders.scorer.rebounds} reb / ${d.winnerLeaders.scorer.assists} ast; ` +
+      `top rebounder: ${d.winnerLeaders.rebounder.name} ${d.winnerLeaders.rebounder.rebounds} reb; ` +
+      `top playmaker: ${d.winnerLeaders.playmaker.name} ${d.winnerLeaders.playmaker.assists} ast`,
+    `${d.loser.abbr} leaders — ${d.loserLeaders.scorer.name}: ${d.loserLeaders.scorer.points} pts / ${d.loserLeaders.scorer.rebounds} reb / ${d.loserLeaders.scorer.assists} ast`,
+    d.ot ? `The game went to ${d.otCount > 1 ? d.otCount + ' overtime periods' : 'overtime'}.` : '',
+    d.trailingAtHalf && !d.ot ? `${d.winner.abbr} trailed at halftime and came back to win.` : '',
+    d.foulOuts.length ? `Fouled out: ${d.foulOuts.join(', ')}.` : '',
+    d.andOnes >= 2 ? `There were ${d.andOnes} and-one plays.` : '',
+  ].filter(Boolean).join('\n');
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err.error && err.error.message) || `HTTP ${res.status}`);
+  }
+  const json = await res.json();
+  const text = json.candidates[0].content.parts[0].text;
+  return text.split(/\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
+}
+
+async function generateSummary(game) {
+  const d = extractGameData(game);
+  if (getApiKey()) {
+    try { return await geminiSummary(d); }
+    catch (e) {
+      console.warn('Gemini failed, falling back to rule-based recap:', e.message);
+    }
+  }
+  return rulebasedSummary(d);
+}
+
+async function regenerateSummary() {
   if (!_lastGame) return;
-  document.getElementById('summaryBody').innerHTML = generateSummary(_lastGame);
+  const el = document.getElementById('summaryBody');
+  el.innerHTML = '<em class="recap-loading">Generating recap…</em>';
+  el.innerHTML = await generateSummary(_lastGame);
 }
 
 // ── UI ───────────────────────────────────────────────────────────────
