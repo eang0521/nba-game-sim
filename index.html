@@ -896,6 +896,7 @@ function extractGameData(game) {
 
   // Clutch makes in Q4/OT last 2 minutes with margin ≤ 7
   const lastPeriod = Math.max(...Object.keys(game.logs).map(Number));
+  const winnerNames = new Set(winner.players.map(p => p.name));
   const lateHeroics = [];
   (game.logs[lastPeriod] || []).forEach(line => {
     if (!line.includes('makes')) return;
@@ -908,6 +909,7 @@ function extractGameData(game) {
     if (Math.abs(parseInt(scoreM[1]) - parseInt(scoreM[2])) > 7) return;
     const makeM = line.match(/^\d+:\d+\s+(.+?)\s+makes\s+(\d+)/);
     if (!makeM) return;
+    if (!winnerNames.has(makeM[1])) return;
     lateHeroics.push({ player: makeM[1], pts: parseInt(makeM[2]), secs });
   });
 
