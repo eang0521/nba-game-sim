@@ -87,6 +87,7 @@
       gap: 2.5rem; margin-bottom: 0.5rem;
     }
     .score-team { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .score-logo { width: 72px; height: 72px; object-fit: contain; margin-bottom: 0.25rem; }
     .team-abbr { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.12em; color: #c5d0fc; }
     .team-score { font-size: 4.5rem; font-weight: 900; line-height: 1.05; color: #fff; }
     .team-score.winner { color: #69db7c; }
@@ -191,11 +192,11 @@
     <h2>Simulate a Game</h2>
     <div class="form-row">
       <div class="form-group">
-        <label for="t1">Home Team</label>
+        <label for="t1">Away Team</label>
         <select id="t1"></select>
       </div>
       <div class="form-group">
-        <label for="t2">Away Team</label>
+        <label for="t2">Home Team</label>
         <select id="t2"></select>
       </div>
       <button class="btn" id="simBtn" onclick="runSim()">Simulate</button>
@@ -225,6 +226,11 @@ function esc(str) {
 }
 
 function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
+
+function espnLogo(abbr) {
+  const map = { GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh' };
+  return `https://a.espncdn.com/i/teamlogos/nba/500/${map[abbr] || abbr.toLowerCase()}.png`;
+}
 
 function logCss(line) {
   const lo = line.toLowerCase();
@@ -785,11 +791,13 @@ function renderResults(game) {
     <div class="scoreboard">
       <div class="score-teams">
         <div class="score-team">
+          <img class="score-logo" src="${espnLogo(game.t1.abbr)}" alt="${esc(game.t1.abbr)}">
           <div class="team-abbr">${esc(game.t1.abbr)}</div>
           <div class="team-score${t1w ? ' winner' : ''}">${game.t1.score}</div>
         </div>
         <div class="score-sep">–</div>
         <div class="score-team">
+          <img class="score-logo" src="${espnLogo(game.t2.abbr)}" alt="${esc(game.t2.abbr)}">
           <div class="team-abbr">${esc(game.t2.abbr)}</div>
           <div class="team-score${!t1w ? ' winner' : ''}">${game.t2.score}</div>
         </div>
