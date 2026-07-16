@@ -580,7 +580,7 @@ class Game:
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    json_file = os.path.join(script_dir, 'nba_rosters26_v2.json')
+    json_file = os.path.join(script_dir, 'nba_rosters26_v3.json')
     
     if not os.path.exists(json_file):
         print(f"Error: Could not find the given json at {json_file}")

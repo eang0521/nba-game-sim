@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nba26_game_sim import Team, Game
 
 app = Flask(__name__)
-TEAMS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nba_rosters26_v2.json")
+TEAMS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nba_rosters26_v3.json")
 
 
 def load_teams():

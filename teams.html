@@ -396,12 +396,12 @@ function filterTeams() {
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────
-fetch('nba_rosters26_v2.json')
+fetch('nba_rosters26_v3.json')
   .then(r => r.json())
   .then(data => render(data))
   .catch(() => {
     document.getElementById('conferenceContainer').innerHTML =
-      '<p style="color:#f87171;padding:2rem 0">Could not load nba_rosters26_v2.json.</p>';
+      '<p style="color:#f87171;padding:2rem 0">Could not load nba_rosters26_v3.json.</p>';
   });
 </script>
 </body>

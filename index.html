@@ -841,7 +841,7 @@ function runSim() {
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────
-fetch('nba_rosters26_v2.json')
+fetch('nba_rosters26_v3.json')
   .then(r => r.json())
   .then(data => {
     teamsData = data;
@@ -856,7 +856,7 @@ fetch('nba_rosters26_v2.json')
       });
     });
   })
-  .catch(() => showError('Could not load nba_rosters26_v2.json. Make sure it is in the same folder as this page.'));
+  .catch(() => showError('Could not load nba_rosters26_v3.json. Make sure it is in the same folder as this page.'));
 </script>
 </body>
 </html>
