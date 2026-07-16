@@ -151,7 +151,8 @@
       letter-spacing: 0.1em; color: #c5d0fc; margin-bottom: 0.5rem;
     }
     .box-wrap { overflow-x: auto; border: 1px solid #1e2d5a; border-radius: 8px; }
-    .box-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 680px; }
+    .box-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 680px; table-layout: fixed; }
+    .box-table th:first-child, .box-table td:first-child { width: 26%; }
     .box-table th, .box-table td {
       padding: 0.45rem 0.7rem; text-align: center;
       border-bottom: 1px solid #1a2235; white-space: nowrap;
