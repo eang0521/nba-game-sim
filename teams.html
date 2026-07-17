@@ -116,17 +116,22 @@
       background: #1e2d5a; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    .team-rating {
-      display: flex; flex-direction: column; align-items: flex-end;
-      gap: 0.2rem; flex-shrink: 0; margin-right: 0.25rem;
+    .team-ratings {
+      display: flex; gap: 0.6rem; flex-shrink: 0; margin-right: 0.25rem;
     }
-    .rating-val {
-      font-size: 1.15rem; font-weight: 900; color: #fff; line-height: 1;
+    .rating-chip {
+      display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
     }
-    .rank-badge {
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
-      color: #748ffc; background: #1e2d5a;
-      padding: 0.15rem 0.5rem; border-radius: 999px;
+    .rating-chip-label {
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #64748b;
+    }
+    .rating-chip-val {
+      font-size: 1rem; font-weight: 900; color: #fff; line-height: 1;
+    }
+    .rating-chip-rank {
+      font-size: 0.6rem; font-weight: 700; color: #748ffc; background: #1e2d5a;
+      padding: 0.1rem 0.4rem; border-radius: 999px;
     }
 
     .chevron {
@@ -255,19 +260,24 @@ function ftChance(t_2pt, t_3pt) {
 
 function pv(p) { return p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def; }
 
-// Weighted average OVR: best player gets weight N, 2nd gets N-1, … last gets 1
-function teamRating(players) {
+// Weighted ratings: top OVR player = weight 15, 2nd = 14, … capped at 0
+// Offense = weighted avg(2PS + 3PS) × 2
+// Defense = weighted avg(DEF + REB/2) × 8/3
+// Overall = (Offense + Defense) / 2
+function teamRatings(players) {
   const sorted = [...players].sort((a, b) =>
     (b.t_2pt + b.t_3pt + b.t_def + b.t_reb) - (a.t_2pt + a.t_3pt + a.t_def + a.t_reb)
   );
-  const n = sorted.length;
-  let weightedSum = 0, totalWeight = 0;
+  let offSum = 0, defSum = 0, totalWeight = 0;
   sorted.forEach((p, i) => {
-    const w = n - i;
-    weightedSum += (p.t_2pt + p.t_3pt + p.t_def + p.t_reb) * w;
+    const w = Math.max(0, 15 - i);
+    offSum += (p.t_2pt + p.t_3pt) * w;
+    defSum += (p.t_def + p.t_reb / 2) * w;
     totalWeight += w;
   });
-  return weightedSum / totalWeight;
+  const offense = totalWeight > 0 ? (offSum / totalWeight) * 2         : 0;
+  const defense = totalWeight > 0 ? (defSum / totalWeight) * (8 / 3)   : 0;
+  return { offense, defense, overall: (offense + defense) / 2 };
 }
 
 // Sort the roster by PV and divide into 5 equal bands → PG/SG/SF/PF/C
@@ -320,9 +330,15 @@ function buildRosterTable(players) {
   </table>`;
 }
 
-function buildTeamCard(abbr, players, rating, rank) {
+function buildTeamCard(abbr, players, ratings, ranks) {
   const info = TEAM_INFO[abbr];
   const url  = logoUrl(info.espn);
+  const chip = (label, val, rank) => `
+    <div class="rating-chip">
+      <span class="rating-chip-label">${label}</span>
+      <span class="rating-chip-val">${val.toFixed(1)}</span>
+      <span class="rating-chip-rank">#${rank}</span>
+    </div>`;
   return `
   <details class="team-card" data-name="${info.name.toLowerCase()} ${abbr.toLowerCase()}">
     <summary class="team-summary">
@@ -333,9 +349,10 @@ function buildTeamCard(abbr, players, rating, rank) {
         <div class="team-fullname">${esc(info.name)}</div>
         <span class="team-abbr-badge">${esc(abbr)}</span>
       </div>
-      <div class="team-rating">
-        <span class="rating-val">${rating.toFixed(1)}</span>
-        <span class="rank-badge">#${rank} overall</span>
+      <div class="team-ratings">
+        ${chip('OVR', ratings.overall, ranks.overall)}
+        ${chip('OFF', ratings.offense, ranks.offense)}
+        ${chip('DEF', ratings.defense, ranks.defense)}
       </div>
       <span class="chevron">&#9658;</span>
     </summary>
@@ -345,19 +362,28 @@ function buildTeamCard(abbr, players, rating, rank) {
 
 // ── Render by conference ─────────────────────────────────────────────
 function render(teamsData) {
-  // Compute weighted ratings and league-wide ranks
+  const allAbbrs = Object.keys(teamsData);
   const ratings = {};
-  for (const [abbr, players] of Object.entries(teamsData))
-    ratings[abbr] = teamRating(players);
+  for (const abbr of allAbbrs)
+    ratings[abbr] = teamRatings(teamsData[abbr]);
 
-  const ranked = Object.keys(ratings).sort((a, b) => ratings[b] - ratings[a]);
+  function rankBy(key) {
+    const sorted = [...allAbbrs].sort((a, b) => ratings[b][key] - ratings[a][key]);
+    const map = {};
+    sorted.forEach((abbr, i) => map[abbr] = i + 1);
+    return map;
+  }
+  const ovrRanks = rankBy('overall');
+  const offRanks = rankBy('offense');
+  const defRanks = rankBy('defense');
   const ranks = {};
-  ranked.forEach((abbr, i) => ranks[abbr] = i + 1);
+  allAbbrs.forEach(abbr => ranks[abbr] = {
+    overall: ovrRanks[abbr], offense: offRanks[abbr], defense: defRanks[abbr],
+  });
 
-  const abbrs = Object.keys(teamsData).sort((a, b) =>
+  const abbrs = allAbbrs.sort((a, b) =>
     TEAM_INFO[a].name.localeCompare(TEAM_INFO[b].name)
   );
-
   const east = abbrs.filter(a => TEAM_INFO[a].conf === 'East');
   const west = abbrs.filter(a => TEAM_INFO[a].conf === 'West');
 
