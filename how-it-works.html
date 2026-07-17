@@ -4,42 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How This Works — NBA Game Simulator</title>
+  <link rel="stylesheet" href="common.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #141929;
-      border-bottom: 3px solid #3b5bdb;
-      padding: 1.1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.9rem;
-    }
-    .header-brand { display: flex; align-items: center; gap: 0.9rem; }
-    header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
-    .badge {
-      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.12em; color: #748ffc;
-      background: #1e2d5a; padding: 0.25rem 0.6rem; border-radius: 999px;
-    }
-    .header-nav { display: flex; gap: 0.25rem; }
-    .nav-link {
-      color: #748ffc; text-decoration: none;
-      padding: 0.4rem 0.9rem; border-radius: 6px;
-      font-size: 0.82rem; font-weight: 600;
-      transition: background 0.15s, color 0.15s;
-    }
-    .nav-link:hover { background: #1e2d5a; color: #c5d0fc; }
-    .nav-link.active { background: #3b5bdb; color: #fff; }
-
     .container { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
 
     /* ── Section layout ─────────────────────────────── */
