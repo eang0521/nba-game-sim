@@ -160,11 +160,17 @@
     }
     .history-clear:hover { color: #94a3b8; }
     .history-list { display: flex; flex-direction: column; gap: 0.35rem; }
-    .history-row {
-      display: flex; align-items: center; gap: 0.6rem;
-      background: #141929; border: 1px solid #1e2d5a; border-radius: 6px;
-      padding: 0.45rem 0.85rem; font-size: 0.82rem;
+    .history-item {
+      background: #141929; border: 1px solid #1e2d5a; border-radius: 6px; overflow: hidden;
     }
+    .history-item[open] { border-color: #3b5bdb; }
+    .history-item > summary {
+      list-style: none; display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.45rem 0.85rem; font-size: 0.82rem; cursor: pointer; user-select: none;
+    }
+    .history-item > summary::-webkit-details-marker { display: none; }
+    .history-item > summary::after { content: '▸'; color: #748ffc; font-size: 0.7rem; flex-shrink: 0; }
+    .history-item[open] > summary::after { content: '▾'; }
     .history-team { display: flex; align-items: center; gap: 0.4rem; }
     .history-abbr { font-weight: 800; color: #64748b; letter-spacing: 0.05em; font-size: 0.78rem; }
     .history-score { font-weight: 900; color: #e2e8f0; font-size: 0.95rem; }
@@ -176,6 +182,7 @@
       background: #1e2d5a; padding: 0.1rem 0.35rem; border-radius: 999px;
     }
     .history-time { color: #475569; font-size: 0.7rem; white-space: nowrap; }
+    .history-detail { padding: 1rem 1.25rem 1.25rem; border-top: 1px solid #1e2d5a; }
 
     /* ── Game leaders ─────────────────────────────── */
     .leaders-table {
@@ -752,7 +759,7 @@ function boxTable(team) {
     tReb+=p.rebounds; tAst+=p.assists; tStl+=p.steals;
     tBlk+=p.blocks; tPf+=p.fouls; tPm+=p.plus_minus;
     return `<tr>
-      <td>${esc(p.name)}<span class="pos-tag">(${p.primaryPos()})</span></td>
+      <td>${esc(p.name)}<span class="pos-tag">(${typeof p.primaryPos === 'function' ? p.primaryPos() : p.pos})</span></td>
       <td>${mp}</td><td>${p.points}</td>
       <td>${p.fg_made}-${p.fg_attempted}</td>
       <td>${p.tpt_made}-${p.tpt_attempted}</td>
@@ -904,6 +911,7 @@ function gameLeaders(game) {
 
 // ── Game History ─────────────────────────────────────────────────────
 const HISTORY_KEY = 'nba_sim_history';
+const HISTORY_MAX = 10;
 
 function timeAgo(ts) {
   const diff = Date.now() - ts;
@@ -920,16 +928,93 @@ function loadHistory() {
   catch { return []; }
 }
 
+function serializePlayers(players) {
+  return players.map(p => ({
+    name: p.name,
+    pos:  typeof p.primaryPos === 'function' ? p.primaryPos() : (p.pos || ''),
+    seconds_played: p.seconds_played,
+    points: p.points, fg_made: p.fg_made, fg_attempted: p.fg_attempted,
+    tpt_made: p.tpt_made, tpt_attempted: p.tpt_attempted,
+    ft_made: p.ft_made, ft_attempted: p.ft_attempted,
+    rebounds: p.rebounds, assists: p.assists, steals: p.steals,
+    blocks: p.blocks, fouls: p.fouls, plus_minus: p.plus_minus,
+  }));
+}
+
 function saveToHistory(game) {
   const entry = {
     t1: game.t1.abbr, t2: game.t2.abbr,
     t1Score: game.t1.score, t2Score: game.t2.score,
+    t1QScores: game.t1_q_scores, t2QScores: game.t2_q_scores,
+    t1Players: serializePlayers(game.t1.players),
+    t2Players: serializePlayers(game.t2.players),
+    logs: game.logs,
     ot: game.t1_q_scores.length > 4,
     otCount: Math.max(0, game.t1_q_scores.length - 4),
     ts: Date.now(),
   };
-  const history = [entry, ...loadHistory()].slice(0, 5);
+  const history = [entry, ...loadHistory()].slice(0, HISTORY_MAX);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function renderHistoryEntry(e) {
+  const mockGame = {
+    t1: { abbr: e.t1, score: e.t1Score, players: e.t1Players },
+    t2: { abbr: e.t2, score: e.t2Score, players: e.t2Players },
+    t1_q_scores: e.t1QScores, t2_q_scores: e.t2QScores,
+    logs: e.logs,
+  };
+
+  const n = e.t1QScores.length;
+  const otLabel = n > 4 ? ` / ${n - 4}OT` : '';
+  let lsHead = '<tr><th>Team</th>';
+  for (let i = 0; i < n; i++) lsHead += `<th>${periodLabel(i + 1)}</th>`;
+  lsHead += '<th>T</th></tr>';
+  const lsRow = (abbr, scores, total) => {
+    let r = `<tr><td>${esc(abbr)}</td>`;
+    scores.forEach(s => r += `<td>${s}</td>`);
+    return r + `<td class="total">${total}</td></tr>`;
+  };
+
+  const quarters = Object.keys(e.logs).map(Number).sort((a, b) => a - b);
+  const pbp = quarters.map(q => {
+    const lines = e.logs[q];
+    const body  = lines.map(l => `<span class="${logCss(l)}">${esc(l)}</span>`).join('');
+    return `<details>
+      <summary>${periodLabel(q)} <span class="play-count">${lines.length} plays</span></summary>
+      <div class="pbp-log">${body}</div>
+    </details>`;
+  }).join('');
+
+  return `
+    <section>
+      <h2>Line Score${otLabel}</h2>
+      <div class="linescore-wrap">
+        <table class="linescore"><thead>${lsHead}</thead><tbody>
+          ${lsRow(e.t1, e.t1QScores, e.t1Score)}
+          ${lsRow(e.t2, e.t2QScores, e.t2Score)}
+        </tbody></table>
+      </div>
+    </section>
+    <section>
+      <h2>Game Leaders</h2>
+      ${gameLeaders(mockGame)}
+    </section>
+    <section>
+      <h2>Play-by-Play</h2>
+      <div class="pbp-list">${pbp}</div>
+    </section>
+    <section>
+      <h2>Box Score</h2>
+      ${[mockGame.t1, mockGame.t2].map(boxTable).join('')}
+    </section>`;
+}
+
+function accordionHistory(el) {
+  if (!el.open) return;
+  document.querySelectorAll('#historyList > details[open]').forEach(d => {
+    if (d !== el) d.open = false;
+  });
 }
 
 function renderHistory() {
@@ -938,23 +1023,26 @@ function renderHistory() {
   if (!history.length) { section.style.display = 'none'; return; }
   section.style.display = '';
   document.getElementById('historyList').innerHTML = history.map(e => {
-    const t1win = e.t1Score > e.t2Score;
+    const t1win  = e.t1Score > e.t2Score;
     const otBadge = e.ot
       ? `<span class="history-ot">${e.otCount > 1 ? e.otCount + 'OT' : 'OT'}</span>` : '';
-    return `<div class="history-row">
-      <div class="history-team">
-        <span class="history-abbr">${esc(e.t1)}</span>
-        <span class="history-score${t1win ? ' win' : ''}">${e.t1Score}</span>
-      </div>
-      <span class="history-vs">–</span>
-      <div class="history-team">
-        <span class="history-score${!t1win ? ' win' : ''}">${e.t2Score}</span>
-        <span class="history-abbr">${esc(e.t2)}</span>
-      </div>
-      ${otBadge}
-      <span class="history-spacer"></span>
-      <span class="history-time">${timeAgo(e.ts)}</span>
-    </div>`;
+    return `<details class="history-item" ontoggle="accordionHistory(this)">
+      <summary>
+        <div class="history-team">
+          <span class="history-abbr">${esc(e.t1)}</span>
+          <span class="history-score${t1win ? ' win' : ''}">${e.t1Score}</span>
+        </div>
+        <span class="history-vs">–</span>
+        <div class="history-team">
+          <span class="history-score${!t1win ? ' win' : ''}">${e.t2Score}</span>
+          <span class="history-abbr">${esc(e.t2)}</span>
+        </div>
+        ${otBadge}
+        <span class="history-spacer"></span>
+        <span class="history-time">${timeAgo(e.ts)}</span>
+      </summary>
+      <div class="history-detail">${renderHistoryEntry(e)}</div>
+    </details>`;
   }).join('');
 }
 
