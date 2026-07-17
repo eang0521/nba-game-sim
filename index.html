@@ -247,6 +247,7 @@
       font-size:0.62rem; color:#748ffc; background:#1e2d5a;
       padding:0.1rem 0.3rem; border-radius:999px; margin-left:0.35rem;
     }
+    .series-stat { color:#475569; font-size:0.75rem; margin-left:0.25rem; }
   </style>
 </head>
 <body>
@@ -290,6 +291,7 @@
   <div id="seriesSection" class="series-section" style="display:none">
     <div class="history-header">
       <span class="history-label">Series Result</span>
+      <button class="history-clear" onclick="clearSeries()">Clear</button>
     </div>
     <div id="seriesContent"></div>
   </div>
@@ -1092,6 +1094,11 @@ function clearHistory() {
   renderHistory();
 }
 
+function clearSeries() {
+  document.getElementById('seriesSection').style.display = 'none';
+  document.getElementById('seriesContent').innerHTML = '';
+}
+
 // ── UI ───────────────────────────────────────────────────────────────
 function showError(msg) {
   const el = document.getElementById('errorMsg');
@@ -1180,12 +1187,17 @@ function runSeries() {
       const t2Score   = isHomeT2 ? homeScore : awayScore;
       if (t1Score > t2Score) t1Wins++; else t2Wins++;
 
+      const allPlayed = [...game.t1.players, ...game.t2.players].filter(p => p.seconds_played > 0);
       games.push({
         gameNum: i + 1,
         homeAbbr, awayAbbr, homeScore, awayScore,
         t1Wins, t2Wins,
         ot: game.t1_q_scores.length > 4,
+        scorer:    allPlayed.reduce((a,b) => b.points   > a.points   ? b : a),
+        rebounder: allPlayed.reduce((a,b) => b.rebounds > a.rebounds ? b : a),
+        playmaker: allPlayed.reduce((a,b) => b.assists  > a.assists  ? b : a),
       });
+      saveToHistory(game);
     }
 
     const winner = t1Wins > t2Wins ? t1Abbr : t2Abbr;
@@ -1205,6 +1217,9 @@ function runSeries() {
         <td><span${awayWon?' class="gw"':''}>${g.awayScore}</span> – <span${!awayWon?' class="gw"':''}>${g.homeScore}</span>${otTag}</td>
         <td class="gw">${esc(winAbbr)}</td>
         <td>${rec}</td>
+        <td>${esc(g.scorer.name)} <span class="series-stat">${g.scorer.points}pts</span></td>
+        <td>${esc(g.rebounder.name)} <span class="series-stat">${g.rebounder.rebounds}reb</span></td>
+        <td>${esc(g.playmaker.name)} <span class="series-stat">${g.playmaker.assists}ast</span></td>
       </tr>`;
     }).join('');
 
@@ -1221,10 +1236,13 @@ function runSeries() {
         </div>
       </div>
       <table class="series-table">
-        <thead><tr><th>Game</th><th>Matchup</th><th>Score</th><th>Winner</th><th>Series</th></tr></thead>
+        <thead><tr><th>Game</th><th>Matchup</th><th>Score</th><th>Winner</th><th>Series</th><th>Scorer</th><th>Rebounder</th><th>Assists</th></tr></thead>
         <tbody>${gameRows}</tbody>
       </table>`;
 
+    renderHistory();
+    const firstEntry = document.querySelector('#historyList > details');
+    if (firstEntry) firstEntry.open = true;
     document.getElementById('seriesSection').style.display = '';
     seriesBtn.textContent = 'Simulate Series'; seriesBtn.disabled = false;
     simBtn.disabled = false;
