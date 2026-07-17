@@ -957,6 +957,13 @@ function renderHistoryEntry(e) {
 
 function accordionHistory(el) {
   if (!el.open) return;
+  // Lazy-render content the first time this entry is opened
+  const detail = el.querySelector('.history-detail');
+  if (!detail.dataset.rendered) {
+    const idx = parseInt(el.dataset.index, 10);
+    detail.innerHTML = renderHistoryEntry(loadHistory()[idx]);
+    detail.dataset.rendered = '1';
+  }
   document.querySelectorAll('#historyList > details[open]').forEach(d => {
     if (d !== el) d.open = false;
   });
@@ -967,11 +974,11 @@ function renderHistory() {
   const section = document.getElementById('historySection');
   if (!history.length) { section.style.display = 'none'; return; }
   section.style.display = '';
-  document.getElementById('historyList').innerHTML = history.map(e => {
+  document.getElementById('historyList').innerHTML = history.map((e, i) => {
     const t1win  = e.t1Score > e.t2Score;
     const otBadge = e.ot
       ? `<span class="history-ot">${e.otCount > 1 ? e.otCount + 'OT' : 'OT'}</span>` : '';
-    return `<details class="history-item" ontoggle="accordionHistory(this)">
+    return `<details class="history-item" data-index="${i}" ontoggle="accordionHistory(this)">
       <summary>
         <div class="history-team">
           <span class="history-abbr">${esc(e.t1)}</span>
@@ -986,7 +993,7 @@ function renderHistory() {
         <span class="history-spacer"></span>
         <span class="history-time">${timeAgo(e.ts)}</span>
       </summary>
-      <div class="history-detail">${renderHistoryEntry(e)}</div>
+      <div class="history-detail"></div>
     </details>`;
   }).join('');
 }
