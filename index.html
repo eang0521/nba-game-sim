@@ -241,7 +241,6 @@
     </div>
     <div id="historyList" class="history-list"></div>
   </div>
-  <div id="results"></div>
 </div>
 
 <script>
@@ -796,75 +795,6 @@ function boxTable(team) {
   </div>`;
 }
 
-function renderResults(game) {
-  const t1w = game.t1.score > game.t2.score;
-  const n   = game.t1_q_scores.length;
-
-  // Linescore
-  let lsHead = '<tr><th>Team</th>';
-  for (let i = 0; i < n; i++) lsHead += `<th>${periodLabel(i+1)}</th>`;
-  lsHead += '<th>T</th></tr>';
-
-  const lsRow = (team, scores) => {
-    let r = `<tr><td>${esc(team.abbr)}</td>`;
-    scores.forEach(s => r += `<td>${s}</td>`);
-    return r + `<td class="total">${team.score}</td></tr>`;
-  };
-
-  // Play-by-play
-  const quarters = Object.keys(game.logs).map(Number).sort((a,b) => a-b);
-  const pbp = quarters.map((q, i) => {
-    const lines = game.logs[q];
-    const open  = '';
-    const body  = lines.map(l => `<span class="${logCss(l)}">${esc(l)}</span>`).join('');
-    return `<details${open}>
-      <summary>${periodLabel(q)} <span class="play-count">${lines.length} plays</span></summary>
-      <div class="pbp-log">${body}</div>
-    </details>`;
-  }).join('');
-
-  const otLabel = n > 4 ? ` / ${n - 4}OT` : '';
-
-  document.getElementById('results').innerHTML = `
-    <div class="scoreboard">
-      <div class="score-teams">
-        <div class="score-team">
-          <img class="score-logo" src="${espnLogo(game.t1.abbr)}" alt="${esc(game.t1.abbr)}">
-          <div class="team-abbr">${esc(game.t1.abbr)}</div>
-          <div class="team-score${t1w ? ' winner' : ''}">${game.t1.score}</div>
-        </div>
-        <div class="score-sep">–</div>
-        <div class="score-team">
-          <img class="score-logo" src="${espnLogo(game.t2.abbr)}" alt="${esc(game.t2.abbr)}">
-          <div class="team-abbr">${esc(game.t2.abbr)}</div>
-          <div class="team-score${!t1w ? ' winner' : ''}">${game.t2.score}</div>
-        </div>
-      </div>
-      <div class="final-label">Final${otLabel}</div>
-      <div class="linescore-wrap" style="margin-top:1.25rem;">
-        <table class="linescore">
-          <thead>${lsHead}</thead>
-          <tbody>${lsRow(game.t1, game.t1_q_scores)}${lsRow(game.t2, game.t2_q_scores)}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <section>
-      <h2>Game Leaders</h2>
-      ${gameLeaders(game)}
-    </section>
-
-    <section>
-      <h2>Play-by-Play</h2>
-      <div class="pbp-list">${pbp}</div>
-    </section>
-
-    <section>
-      <h2>Box Score</h2>
-      ${[game.t1, game.t2].map(boxTable).join('')}
-    </section>`;
-
-}
 
 // ── Game Leaders ──────────────────────────────────────────────────────
 
@@ -965,8 +895,10 @@ function renderHistoryEntry(e) {
     logs: e.logs,
   };
 
+  const t1w = e.t1Score > e.t2Score;
   const n = e.t1QScores.length;
   const otLabel = n > 4 ? ` / ${n - 4}OT` : '';
+
   let lsHead = '<tr><th>Team</th>';
   for (let i = 0; i < n; i++) lsHead += `<th>${periodLabel(i + 1)}</th>`;
   lsHead += '<th>T</th></tr>';
@@ -987,15 +919,28 @@ function renderHistoryEntry(e) {
   }).join('');
 
   return `
-    <section>
-      <h2>Line Score${otLabel}</h2>
-      <div class="linescore-wrap">
+    <div class="scoreboard">
+      <div class="score-teams">
+        <div class="score-team">
+          <img class="score-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}">
+          <div class="team-abbr">${esc(e.t1)}</div>
+          <div class="team-score${t1w ? ' winner' : ''}">${e.t1Score}</div>
+        </div>
+        <div class="score-sep">–</div>
+        <div class="score-team">
+          <img class="score-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}">
+          <div class="team-abbr">${esc(e.t2)}</div>
+          <div class="team-score${!t1w ? ' winner' : ''}">${e.t2Score}</div>
+        </div>
+      </div>
+      <div class="final-label">Final${otLabel}</div>
+      <div class="linescore-wrap" style="margin-top:1.25rem;">
         <table class="linescore"><thead>${lsHead}</thead><tbody>
           ${lsRow(e.t1, e.t1QScores, e.t1Score)}
           ${lsRow(e.t2, e.t2QScores, e.t2Score)}
         </tbody></table>
       </div>
-    </section>
+    </div>
     <section>
       <h2>Game Leaders</h2>
       ${gameLeaders(mockGame)}
@@ -1083,7 +1028,8 @@ function runSim() {
     game.run();
     saveToHistory(game);
     renderHistory();
-    renderResults(game);
+    const firstEntry = document.querySelector('#historyList > details');
+    if (firstEntry) firstEntry.open = true;
     btn.textContent = 'Simulate'; btn.disabled = false;
   }, 20);
 }
