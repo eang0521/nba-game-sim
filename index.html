@@ -200,6 +200,53 @@
     .leaders-table td:not(:first-child) { text-align: center; font-weight: 700; color: #e2e8f0; }
     .leaders-table .team-row td:first-child { color: #748ffc; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
     .leaders-table .stat-leader { color: #c5d0fc; }
+
+    /* ── Form logo preview ──────────────────────────── */
+    .matchup-logos { display:flex; align-items:center; gap:0.5rem; padding:0 0.25rem; }
+    .preview-logo { width:44px; height:44px; object-fit:contain; flex-shrink:0; }
+    .preview-at { color:#475569; font-size:0.82rem; font-weight:700; }
+    .btn-series { background:#7c3aed; }
+    .btn-series:hover { background:#8b5cf6; }
+    .btn-series:active { background:#6d28d9; }
+    .btn-series:disabled { background:#2d1f4a; cursor:default; }
+
+    /* ── History row logos ──────────────────────────── */
+    .history-logo { width:22px; height:22px; object-fit:contain; flex-shrink:0; }
+
+    /* ── Stat highlight ─────────────────────────────── */
+    .stat-hi { color:#ffd43b; font-weight:800; }
+
+    /* ── Series section ─────────────────────────────── */
+    .series-section { margin-bottom:1.5rem; }
+    .series-banner {
+      background:#141929; border:1px solid #3b5bdb; border-radius:10px;
+      padding:1.1rem 1.5rem; margin-bottom:0.85rem;
+      display:flex; align-items:center; gap:1.25rem;
+    }
+    .series-logos { display:flex; align-items:center; gap:0.6rem; }
+    .series-logo { width:48px; height:48px; object-fit:contain; }
+    .series-logo-sep { color:#2d3a5c; font-weight:700; font-size:1rem; }
+    .series-title { font-size:1.05rem; font-weight:900; color:#fff; }
+    .series-sub { font-size:0.78rem; color:#64748b; margin-top:0.2rem; }
+    .series-table {
+      width:100%; border-collapse:collapse; font-size:0.83rem;
+      border:1px solid #1e2d5a; border-radius:8px; overflow:hidden;
+    }
+    .series-table th, .series-table td {
+      padding:0.5rem 0.9rem; text-align:left; border-bottom:1px solid #1a2235;
+    }
+    .series-table th {
+      background:#0f1117; color:#748ffc; font-size:0.7rem;
+      font-weight:700; text-transform:uppercase; letter-spacing:0.07em;
+    }
+    .series-table td { color:#cbd5e1; }
+    .series-table tr:last-child td { border-bottom:none; }
+    .series-table tr:hover td { background:#172035; }
+    .series-table .gw { color:#69db7c; font-weight:700; }
+    .series-table .ot-tag {
+      font-size:0.62rem; color:#748ffc; background:#1e2d5a;
+      padding:0.1rem 0.3rem; border-radius:999px; margin-left:0.35rem;
+    }
   </style>
 </head>
 <body>
@@ -223,16 +270,28 @@
     <div class="form-row">
       <div class="form-group">
         <label for="t1">Away Team</label>
-        <select id="t1"></select>
+        <select id="t1" onchange="updateLogoPreview()"></select>
+      </div>
+      <div class="matchup-logos" id="matchupLogos" style="display:none">
+        <img id="logo1" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <span class="preview-at">@</span>
+        <img id="logo2" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
       </div>
       <div class="form-group">
         <label for="t2">Home Team</label>
-        <select id="t2"></select>
+        <select id="t2" onchange="updateLogoPreview()"></select>
       </div>
       <button class="btn-secondary" onclick="randomize()">🎲 Random</button>
       <button class="btn" id="simBtn" onclick="runSim()">Simulate</button>
+      <button class="btn btn-series" id="seriesBtn" onclick="runSeries()">Simulate Series</button>
     </div>
     <div id="errorMsg" class="error" style="display:none"></div>
+  </div>
+  <div id="seriesSection" class="series-section" style="display:none">
+    <div class="history-header">
+      <span class="history-label">Series Result</span>
+    </div>
+    <div id="seriesContent"></div>
   </div>
   <div id="historySection" class="history-section" style="display:none">
     <div class="history-header">
@@ -267,6 +326,16 @@ function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
 function espnLogo(abbr) {
   const map = { GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh' };
   return `https://a.espncdn.com/i/teamlogos/nba/500/${map[abbr] || abbr.toLowerCase()}.png`;
+}
+
+function applyHomeBonus(team) {
+  team.players.forEach(p => {
+    p.t_2pt += 1; p.t_3pt += 1; p.t_def += 1; p.t_reb += 1;
+    p.ovr = p.t_2pt + p.t_3pt + p.t_def + p.t_reb;
+    p.pv  = p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def;
+    p.off = p.t_2pt + p.t_3pt + 0.01 * p.ovr;
+    p.ft_chance = Math.max(1, Math.min(90, Math.round(50 + p.t_2pt * 0.4 + p.t_3pt * 1.0)));
+  });
 }
 
 function logCss(line) {
@@ -746,6 +815,15 @@ function boxTable(team) {
     .filter(p => p.seconds_played > 0)
     .sort((a, b) => b.seconds_played - a.seconds_played);
 
+  const hi = {
+    pts: Math.max(...rows.map(p => p.points)),
+    reb: Math.max(...rows.map(p => p.rebounds)),
+    ast: Math.max(...rows.map(p => p.assists)),
+    stl: Math.max(...rows.map(p => p.steals)),
+    blk: Math.max(...rows.map(p => p.blocks)),
+  };
+  const hc = (val, key) => val > 0 && val === hi[key] ? ' class="stat-hi"' : '';
+
   let tMin=0,tPts=0,tFgm=0,tFga=0,t3m=0,t3a=0,tFtm=0,tFta=0,
       tReb=0,tAst=0,tStl=0,tBlk=0,tPf=0,tPm=0;
 
@@ -759,12 +837,12 @@ function boxTable(team) {
     tBlk+=p.blocks; tPf+=p.fouls; tPm+=p.plus_minus;
     return `<tr>
       <td>${esc(p.name)}<span class="pos-tag">(${typeof p.primaryPos === 'function' ? p.primaryPos() : p.pos})</span></td>
-      <td>${mp}</td><td>${p.points}</td>
+      <td>${mp}</td><td${hc(p.points,'pts')}>${p.points}</td>
       <td>${p.fg_made}-${p.fg_attempted}</td>
       <td>${p.tpt_made}-${p.tpt_attempted}</td>
       <td>${p.ft_made}-${p.ft_attempted}</td>
-      <td>${p.rebounds}</td><td>${p.assists}</td>
-      <td>${p.steals}</td><td>${p.blocks}</td>
+      <td${hc(p.rebounds,'reb')}>${p.rebounds}</td><td${hc(p.assists,'ast')}>${p.assists}</td>
+      <td${hc(p.steals,'stl')}>${p.steals}</td><td${hc(p.blocks,'blk')}>${p.blocks}</td>
       <td>${p.fouls}</td>
       <td class="${pmCls}">${pm}</td>
     </tr>`;
@@ -922,13 +1000,13 @@ function renderHistoryEntry(e) {
     <div class="scoreboard">
       <div class="score-teams">
         <div class="score-team">
-          <img class="score-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}">
+          <img class="score-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.style.visibility='hidden'">
           <div class="team-abbr">${esc(e.t1)}</div>
           <div class="team-score${t1w ? ' winner' : ''}">${e.t1Score}</div>
         </div>
         <div class="score-sep">–</div>
         <div class="score-team">
-          <img class="score-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}">
+          <img class="score-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.style.visibility='hidden'">
           <div class="team-abbr">${esc(e.t2)}</div>
           <div class="team-score${!t1w ? ' winner' : ''}">${e.t2Score}</div>
         </div>
@@ -990,6 +1068,7 @@ function renderHistory() {
     return `<details class="history-item" data-index="${i}" ontoggle="accordionHistory(this)">
       <summary>
         <div class="history-team">
+          <img class="history-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.style.visibility='hidden'">
           <span class="history-abbr">${esc(e.t1)}</span>
           <span class="history-score${t1win ? ' win' : ''}">${e.t1Score}</span>
         </div>
@@ -997,6 +1076,7 @@ function renderHistory() {
         <div class="history-team">
           <span class="history-score${!t1win ? ' win' : ''}">${e.t2Score}</span>
           <span class="history-abbr">${esc(e.t2)}</span>
+          <img class="history-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.style.visibility='hidden'">
         </div>
         ${otBadge}
         <span class="history-spacer"></span>
@@ -1019,6 +1099,17 @@ function showError(msg) {
   el.style.display = msg ? '' : 'none';
 }
 
+function updateLogoPreview() {
+  const t1 = document.getElementById('t1').value;
+  const t2 = document.getElementById('t2').value;
+  if (!t1 || !t2) return;
+  const el1 = document.getElementById('logo1');
+  const el2 = document.getElementById('logo2');
+  el1.style.visibility = 'visible'; el1.src = espnLogo(t1); el1.alt = t1;
+  el2.style.visibility = 'visible'; el2.src = espnLogo(t2); el2.alt = t2;
+  document.getElementById('matchupLogos').style.display = 'flex';
+}
+
 function randomize() {
   const abbrs = Object.keys(teamsData);
   if (abbrs.length < 2) return;
@@ -1027,6 +1118,7 @@ function randomize() {
   do { j = Math.floor(Math.random() * abbrs.length); } while (j === i);
   document.getElementById('t1').value = abbrs[i];
   document.getElementById('t2').value = abbrs[j];
+  updateLogoPreview();
 }
 
 function runSim() {
@@ -1036,19 +1128,112 @@ function runSim() {
   if (t1 === t2) { showError('Please select two different teams.'); return; }
 
   const btn = document.getElementById('simBtn');
+  const seriesBtn = document.getElementById('seriesBtn');
   btn.textContent = 'Simulating…'; btn.disabled = true;
+  seriesBtn.disabled = true;
 
   // defer one tick so the browser can paint the button state first
   setTimeout(() => {
-    const game = new Game(new Team(t1, teamsData[t1]), new Team(t2, teamsData[t2]));
+    const homeTeam = new Team(t2, teamsData[t2]);
+    applyHomeBonus(homeTeam);
+    const game = new Game(new Team(t1, teamsData[t1]), homeTeam);
     game.run();
     saveToHistory(game);
     renderHistory();
     const firstEntry = document.querySelector('#historyList > details');
     if (firstEntry) firstEntry.open = true;
     btn.textContent = 'Simulate'; btn.disabled = false;
+    seriesBtn.disabled = false;
   }, 20);
 }
+
+function runSeries() {
+  showError('');
+  const t1Abbr = document.getElementById('t1').value;
+  const t2Abbr = document.getElementById('t2').value;
+  if (t1Abbr === t2Abbr) { showError('Please select two different teams.'); return; }
+
+  const simBtn    = document.getElementById('simBtn');
+  const seriesBtn = document.getElementById('seriesBtn');
+  seriesBtn.textContent = 'Simulating…'; seriesBtn.disabled = true;
+  simBtn.disabled = true;
+
+  setTimeout(() => {
+    // 2-2-1-1-1 home schedule: true = original home (t2Abbr) is home
+    const homeIsT2 = [true, true, false, false, true, false, true];
+    let t1Wins = 0, t2Wins = 0;
+    const games = [];
+
+    for (let i = 0; i < 7 && t1Wins < 4 && t2Wins < 4; i++) {
+      const isHomeT2  = homeIsT2[i];
+      const homeAbbr  = isHomeT2 ? t2Abbr : t1Abbr;
+      const awayAbbr  = isHomeT2 ? t1Abbr : t2Abbr;
+
+      const homeTeam = new Team(homeAbbr, teamsData[homeAbbr]);
+      applyHomeBonus(homeTeam);
+      const game = new Game(new Team(awayAbbr, teamsData[awayAbbr]), homeTeam);
+      game.run();
+
+      // game.t1 = away, game.t2 = home
+      const awayScore = game.t1.score, homeScore = game.t2.score;
+      const t1Score   = isHomeT2 ? awayScore : homeScore;
+      const t2Score   = isHomeT2 ? homeScore : awayScore;
+      if (t1Score > t2Score) t1Wins++; else t2Wins++;
+
+      games.push({
+        gameNum: i + 1,
+        homeAbbr, awayAbbr, homeScore, awayScore,
+        t1Wins, t2Wins,
+        ot: game.t1_q_scores.length > 4,
+      });
+    }
+
+    const winner = t1Wins > t2Wins ? t1Abbr : t2Abbr;
+    const winW = Math.max(t1Wins, t2Wins), winL = Math.min(t1Wins, t2Wins);
+
+    const gameRows = games.map(g => {
+      const awayWon = g.awayScore > g.homeScore;
+      const winAbbr = awayWon ? g.awayAbbr : g.homeAbbr;
+      const isFinal = g.t1Wins === 4 || g.t2Wins === 4;
+      const rec = g.t1Wins === g.t2Wins
+        ? `Tied ${g.t1Wins}-${g.t2Wins}`
+        : `${esc(g.t1Wins > g.t2Wins ? t1Abbr : t2Abbr)} ${isFinal ? 'wins' : 'leads'} ${Math.max(g.t1Wins,g.t2Wins)}-${Math.min(g.t1Wins,g.t2Wins)}`;
+      const otTag = g.ot ? '<span class="ot-tag">OT</span>' : '';
+      return `<tr>
+        <td>Game ${g.gameNum}</td>
+        <td>${esc(g.awayAbbr)} @ ${esc(g.homeAbbr)}</td>
+        <td><span${awayWon?' class="gw"':''}>${g.awayScore}</span> – <span${!awayWon?' class="gw"':''}>${g.homeScore}</span>${otTag}</td>
+        <td class="gw">${esc(winAbbr)}</td>
+        <td>${rec}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('seriesContent').innerHTML = `
+      <div class="series-banner">
+        <div class="series-logos">
+          <img class="series-logo" src="${espnLogo(t1Abbr)}" alt="${esc(t1Abbr)}" onerror="this.style.visibility='hidden'">
+          <span class="series-logo-sep">vs</span>
+          <img class="series-logo" src="${espnLogo(t2Abbr)}" alt="${esc(t2Abbr)}" onerror="this.style.visibility='hidden'">
+        </div>
+        <div>
+          <div class="series-title">${esc(winner)} wins the series ${winW}–${winL}</div>
+          <div class="series-sub">${esc(t1Abbr)} ${t1Wins} – ${t2Wins} ${esc(t2Abbr)}</div>
+        </div>
+      </div>
+      <table class="series-table">
+        <thead><tr><th>Game</th><th>Matchup</th><th>Score</th><th>Winner</th><th>Series</th></tr></thead>
+        <tbody>${gameRows}</tbody>
+      </table>`;
+
+    document.getElementById('seriesSection').style.display = '';
+    seriesBtn.textContent = 'Simulate Series'; seriesBtn.disabled = false;
+    simBtn.disabled = false;
+  }, 20);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('simBtn').disabled) runSim();
+});
 
 // ── Boot ─────────────────────────────────────────────────────────────
 renderHistory();
@@ -1066,6 +1251,7 @@ fetch('nba_rosters26_v3.json')
         sel.appendChild(opt);
       });
     });
+    updateLogoPreview();
   })
   .catch(() => showError('Could not load nba_rosters26_v3.json. Make sure it is in the same folder as this page.'));
 </script>
