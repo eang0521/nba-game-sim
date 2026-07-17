@@ -957,6 +957,9 @@ function renderHistoryEntry(e) {
 
 function accordionHistory(el) {
   if (!el.open) return;
+  const summary = el.querySelector('summary');
+  const summaryTop = summary.getBoundingClientRect().top;
+
   // Lazy-render content the first time this entry is opened
   const detail = el.querySelector('.history-detail');
   if (!detail.dataset.rendered) {
@@ -966,6 +969,12 @@ function accordionHistory(el) {
   }
   document.querySelectorAll('#historyList > details[open]').forEach(d => {
     if (d !== el) d.open = false;
+  });
+
+  // After layout settles, scroll so the summary stays at the same viewport position
+  requestAnimationFrame(() => {
+    const delta = summary.getBoundingClientRect().top - summaryTop;
+    if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' });
   });
 }
 
