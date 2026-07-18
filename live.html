@@ -76,14 +76,10 @@
       background: #141929; border: 1px solid #1e2d5a; border-radius: 10px;
       padding: 1.1rem 1.75rem; margin-bottom: 1rem;
     }
-    .lb-score-row {
-      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem;
-    }
-    .lb-side { display: flex; align-items: center; gap: 0.75rem; }
-    .lb-side-right { justify-content: flex-end; }
+    .lb-score-row { display: flex; align-items: center; justify-content: center; gap: 1.75rem; }
+    .lb-team { display: flex; align-items: center; gap: 0.75rem; }
     .lb-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
     .lb-abbr { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.1em; color: #c5d0fc; }
-    .lb-center { display: flex; align-items: center; gap: 0.85rem; justify-content: center; }
     .lb-score {
       font-size: 3rem; font-weight: 900; line-height: 1; color: #fff;
       min-width: 2.5ch; text-align: center; font-variant-numeric: tabular-nums;
@@ -130,7 +126,7 @@
     /* ── Game grid ──────────────────────────── */
     .game-grid {
       display: grid;
-      grid-template-columns: 3fr 2fr;
+      grid-template-columns: 4fr 2fr;
       gap: 1rem;
       align-items: start;
     }
@@ -303,20 +299,18 @@
 
     <div class="live-board" id="liveBoard">
       <div class="lb-score-row">
-        <div class="lb-side">
+        <div class="lb-team">
           <img id="lbLogo1" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
           <span id="lbAbbr1" class="lb-abbr"></span>
-        </div>
-        <div class="lb-center">
           <span id="lbScore1" class="lb-score">0</span>
-          <div class="lb-mid-info">
-            <div id="lbPeriod" class="lb-period">Q1</div>
-            <div id="lbClock" class="lb-clock">12:00</div>
-            <div id="lbFinal" class="lb-final" style="display:none">Final</div>
-          </div>
-          <span id="lbScore2" class="lb-score">0</span>
         </div>
-        <div class="lb-side lb-side-right">
+        <div class="lb-mid-info">
+          <div id="lbPeriod" class="lb-period">Q1</div>
+          <div id="lbClock" class="lb-clock">12:00</div>
+          <div id="lbFinal" class="lb-final" style="display:none">Final</div>
+        </div>
+        <div class="lb-team">
+          <span id="lbScore2" class="lb-score">0</span>
           <span id="lbAbbr2" class="lb-abbr"></span>
           <img id="lbLogo2" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
         </div>
