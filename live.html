@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Sim — NBA Game Simulator</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Form ───────────────────────────────── */
+    .form-card {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 10px; padding: 1.25rem 1.75rem; margin-bottom: 1.5rem;
+    }
+    .form-card h2 {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc; margin-bottom: 1rem;
+    }
+    .form-row { display: flex; gap: 0.9rem; align-items: flex-end; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #64748b;
+    }
+    select {
+      background: #0f1117; color: #e2e8f0;
+      border: 1px solid #2d3f6e; border-radius: 6px;
+      padding: 0.5rem 0.75rem; font-size: 0.88rem; min-width: 130px; cursor: pointer;
+    }
+    select:focus { outline: 2px solid #748ffc; outline-offset: 1px; }
+    .btn {
+      background: #3b5bdb; color: #fff; border: none; border-radius: 6px;
+      padding: 0.55rem 1.5rem; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; letter-spacing: 0.03em;
+    }
+    .btn:hover { background: #4c6ef5; }
+    .btn:active { background: #2f4ac0; }
+    .btn:disabled { background: #2d3a5c; cursor: default; }
+    .btn-secondary {
+      background: none; color: #748ffc; border: 1px solid #2d3f6e; border-radius: 6px;
+      padding: 0.55rem 1rem; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .btn-secondary:hover { background: #1e2d5a; color: #c5d0fc; }
+    .error {
+      color: #fca5a5; background: #2d1616; border: 1px solid #7f1d1d;
+      border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 0.88rem;
+    }
+
+    /* ── Logo preview ───────────────────────── */
+    .matchup-logos { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.25rem; }
+    .preview-logo { width: 44px; height: 44px; object-fit: contain; flex-shrink: 0; }
+    .preview-at { color: #475569; font-size: 0.82rem; font-weight: 700; }
+
+    /* ── Speed slider ───────────────────────── */
+    .speed-group { min-width: 150px; }
+    .speed-row { display: flex; align-items: center; gap: 0.4rem; }
+    .speed-label-sm { font-size: 0.68rem; color: #475569; white-space: nowrap; }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100px; height: 4px; border-radius: 2px;
+      background: #2d3f6e; outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: #748ffc; cursor: pointer;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #748ffc; cursor: pointer; border: none;
+    }
+
+    /* ── Live scoreboard ────────────────────── */
+    .live-board {
+      background: #141929; border: 1px solid #1e2d5a; border-radius: 10px;
+      padding: 1.1rem 1.75rem; margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .lb-team { display: flex; align-items: center; gap: 0.75rem; }
+    .lb-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
+    .lb-abbr { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.1em; color: #c5d0fc; }
+    .lb-score {
+      font-size: 3rem; font-weight: 900; line-height: 1; color: #fff;
+      min-width: 2.5ch; text-align: center; font-variant-numeric: tabular-nums;
+    }
+    .lb-score.winning { color: #69db7c; }
+    .lb-mid { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; flex: 1; }
+    .lb-dash { font-size: 1.5rem; color: #2d3a5c; font-weight: 700; }
+    .lb-period {
+      font-size: 0.72rem; font-weight: 700; color: #748ffc;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .lb-clock { font-size: 1.3rem; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; }
+    .lb-final { font-size: 0.7rem; font-weight: 700; color: #69db7c; text-transform: uppercase; letter-spacing: 0.12em; }
+
+    /* ── Game controls ──────────────────────── */
+    .live-controls { display: flex; gap: 0.6rem; margin-bottom: 1rem; align-items: center; }
+    .btn-ctrl {
+      padding: 0.4rem 1rem; font-size: 0.82rem; font-weight: 700;
+      border-radius: 6px; border: none; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-pause { background: #1e2d5a; color: #c5d0fc; }
+    .btn-pause:hover { background: #2d3f6e; }
+    .btn-reset { background: none; color: #475569; border: 1px solid #1e2d5a; border-radius: 6px; }
+    .btn-reset:hover { color: #94a3b8; border-color: #2d3f6e; }
+
+    /* ── Game grid ──────────────────────────── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    /* ── Lineup panels ──────────────────────── */
+    .lineup-panel {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; overflow: hidden;
+    }
+    .lp-header {
+      padding: 0.5rem 0.9rem;
+      background: #0f1117; border-bottom: 1px solid #1e2d5a;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .lp-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+    .lp-list { padding: 0.35rem 0; }
+    .lp-player {
+      display: flex; align-items: baseline; gap: 0.55rem;
+      padding: 0.3rem 0.9rem; font-size: 0.79rem;
+    }
+    .lp-pos {
+      font-size: 0.62rem; font-weight: 700; color: #748ffc;
+      background: #1e2d5a; border-radius: 3px;
+      padding: 0.1rem 0.28rem; min-width: 2.1rem; text-align: center;
+      flex-shrink: 0; letter-spacing: 0.04em;
+    }
+    .lp-name { color: #e2e8f0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lp-stats { color: #475569; font-size: 0.7rem; white-space: nowrap; flex-shrink: 0; }
+
+    /* ── PBP panel ──────────────────────────── */
+    .pbp-panel {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .pbp-header {
+      padding: 0.5rem 1rem; background: #0f1117; border-bottom: 1px solid #1e2d5a;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #748ffc; flex-shrink: 0;
+    }
+    .pbp-feed {
+      height: 440px; overflow-y: auto; padding: 0.4rem 0;
+      display: flex; flex-direction: column;
+    }
+    .pbp-event {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.76rem; line-height: 1.75; padding: 0.04rem 1rem; display: block;
+    }
+    .pbp-divider {
+      text-align: center; font-size: 0.65rem; font-weight: 700;
+      color: #3b5bdb; text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 0.45rem 1rem; background: #0f1117;
+      border-top: 1px solid #1e2d5a; border-bottom: 1px solid #1e2d5a;
+      margin: 0.25rem 0; flex-shrink: 0;
+    }
+    .ev-make    { color: #69db7c; }
+    .ev-miss    { color: #4b5e7a; }
+    .ev-foul    { color: #ffa94d; }
+    .ev-steal   { color: #4dabf7; }
+    .ev-block   { color: #da77f2; }
+    .ev-reb     { color: #38d9a9; }
+    .ev-misc    { color: #748ffc; font-style: italic; }
+    .ev-neutral { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Instant Results</a>
+    <a href="live.html" class="nav-link active">Live Sim</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="how-it-works.html" class="nav-link">How This Works</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="form-card">
+    <h2>Live Simulation</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="t1">Away Team</label>
+        <select id="t1" onchange="updateLogoPreview()"></select>
+      </div>
+      <div class="matchup-logos" id="matchupLogos" style="display:none">
+        <img id="logo1" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <span class="preview-at">@</span>
+        <img id="logo2" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+      </div>
+      <div class="form-group">
+        <label for="t2">Home Team</label>
+        <select id="t2" onchange="updateLogoPreview()"></select>
+      </div>
+      <div class="form-group speed-group">
+        <label>Speed</label>
+        <div class="speed-row">
+          <span class="speed-label-sm">Slow</span>
+          <input type="range" id="speedSlider" min="1" max="10" value="4">
+          <span class="speed-label-sm">Fast</span>
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="randomize()">🎲 Random</button>
+      <button class="btn" id="simBtn" onclick="startLiveSim()">Simulate</button>
+    </div>
+    <div id="errorMsg" class="error" style="display:none"></div>
+  </div>
+
+  <div id="gameArea" style="display:none">
+
+    <div class="live-board">
+      <div class="lb-team">
+        <img id="lbLogo1" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <span id="lbAbbr1" class="lb-abbr"></span>
+        <span id="lbScore1" class="lb-score">0</span>
+      </div>
+      <div class="lb-mid">
+        <span class="lb-dash">–</span>
+        <div id="lbPeriod" class="lb-period">Q1</div>
+        <div id="lbClock" class="lb-clock">12:00</div>
+        <div id="lbFinal" class="lb-final" style="display:none">Final</div>
+      </div>
+      <div class="lb-team">
+        <span id="lbScore2" class="lb-score">0</span>
+        <span id="lbAbbr2" class="lb-abbr"></span>
+        <img id="lbLogo2" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+      </div>
+    </div>
+
+    <div class="live-controls">
+      <button class="btn-ctrl btn-pause" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+      <button class="btn-ctrl btn-reset" onclick="resetSim()">↺ Reset</button>
+    </div>
+
+    <div class="game-grid">
+      <div class="lineup-panel">
+        <div class="lp-header">
+          <img id="lpLogo1" class="lp-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+          <span id="lpAbbr1"></span>
+        </div>
+        <div id="lineup1" class="lp-list"></div>
+      </div>
+      <div class="lineup-panel">
+        <div class="lp-header">
+          <img id="lpLogo2" class="lp-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+          <span id="lpAbbr2"></span>
+        </div>
+        <div id="lineup2" class="lp-list"></div>
+      </div>
+      <div class="pbp-panel">
+        <div class="pbp-header">Play-by-Play</div>
+        <div class="pbp-feed" id="pbpFeed"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Globals ──────────────────────────────────────────────────────────
+let teamsData = {};
+let simTimeout = null;
+let timeline = [];
+let timelineIdx = 0;
+let isPaused = false;
+let currentQuarter = 0;
+
+const DELAYS     = [1000, 600, 350, 200, 100, 60, 35, 20, 10, 3];
+const POS_LABELS = ['—', 'PG', 'SG', 'SF', 'PF', 'C'];
+
+// ── Utilities ────────────────────────────────────────────────────────
+function rollD(sides, num = 1) {
+  let t = 0;
+  for (let i = 0; i < num; i++) t += Math.floor(Math.random() * sides) + 1;
+  return t;
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
+
+function espnLogo(abbr) {
+  const map = { GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh' };
+  return `https://a.espncdn.com/i/teamlogos/nba/500/${map[abbr] || abbr.toLowerCase()}.png`;
+}
+
+function applyHomeBonus(team) {
+  team.players.forEach(p => {
+    p.t_2pt += 1; p.t_3pt += 1; p.t_def += 1; p.t_reb += 1;
+    p.ovr = p.t_2pt + p.t_3pt + p.t_def + p.t_reb;
+    p.pv  = p.t_reb - p.t_3pt + 0.01 * p.t_2pt + 0.0001 * p.t_def;
+    p.off = p.t_2pt + p.t_3pt + 0.01 * p.ovr;
+    p.ft_chance = Math.max(1, Math.min(90, Math.round(50 + p.t_2pt * 0.4 + p.t_3pt * 1.0)));
+  });
+}
+
+function logCss(line) {
+  const lo = line.toLowerCase();
+  if (lo.includes('makes') || lo.includes('and-1')) return 'ev-make';
+  if (lo.includes('misses'))                         return 'ev-miss';
+  if (lo.includes('steal'))                          return 'ev-steal';
+  if (lo.includes('block'))                          return 'ev-block';
+  if (lo.includes('foul') || lo.includes('free throw')) return 'ev-foul';
+  if (lo.includes('rebound'))                        return 'ev-reb';
+  if (lo.includes('sub:') || lo.includes('wins the')) return 'ev-misc';
+  return 'ev-neutral';
+}
+
+// ── Player ───────────────────────────────────────────────────────────
+class Player {
+  constructor(name, t_2pt, t_3pt, t_def, t_reb) {
+    this.name  = name;
+    this.t_2pt = t_2pt; this.t_3pt = t_3pt;
+    this.t_def = t_def; this.t_reb = t_reb;
+    this.ovr = t_2pt + t_3pt + t_def + t_reb;
+    this.pv  = t_reb - t_3pt + 0.01 * t_2pt + 0.0001 * t_def;
+    this.off = t_2pt + t_3pt + 0.01 * this.ovr;
+    this.ft_chance = Math.max(1, Math.min(90, Math.round(50 + t_2pt * 0.4 + t_3pt * 1.0)));
+    this.seconds_played = 0; this.points       = 0;
+    this.fg_made        = 0; this.fg_attempted  = 0;
+    this.tpt_made       = 0; this.tpt_attempted = 0;
+    this.ft_made        = 0; this.ft_attempted  = 0;
+    this.rebounds = 0; this.assists = 0;
+    this.steals   = 0; this.blocks  = 0;
+    this.fouls    = 0; this.plus_minus = 0;
+    this.on_court         = false;
+    this.fouled_out       = false;
+    this.positions_played = {1:0, 2:0, 3:0, 4:0, 5:0};
+    this.current_position = null;
+    this.team_ref         = null;
+  }
+
+  primaryPos() {
+    const total = Object.values(this.positions_played).reduce((a, b) => a + b, 0);
+    if (!total) return 'BN';
+    let best = 1;
+    for (let i = 2; i <= 5; i++)
+      if (this.positions_played[i] > this.positions_played[best]) best = i;
+    return ['PG','SG','SF','PF','C'][best - 1];
+  }
+}
+
+// ── Team ─────────────────────────────────────────────────────────────
+class Team {
+  constructor(abbr, playerData) {
+    this.abbr    = abbr;
+    this.players = playerData.map(p => new Player(p.name, p.t_2pt, p.t_3pt, p.t_def, p.t_reb));
+    this.score   = 0;
+    this.court   = [];
+    this.defensive_fouls_qtr = 0;
+    this.foul_in_last_2_mins = false;
+  }
+
+  byPv() {
+    const s = [...this.court].sort((a, b) => a.pv - b.pv);
+    s.forEach((p, i) => p.current_position = i + 1);
+    return s;
+  }
+
+  byOff() { return [...this.court].sort((a, b) => b.off - a.off); }
+}
+
+// ── Game ─────────────────────────────────────────────────────────────
+class Game {
+  constructor(t1, t2) {
+    this.t1 = t1; this.t2 = t2;
+    this.quarter = 0; this.clock = 0;
+    this.possession = null; this.jumpball_winner = null;
+    this.subs_waiting = false;
+    this.t1_q_scores = []; this.t2_q_scores = [];
+    this.t1_last = 0; this.t2_last = 0;
+    this.logs = {};
+    this.timeline = [];
+  }
+
+  fmt() {
+    const m = Math.floor(this.clock / 60), s = this.clock % 60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  // Compute a position-sorted court snapshot without mutating current_position
+  snap(team) {
+    const sorted = [...team.court].sort((a, b) => a.pv - b.pv);
+    return sorted.map((p, i) => ({
+      name: p.name, pos: i + 1,
+      pts: p.points, reb: p.rebounds, ast: p.assists,
+    }));
+  }
+
+  log(msg) {
+    const scored = msg.includes('makes') || msg.includes('scores');
+    const tag = scored ? ` [${this.t1.abbr} ${this.t1.score} – ${this.t2.abbr} ${this.t2.score}]` : '';
+    if (!this.logs[this.quarter]) this.logs[this.quarter] = [];
+    const line = `${this.fmt()} ${msg}${tag}`.trim();
+    this.logs[this.quarter].push(line);
+    this.timeline.push({
+      quarter:  this.quarter,
+      clockFmt: this.fmt(),
+      text:     line,
+      t1Score:  this.t1.score,
+      t2Score:  this.t2.score,
+      t1Court:  this.snap(this.t1),
+      t2Court:  this.snap(this.t2),
+    });
+  }
+
+  pm(scoringTeam, pts) {
+    const other = scoringTeam === this.t1 ? this.t2 : this.t1;
+    scoringTeam.court.forEach(p => p.plus_minus += pts);
+    other.court.forEach(p => p.plus_minus -= pts);
+  }
+
+  startLineups() {
+    for (const team of [this.t1, this.t2]) {
+      team.court = [];
+      team.players.forEach(p => p.on_court = false);
+      for (let s = 0; s < 5; s++) {
+        const bench = [...team.players]
+          .filter(p => !p.on_court && !p.fouled_out)
+          .sort((a, b) => b.ovr - a.ovr);
+        if (!bench.length) break;
+        const r = rollD(20);
+        const idx = r <= 6  ? 0
+          : r <= 11 ? Math.min(1, bench.length - 1)
+          : r <= 15 ? Math.min(2, bench.length - 1)
+          : r <= 18 ? Math.min(3, bench.length - 1)
+          :           Math.min(4, bench.length - 1);
+        bench[idx].on_court = true;
+        team.court.push(bench[idx]);
+      }
+    }
+  }
+
+  thresh(roll, sz) {
+    const t = sz >= 5 ? [6,11,15,18,20]
+      : sz === 4 ? [8,14,18,20]
+      : sz === 3 ? [9,16,20]
+      : sz === 2 ? [13,20] : [20];
+    for (let i = 0; i < t.length; i++) if (roll <= t[i]) return i;
+    return t.length - 1;
+  }
+
+  subs(ftShooter = null, forced = []) {
+    for (const team of [this.t1, this.t2]) {
+      const forcedTeam = forced.filter(p => team.players.includes(p) && p.on_court);
+      if (!this.subs_waiting && !forcedTeam.length) continue;
+      let n = (forcedTeam.length && !this.subs_waiting)
+        ? 1
+        : Math.min(5, this.thresh(rollD(20), 5) + 1);
+      n = Math.max(n, forcedTeam.length);
+      const courtPool = [...team.court].sort((a, b) => a.ovr - b.ovr);
+      const initBench = team.players.filter(p => !p.on_court && !p.fouled_out);
+      const maxSubs   = Math.min(n, courtPool.length, initBench.length);
+      const outList = [], inList = [];
+      for (let i = 0; i < maxSubs; i++) {
+        let outP;
+        if (i < forcedTeam.length) {
+          outP = forcedTeam[i];
+        } else {
+          const validOut = courtPool.filter(p => !outList.includes(p) && p !== ftShooter);
+          if (!validOut.length) break;
+          outP = validOut[this.thresh(rollD(20), validOut.length)];
+        }
+        const validIn = [...team.players]
+          .filter(p => !p.on_court && !p.fouled_out && !inList.includes(p))
+          .sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+        if (!validIn.length) break;
+        let idxIn = this.thresh(rollD(20), 5);
+        idxIn = Math.min(idxIn, validIn.length - 1);
+        outList.push(outP);
+        inList.push(validIn[idxIn]);
+      }
+      for (let i = 0; i < outList.length; i++) {
+        const op = outList[i], ip = inList[i];
+        op.on_court = false;
+        team.court = team.court.filter(p => p !== op);
+        ip.on_court = true;
+        team.court.push(ip);
+        this.log(`SUB: ${ip.name} in for ${op.name}`);
+      }
+    }
+    this.subs_waiting = false;
+    this.t1.byPv();
+    this.t2.byPv();
+  }
+
+  tick(dice) {
+    const t = rollD(6, dice);
+    this.clock = Math.max(0, this.clock - t);
+    for (const team of [this.t1, this.t2])
+      for (const p of team.court) {
+        p.seconds_played += t;
+        if (p.current_position) p.positions_played[p.current_position] += t;
+      }
+    return this.clock > 0;
+  }
+
+  bonus(defTeam) {
+    return defTeam.defensive_fouls_qtr >= 4
+      || (this.clock <= 120 && defTeam.foul_in_last_2_mins);
+  }
+
+  foulOn(player) {
+    player.fouls++;
+    const f = [];
+    if (player.fouls >= 6) {
+      player.fouled_out = true; f.push(player);
+      this.log(`${player.name} fouled out!`);
+    } else if (player.fouls >= this.quarter + 2) {
+      f.push(player);
+      this.log(`${player.name} is in foul trouble (${player.fouls} fouls) and must sub out.`);
+    }
+    return f;
+  }
+
+  fts(shooter, n) {
+    if (!n) return true;
+    let madeLast = false;
+    for (let i = 0; i < n; i++) {
+      shooter.ft_attempted++;
+      if (rollD(100) <= shooter.ft_chance) {
+        shooter.points++; shooter.ft_made++;
+        shooter.team_ref.score++;
+        this.pm(shooter.team_ref, 1);
+        this.log(`${shooter.name} makes free throw ${i+1}/${n}`);
+        madeLast = (i === n - 1);
+      } else {
+        this.log(`${shooter.name} misses free throw ${i+1}/${n}`);
+        if (i === n - 1) madeLast = false;
+      }
+    }
+    return madeLast;
+  }
+
+  assist(offPv, shooter) {
+    const r = rollD(100);
+    let idx = -1;
+    if (r <= 24) idx = 0; else if (r <= 42) idx = 1;
+    else if (r <= 54) idx = 2; else if (r <= 60) idx = 3;
+    if (idx >= 0) {
+      const mates = offPv.filter(p => p !== shooter);
+      if (idx < mates.length) { mates[idx].assists++; return mates[idx]; }
+    }
+    return null;
+  }
+
+  rebCycle(offTeam, defTeam, skipped) {
+    const offPv = offTeam.byPv();
+    const defPv = defTeam.byPv();
+    let cycle = 1;
+    while (this.clock > 0) {
+      const order = [...defPv].reverse().concat([...offPv].reverse());
+      let grabbed = false;
+      for (const p of order) {
+        if (cycle === 1 && p === skipped) continue;
+        const rating = Math.max(1, p.t_reb) + (cycle === 1 && defPv.includes(p) ? 3 : 0);
+        if (rollD(100) <= rating) {
+          p.rebounds++;
+          this.log(`${p.name} Rebound`);
+          if (defPv.includes(p)) {
+            this.possession = defTeam;
+          } else {
+            this.possession = offTeam;
+            this.poss(2);
+          }
+          grabbed = true; break;
+        }
+      }
+      if (grabbed) break;
+      this.clock--; cycle++;
+    }
+  }
+
+  poss(dice = 4) {
+    if (this.clock <= 0) return;
+    if (!this.tick(dice)) return;
+    const off = this.possession;
+    const def = off === this.t1 ? this.t2 : this.t1;
+    off.court.forEach(p => p.team_ref = off);
+    def.court.forEach(p => p.team_ref = def);
+    let ev = rollD(6);
+    const offPv = off.byPv();
+    const defPv = def.byPv();
+
+    if (ev === 1) {
+      let stolen = false;
+      for (const d of defPv) {
+        if (rollD(100) <= Math.max(1, d.t_def)) {
+          d.steals++; this.log(`${d.name} Steal`);
+          this.possession = def; stolen = true; break;
+        }
+      }
+      if (stolen) return;
+      ev = Math.floor(Math.random() * 4) + 3;
+    }
+
+    if (ev === 2) {
+      const foulType = rollD(10);
+      const foulPos  = Math.floor((rollD(10) - 1) / 2);
+      if (foulType === 1) {
+        const fouler = offPv[foulPos];
+        const forced = this.foulOn(fouler);
+        this.log(`${fouler.name} offensive foul`);
+        if (this.bonus(off)) {
+          const shooter = def.court[Math.floor(Math.random() * def.court.length)];
+          this.subs(shooter, forced);
+          if (!this.fts(shooter, 2)) this.rebCycle(def, off, shooter);
+          else this.possession = off;
+        } else {
+          this.subs(null, forced);
+          this.possession = def;
+        }
+      } else {
+        const fouler = defPv[foulPos];
+        const forced = this.foulOn(fouler);
+        def.defensive_fouls_qtr++;
+        if (this.clock <= 120) def.foul_in_last_2_mins = true;
+        if (foulType <= 6) {
+          this.log(`${fouler.name} defensive foul`);
+          if (this.bonus(def)) {
+            const shooter = off.court[Math.floor(Math.random() * off.court.length)];
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, 2)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          } else {
+            this.subs(null, forced);
+            this.poss(2);
+          }
+        } else {
+          this.log(`${fouler.name} shooting foul`);
+          const offOff  = off.byOff();
+          const shooter = offOff[this.thresh(rollD(20), 5)];
+          const s2 = Math.max(1, shooter.t_2pt), s3 = Math.max(1, shooter.t_3pt);
+          const ratio = Math.round((s2 * 3) / ((s2 * 3) + (s3 * 2)) * 100);
+          let is2 = rollD(100) <= ratio;
+          if (!is2 && rollD(6) <= 4) is2 = true;
+          const pts = is2 ? 2 : 3;
+          const defender = defPv[shooter.current_position - 1];
+          const diff = (is2 ? shooter.t_2pt : shooter.t_3pt) - defender.t_def;
+          const target = Math.round(diff * (is2 ? 2/3 : 0.5)) + (is2 ? 54 : 36);
+          const m1 = rollD(100) <= target, m2 = rollD(100) <= target;
+          if (m1 && m2) {
+            shooter.fg_attempted++; shooter.fg_made++;
+            if (!is2) { shooter.tpt_attempted++; shooter.tpt_made++; }
+            shooter.points += pts; off.score += pts; this.pm(off, pts);
+            const ast = this.assist(offPv, shooter);
+            this.log(`${shooter.name} makes ${pts} (And-1!)${ast ? ` (${ast.name} Assist)` : ''}`);
+            if (rollD(10) <= pts) this.subs_waiting = true;
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, 1)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          } else {
+            this.log(`${shooter.name} misses ${pts} on foul`);
+            this.subs(shooter, forced);
+            if (!this.fts(shooter, pts)) this.rebCycle(off, def, shooter);
+            else this.possession = def;
+          }
+        }
+      }
+      return;
+    }
+
+    const offOff  = off.byOff();
+    const shooter = offOff[this.thresh(rollD(20), 5)];
+    const s2 = Math.max(1, shooter.t_2pt), s3 = Math.max(1, shooter.t_3pt);
+    const ratio = Math.round((s2 * 3) / ((s2 * 3) + (s3 * 2)) * 100);
+    const is2 = rollD(100) <= ratio;
+    const pts = is2 ? 2 : 3;
+    const defender = defPv[shooter.current_position - 1];
+    const diff = (is2 ? shooter.t_2pt : shooter.t_3pt) - defender.t_def;
+    const target = Math.round(diff * (is2 ? 2/3 : 0.5)) + (is2 ? 54 : 36);
+    shooter.fg_attempted++;
+    if (!is2) shooter.tpt_attempted++;
+    if (rollD(100) <= target) {
+      shooter.fg_made++;
+      if (!is2) shooter.tpt_made++;
+      shooter.points += pts; off.score += pts; this.pm(off, pts);
+      const ast = this.assist(offPv, shooter);
+      this.log(`${shooter.name} makes ${pts}${ast ? ` (${ast.name} Assist)` : ''}`);
+      if (rollD(10) <= pts) this.subs_waiting = true;
+      this.possession = def;
+    } else {
+      let blocked = false;
+      if (rollD(100) <= Math.max(1, defender.t_def)) {
+        if (rollD(6) <= defender.current_position + 1) {
+          blocked = true; defender.blocks++;
+          this.log(`${shooter.name} misses ${pts} (Blocked by ${defender.name}!)`);
+        }
+      }
+      if (!blocked) this.log(`${shooter.name} misses ${pts}`);
+      this.rebCycle(off, def, shooter);
+    }
+  }
+
+  playQuarter(mins) {
+    this.subs_waiting = false;
+    this.clock = mins * 60;
+    this.t1.defensive_fouls_qtr = 0; this.t2.defensive_fouls_qtr = 0;
+    this.t1.foul_in_last_2_mins = false; this.t2.foul_in_last_2_mins = false;
+    this.startLineups();
+    this.t1.byPv(); this.t2.byPv();
+    if (this.quarter === 1 || mins === 5) {
+      const c1 = this.t1.byPv()[4], c2 = this.t2.byPv()[4];
+      const r1 = Math.max(1, c1.t_reb), r2 = Math.max(1, c2.t_reb);
+      if (rollD(r1 + r2) <= r1) {
+        this.possession = this.t1;
+        if (this.quarter === 1) this.jumpball_winner = this.t1;
+        this.log(`${c1.name} wins the jumpball for ${this.t1.abbr}`);
+      } else {
+        this.possession = this.t2;
+        if (this.quarter === 1) this.jumpball_winner = this.t2;
+        this.log(`${c2.name} wins the jumpball for ${this.t2.abbr}`);
+      }
+    } else if (this.quarter === 2 || this.quarter === 3) {
+      this.possession = this.jumpball_winner === this.t1 ? this.t2 : this.t1;
+    } else {
+      this.possession = this.jumpball_winner;
+    }
+    while (this.clock > 0) this.poss();
+    this.t1_q_scores.push(this.t1.score - this.t1_last);
+    this.t2_q_scores.push(this.t2.score - this.t2_last);
+    this.t1_last = this.t1.score;
+    this.t2_last = this.t2.score;
+  }
+
+  run() {
+    for (let q = 1; q <= 4; q++) { this.quarter = q; this.playQuarter(12); }
+    let ot = 1;
+    while (this.t1.score === this.t2.score) {
+      this.quarter = 4 + ot; this.playQuarter(5); ot++;
+    }
+  }
+}
+
+// ── UI helpers ───────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = msg ? '' : 'none';
+}
+
+function updateLogoPreview() {
+  const t1 = document.getElementById('t1').value;
+  const t2 = document.getElementById('t2').value;
+  if (!t1 || !t2) return;
+  const el1 = document.getElementById('logo1');
+  const el2 = document.getElementById('logo2');
+  el1.style.visibility = 'visible'; el1.src = espnLogo(t1); el1.alt = t1;
+  el2.style.visibility = 'visible'; el2.src = espnLogo(t2); el2.alt = t2;
+  document.getElementById('matchupLogos').style.display = 'flex';
+}
+
+function randomize() {
+  const abbrs = Object.keys(teamsData);
+  if (abbrs.length < 2) return;
+  const i = Math.floor(Math.random() * abbrs.length);
+  let j;
+  do { j = Math.floor(Math.random() * abbrs.length); } while (j === i);
+  document.getElementById('t1').value = abbrs[i];
+  document.getElementById('t2').value = abbrs[j];
+  updateLogoPreview();
+}
+
+// ── Live replay ──────────────────────────────────────────────────────
+function getDelay() {
+  return DELAYS[parseInt(document.getElementById('speedSlider').value, 10) - 1];
+}
+
+function startLiveSim() {
+  showError('');
+  const t1Abbr = document.getElementById('t1').value;
+  const t2Abbr = document.getElementById('t2').value;
+  if (t1Abbr === t2Abbr) { showError('Please select two different teams.'); return; }
+
+  if (simTimeout) { clearTimeout(simTimeout); simTimeout = null; }
+  isPaused = false;
+
+  const btn = document.getElementById('simBtn');
+  btn.textContent = 'Simulating…'; btn.disabled = true;
+
+  setTimeout(() => {
+    const homeTeam = new Team(t2Abbr, teamsData[t2Abbr]);
+    applyHomeBonus(homeTeam);
+    const game = new Game(new Team(t1Abbr, teamsData[t1Abbr]), homeTeam);
+    game.run();
+
+    timeline = game.timeline;
+    timelineIdx = 0;
+    currentQuarter = 0;
+
+    // Wire up scoreboard
+    document.getElementById('lbAbbr1').textContent  = t1Abbr;
+    document.getElementById('lbAbbr2').textContent  = t2Abbr;
+    document.getElementById('lbLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('lbLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('lpLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('lpAbbr1').textContent  = t1Abbr;
+    document.getElementById('lpLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('lpAbbr2').textContent  = t2Abbr;
+    document.getElementById('lbScore1').textContent = '0';
+    document.getElementById('lbScore2').textContent = '0';
+    document.getElementById('lbScore1').className   = 'lb-score';
+    document.getElementById('lbScore2').className   = 'lb-score';
+    document.getElementById('lbPeriod').textContent = 'Q1';
+    document.getElementById('lbClock').textContent  = '12:00';
+    document.getElementById('lbFinal').style.display = 'none';
+    document.getElementById('pbpFeed').innerHTML    = '';
+    document.getElementById('lineup1').innerHTML    = '';
+    document.getElementById('lineup2').innerHTML    = '';
+    document.getElementById('pauseBtn').textContent = '⏸ Pause';
+    document.getElementById('gameArea').style.display = '';
+
+    btn.textContent = 'Simulate'; btn.disabled = false;
+    scheduleNext();
+  }, 20);
+}
+
+function scheduleNext() {
+  if (timelineIdx >= timeline.length) {
+    document.getElementById('lbFinal').style.display = '';
+    document.getElementById('lbClock').textContent   = 'Final';
+    return;
+  }
+  simTimeout = setTimeout(tick, getDelay());
+}
+
+function tick() {
+  if (isPaused || timelineIdx >= timeline.length) return;
+  const entry = timeline[timelineIdx++];
+
+  // Quarter divider when period changes
+  if (entry.quarter !== currentQuarter) {
+    currentQuarter = entry.quarter;
+    const div = document.createElement('div');
+    div.className = 'pbp-divider';
+    div.textContent = `— ${periodLabel(entry.quarter)} —`;
+    document.getElementById('pbpFeed').appendChild(div);
+  }
+
+  // Scoreboard
+  const s1 = document.getElementById('lbScore1');
+  const s2 = document.getElementById('lbScore2');
+  s1.textContent = entry.t1Score;
+  s2.textContent = entry.t2Score;
+  s1.className = 'lb-score' + (entry.t1Score > entry.t2Score ? ' winning' : '');
+  s2.className = 'lb-score' + (entry.t2Score > entry.t1Score ? ' winning' : '');
+  document.getElementById('lbPeriod').textContent = periodLabel(entry.quarter);
+  document.getElementById('lbClock').textContent  = entry.clockFmt;
+
+  // PBP line
+  const span = document.createElement('span');
+  span.className = `pbp-event ${logCss(entry.text)}`;
+  span.textContent = entry.text;
+  const feed = document.getElementById('pbpFeed');
+  feed.appendChild(span);
+  feed.scrollTop = feed.scrollHeight;
+
+  // Lineups
+  renderLineup('lineup1', entry.t1Court);
+  renderLineup('lineup2', entry.t2Court);
+
+  scheduleNext();
+}
+
+function renderLineup(elId, court) {
+  if (!court || !court.length) return;
+  document.getElementById(elId).innerHTML = court.map(p => `
+    <div class="lp-player">
+      <span class="lp-pos">${POS_LABELS[p.pos] || '—'}</span>
+      <span class="lp-name">${esc(p.name)}</span>
+      <span class="lp-stats">${p.pts}pts ${p.reb}reb ${p.ast}ast</span>
+    </div>`).join('');
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+  if (!isPaused) scheduleNext();
+}
+
+function resetSim() {
+  if (simTimeout) { clearTimeout(simTimeout); simTimeout = null; }
+  isPaused = false;
+  timeline = []; timelineIdx = 0; currentQuarter = 0;
+  document.getElementById('gameArea').style.display = 'none';
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('simBtn').disabled) startLiveSim();
+});
+
+fetch('nba_rosters26_v3.json')
+  .then(r => r.json())
+  .then(data => {
+    teamsData = data;
+    const abbrs = Object.keys(data).sort();
+    ['t1','t2'].forEach((id, i) => {
+      const sel = document.getElementById(id);
+      abbrs.forEach(abbr => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = abbr;
+        if (abbr === abbrs[i]) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    });
+    updateLogoPreview();
+  })
+  .catch(() => showError('Could not load nba_rosters26_v3.json. Make sure it is in the same folder as this page.'));
+</script>
+</body>
+</html>
