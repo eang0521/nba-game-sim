@@ -99,7 +99,7 @@
 
     /* ── Linescore ───────────────────────────── */
     .lb-linescore { margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid #1a2235; }
-    .ls-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+    .ls-table { width: auto; margin: 0 auto; border-collapse: collapse; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
     .ls-table th, .ls-table td { text-align: center; padding: 0.18rem 0.5rem; }
     .ls-table td:first-child { text-align: left; font-weight: 700; color: #c5d0fc; min-width: 2.5rem; }
     .ls-table th { color: #475569; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; }
@@ -123,37 +123,37 @@
     /* ── Game grid ──────────────────────────── */
     .game-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 2fr;
+      grid-template-columns: 3fr 2fr;
       gap: 1rem;
       align-items: start;
     }
 
-    /* ── Lineup panels ──────────────────────── */
-    .lineup-panel {
-      background: #141929; border: 1px solid #1e2d5a;
-      border-radius: 8px; overflow: hidden;
-    }
-    .lp-header {
-      padding: 0.5rem 0.9rem;
-      background: #0f1117; border-bottom: 1px solid #1e2d5a;
-      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #748ffc;
+    /* ── Box scores ─────────────────────────── */
+    .bs-section { margin-bottom: 1rem; }
+    .bs-section:last-child { margin-bottom: 0; }
+    .bs-hdr {
       display: flex; align-items: center; gap: 0.5rem;
+      padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #1e2d5a;
     }
-    .lp-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
-    .lp-list { padding: 0.35rem 0; }
-    .lp-player {
-      display: flex; align-items: baseline; gap: 0.55rem;
-      padding: 0.3rem 0.9rem; font-size: 0.79rem;
-    }
-    .lp-pos {
-      font-size: 0.62rem; font-weight: 700; color: #748ffc;
-      background: #1e2d5a; border-radius: 3px;
-      padding: 0.1rem 0.28rem; min-width: 2.1rem; text-align: center;
-      flex-shrink: 0; letter-spacing: 0.04em;
-    }
-    .lp-name { color: #e2e8f0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lp-stats { color: #475569; font-size: 0.7rem; white-space: nowrap; flex-shrink: 0; }
+    .bs-logo { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+    .bs-name { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #c5d0fc; }
+    .bs-label { font-size: 0.65rem; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-left: auto; }
+    .box-wrap { overflow-x: auto; border: 1px solid #1e2d5a; border-radius: 8px; }
+    .box-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 660px; table-layout: fixed; }
+    .box-table th:first-child, .box-table td:first-child { width: 24%; }
+    .box-table th, .box-table td { padding: 0.38rem 0.55rem; text-align: center; }
+    .box-table th { background: #0f1117; color: #748ffc; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .box-table td { color: #94a3b8; }
+    .box-table td:first-child { text-align: left; color: #e2e8f0; padding-left: 0.85rem; }
+    .box-table tbody tr:hover td { background: #172035; }
+    .box-table .totals-row td { background: #111827; border-top: 2px solid #3b5bdb; font-weight: 700; color: #748ffc; }
+    .box-table .totals-row td:first-child { color: #748ffc; }
+    .bs-active td { background: #192140 !important; }
+    .bs-active td:first-child { color: #c5d0fc !important; }
+    .stat-hi { color: #ffd43b; font-weight: 800; }
+    .pos-tag { color: #748ffc; font-size: 0.65rem; margin-left: 0.25rem; }
+    .pm-pos { color: #69db7c; font-weight: 700; }
+    .pm-neg { color: #f87171; font-weight: 700; }
 
     /* ── PBP panel ──────────────────────────── */
     .pbp-panel {
@@ -285,19 +285,23 @@
     </div>
 
     <div class="game-grid">
-      <div class="lineup-panel">
-        <div class="lp-header">
-          <img id="lpLogo1" class="lp-logo" src="" alt="" onerror="this.style.visibility='hidden'">
-          <span id="lpAbbr1"></span>
+      <div>
+        <div class="bs-section">
+          <div class="bs-hdr">
+            <img id="bsLogo1" class="bs-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+            <span id="bsName1" class="bs-name"></span>
+            <span class="bs-label">Away</span>
+          </div>
+          <div id="boxScore1"></div>
         </div>
-        <div id="lineup1" class="lp-list"></div>
-      </div>
-      <div class="lineup-panel">
-        <div class="lp-header">
-          <img id="lpLogo2" class="lp-logo" src="" alt="" onerror="this.style.visibility='hidden'">
-          <span id="lpAbbr2"></span>
+        <div class="bs-section">
+          <div class="bs-hdr">
+            <img id="bsLogo2" class="bs-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+            <span id="bsName2" class="bs-name"></span>
+            <span class="bs-label">Home</span>
+          </div>
+          <div id="boxScore2"></div>
         </div>
-        <div id="lineup2" class="lp-list"></div>
       </div>
       <div class="pbp-panel">
         <div class="pbp-header">Play-by-Play</div>
@@ -323,6 +327,9 @@ let currentQuarter = 0;
 let lsT1 = [], lsT2 = [];       // completed per-quarter scores
 let lsQStart1 = 0, lsQStart2 = 0; // running total at start of current quarter
 let lsLastT1  = 0, lsLastT2  = 0; // last processed totals (for end-of-quarter snapshot)
+
+// Box score appearance order
+let t1Order = [], t2Order = []; // player names in order of first court appearance
 
 const DELAYS     = [1000, 600, 350, 200, 100, 60, 35, 20, 10, 3];
 const POS_LABELS = ['—', 'PG', 'SG', 'SF', 'PF', 'C'];
@@ -441,12 +448,19 @@ class Game {
     return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   }
 
-  // Compute a position-sorted court snapshot without mutating current_position
+  // Full team stats snapshot with court positions (doesn't mutate current_position)
   snap(team) {
-    const sorted = [...team.court].sort((a, b) => a.pv - b.pv);
-    return sorted.map((p, i) => ({
-      name: p.name, pos: i + 1,
-      pts: p.points, reb: p.rebounds, ast: p.assists,
+    const onCourt = [...team.court].sort((a, b) => a.pv - b.pv);
+    const posMap = {};
+    onCourt.forEach((p, i) => { posMap[p.name] = i + 1; });
+    return team.players.map(p => ({
+      name: p.name, on_court: p.on_court, pos: posMap[p.name] || 0,
+      pts: p.points,   reb: p.rebounds, ast: p.assists,
+      stl: p.steals,   blk: p.blocks,  pf:  p.fouls,
+      fgm: p.fg_made,  fga: p.fg_attempted,
+      tpm: p.tpt_made, tpa: p.tpt_attempted,
+      ftm: p.ft_made,  fta: p.ft_attempted,
+      sec: p.seconds_played, pm: p.plus_minus,
     }));
   }
 
@@ -462,8 +476,8 @@ class Game {
       text:     line,
       t1Score:  this.t1.score,
       t2Score:  this.t2.score,
-      t1Court:  this.snap(this.t1),
-      t2Court:  this.snap(this.t2),
+      t1Snap:  this.snap(this.t1),
+      t2Snap:  this.snap(this.t2),
     });
   }
 
@@ -851,16 +865,17 @@ function startLiveSim() {
     timelineIdx = 0;
     currentQuarter = 0;
     lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
+    t1Order = []; t2Order = [];
 
     // Wire up scoreboard
     document.getElementById('lbAbbr1').textContent  = t1Abbr;
     document.getElementById('lbAbbr2').textContent  = t2Abbr;
     document.getElementById('lbLogo1').src = espnLogo(t1Abbr);
     document.getElementById('lbLogo2').src = espnLogo(t2Abbr);
-    document.getElementById('lpLogo1').src = espnLogo(t1Abbr);
-    document.getElementById('lpAbbr1').textContent  = t1Abbr;
-    document.getElementById('lpLogo2').src = espnLogo(t2Abbr);
-    document.getElementById('lpAbbr2').textContent  = t2Abbr;
+    document.getElementById('bsLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('bsName1').textContent  = t1Abbr;
+    document.getElementById('bsLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('bsName2').textContent  = t2Abbr;
     document.getElementById('lbScore1').textContent = '0';
     document.getElementById('lbScore2').textContent = '0';
     document.getElementById('lbScore1').className   = 'lb-score';
@@ -869,8 +884,8 @@ function startLiveSim() {
     document.getElementById('lbClock').textContent  = '12:00';
     document.getElementById('lbFinal').style.display = 'none';
     document.getElementById('pbpFeed').innerHTML    = '';
-    document.getElementById('lineup1').innerHTML    = '';
-    document.getElementById('lineup2').innerHTML    = '';
+    document.getElementById('boxScore1').innerHTML  = '';
+    document.getElementById('boxScore2').innerHTML  = '';
     document.getElementById('pauseBtn').textContent = '⏸ Pause';
     document.getElementById('gameArea').style.display = '';
 
@@ -939,9 +954,11 @@ function tick() {
   feed.prepend(row);
   feed.scrollTop = 0;
 
-  // Lineups
-  renderLineup('lineup1', entry.t1Court);
-  renderLineup('lineup2', entry.t2Court);
+  // Box scores
+  entry.t1Snap.forEach(p => { if (p.on_court && !t1Order.includes(p.name)) t1Order.push(p.name); });
+  entry.t2Snap.forEach(p => { if (p.on_court && !t2Order.includes(p.name)) t2Order.push(p.name); });
+  renderBoxScore('boxScore1', entry.t1Snap, t1Order);
+  renderBoxScore('boxScore2', entry.t2Snap, t2Order);
 
   scheduleNext();
 }
@@ -973,14 +990,58 @@ function renderLinescore(currentQ, t1Total, t2Total) {
     buildRow(abbr2, lsT2, lsQStart2, t2Total);
 }
 
-function renderLineup(elId, court) {
-  if (!court || !court.length) return;
-  document.getElementById(elId).innerHTML = court.map(p => `
-    <div class="lp-player">
-      <span class="lp-pos">${POS_LABELS[p.pos] || '—'}</span>
-      <span class="lp-name">${esc(p.name)}</span>
-      <span class="lp-stats">${p.pts}pts ${p.reb}reb ${p.ast}ast</span>
-    </div>`).join('');
+function renderBoxScore(elId, snap, order) {
+  const snapMap = {};
+  snap.forEach(p => { snapMap[p.name] = p; });
+  const rows = order.map(name => snapMap[name]).filter(p => p && (p.sec > 0 || p.on_court));
+  if (!rows.length) return;
+
+  const hi = {
+    pts: Math.max(0, ...rows.map(p => p.pts)),
+    reb: Math.max(0, ...rows.map(p => p.reb)),
+    ast: Math.max(0, ...rows.map(p => p.ast)),
+    stl: Math.max(0, ...rows.map(p => p.stl)),
+    blk: Math.max(0, ...rows.map(p => p.blk)),
+  };
+  const hc = (val, key) => val > 0 && val === hi[key] ? ' class="stat-hi"' : '';
+
+  let tMin=0, tPts=0, tFgm=0, tFga=0, t3m=0, t3a=0, tFtm=0, tFta=0,
+      tReb=0, tAst=0, tStl=0, tBlk=0, tPf=0;
+
+  const playerRows = rows.map(p => {
+    const mp = Math.round(p.sec / 60);
+    const pm = p.pm > 0 ? `+${p.pm}` : `${p.pm}`;
+    const pmCls = p.pm > 0 ? 'pm-pos' : (p.pm < 0 ? 'pm-neg' : '');
+    const posLabel = p.on_court ? ` <span class="pos-tag">(${POS_LABELS[p.pos] || '?'})</span>` : '';
+    tMin+=mp; tPts+=p.pts; tFgm+=p.fgm; tFga+=p.fga;
+    t3m+=p.tpm; t3a+=p.tpa; tFtm+=p.ftm; tFta+=p.fta;
+    tReb+=p.reb; tAst+=p.ast; tStl+=p.stl; tBlk+=p.blk; tPf+=p.pf;
+    return `<tr${p.on_court ? ' class="bs-active"' : ''}>
+      <td>${esc(p.name)}${posLabel}</td>
+      <td>${mp}</td><td${hc(p.pts,'pts')}>${p.pts}</td>
+      <td>${p.fgm}-${p.fga}</td><td>${p.tpm}-${p.tpa}</td><td>${p.ftm}-${p.fta}</td>
+      <td${hc(p.reb,'reb')}>${p.reb}</td><td${hc(p.ast,'ast')}>${p.ast}</td>
+      <td${hc(p.stl,'stl')}>${p.stl}</td><td${hc(p.blk,'blk')}>${p.blk}</td>
+      <td>${p.pf}</td><td class="${pmCls}">${pm}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById(elId).innerHTML = `
+    <div class="box-wrap"><table class="box-table">
+      <thead><tr>
+        <th>Player</th><th>MIN</th><th>PTS</th><th>FG</th><th>3PT</th><th>FT</th>
+        <th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>PF</th><th>+/-</th>
+      </tr></thead>
+      <tbody>
+        ${playerRows}
+        <tr class="totals-row">
+          <td>TOTALS</td><td>${tMin}</td><td>${tPts}</td>
+          <td>${tFgm}-${tFga}</td><td>${t3m}-${t3a}</td><td>${tFtm}-${tFta}</td>
+          <td>${tReb}</td><td>${tAst}</td><td>${tStl}</td><td>${tBlk}</td>
+          <td>${tPf}</td><td></td>
+        </tr>
+      </tbody>
+    </table></div>`;
 }
 
 function togglePause() {
@@ -994,6 +1055,7 @@ function resetSim() {
   isPaused = false;
   timeline = []; timelineIdx = 0; currentQuarter = 0;
   lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
+  t1Order = []; t2Order = [];
   document.getElementById('gameArea').style.display = 'none';
 }
 
