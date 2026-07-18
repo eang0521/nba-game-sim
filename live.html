@@ -205,6 +205,29 @@
     .ev-reb     { color: #38d9a9; }
     .ev-misc    { color: #748ffc; }
     .ev-neutral { color: #94a3b8; }
+    /* ── Sticky scorebug ────────────────────── */
+    .sticky-bug {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: #141929; border-bottom: 2px solid #3b5bdb;
+      padding: 0.35rem 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 1.25rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.55);
+      opacity: 0; transform: translateY(-100%);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      pointer-events: none;
+    }
+    .sticky-bug.sb-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .sb-team { display: flex; align-items: center; gap: 0.45rem; }
+    .sb-logo { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+    .sb-abbr { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; color: #c5d0fc; }
+    .sb-score {
+      font-size: 1.35rem; font-weight: 900; color: #fff;
+      min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums;
+    }
+    .sb-score.winning { color: #69db7c; }
+    .sb-mid { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; padding: 0 0.25rem; }
+    .sb-period { font-size: 0.6rem; font-weight: 700; color: #748ffc; text-transform: uppercase; letter-spacing: 0.1em; }
+    .sb-clock { font-size: 0.82rem; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
@@ -222,6 +245,23 @@
     <a href="rulebook.html" class="nav-link">Rulebook</a>
   </nav>
 </header>
+
+<div id="stickyBug" class="sticky-bug">
+  <div class="sb-team">
+    <img id="sbLogo1" class="sb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+    <span id="sbAbbr1" class="sb-abbr"></span>
+    <span id="sbScore1" class="sb-score">0</span>
+  </div>
+  <div class="sb-mid">
+    <span id="sbPeriod" class="sb-period">Q1</span>
+    <span id="sbClock" class="sb-clock">12:00</span>
+  </div>
+  <div class="sb-team">
+    <span id="sbScore2" class="sb-score">0</span>
+    <span id="sbAbbr2" class="sb-abbr"></span>
+    <img id="sbLogo2" class="sb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+  </div>
+</div>
 
 <div class="container">
 
@@ -257,7 +297,7 @@
 
   <div id="gameArea" style="display:none">
 
-    <div class="live-board">
+    <div class="live-board" id="liveBoard">
       <div class="lb-score-row">
         <div class="lb-side">
           <img id="lbLogo1" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
@@ -334,6 +374,9 @@ let lsLastT1  = 0, lsLastT2  = 0; // last processed totals (for end-of-quarter s
 
 // Box score appearance order
 let t1Order = [], t2Order = []; // player names in order of first court appearance
+
+// Sticky scorebug
+let bugObserver = null;
 
 const DELAYS     = [1000, 600, 350, 200, 100, 60, 35, 20, 10, 3];
 const POS_LABELS = ['—', 'PG', 'SG', 'SF', 'PF', 'C'];
@@ -894,6 +937,23 @@ function startLiveSim() {
     document.getElementById('stepBtn').disabled = true;
     document.getElementById('gameArea').style.display = '';
 
+    // Sticky bug — populate team info and start observing the main scoreboard
+    document.getElementById('sbLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('sbAbbr1').textContent = t1Abbr;
+    document.getElementById('sbScore1').textContent = '0';
+    document.getElementById('sbScore1').className = 'sb-score';
+    document.getElementById('sbLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('sbAbbr2').textContent = t2Abbr;
+    document.getElementById('sbScore2').textContent = '0';
+    document.getElementById('sbScore2').className = 'sb-score';
+    document.getElementById('sbPeriod').textContent = 'Q1';
+    document.getElementById('sbClock').textContent = '12:00';
+    if (bugObserver) bugObserver.disconnect();
+    bugObserver = new IntersectionObserver(entries => {
+      document.getElementById('stickyBug').classList.toggle('sb-visible', !entries[0].isIntersecting);
+    }, { threshold: 0 });
+    bugObserver.observe(document.getElementById('liveBoard'));
+
     btn.textContent = 'Simulate'; btn.disabled = false;
     scheduleNext();
   }, 20);
@@ -903,6 +963,8 @@ function scheduleNext() {
   if (timelineIdx >= timeline.length) {
     document.getElementById('lbFinal').style.display = '';
     document.getElementById('lbClock').textContent   = 'Final';
+    document.getElementById('sbPeriod').textContent  = 'Final';
+    document.getElementById('sbClock').textContent   = '';
     document.getElementById('stepBtn').disabled = true;
     return;
   }
@@ -940,6 +1002,14 @@ function tick(autoAdvance = true) {
   document.getElementById('lbPeriod').textContent = periodLabel(entry.quarter);
   document.getElementById('lbClock').textContent  = entry.clockFmt;
 
+  // Sticky scorebug
+  document.getElementById('sbScore1').textContent = entry.t1Score;
+  document.getElementById('sbScore2').textContent = entry.t2Score;
+  document.getElementById('sbScore1').className = 'sb-score' + (entry.t1Score > entry.t2Score ? ' winning' : '');
+  document.getElementById('sbScore2').className = 'sb-score' + (entry.t2Score > entry.t1Score ? ' winning' : '');
+  document.getElementById('sbPeriod').textContent = periodLabel(entry.quarter);
+  document.getElementById('sbClock').textContent  = entry.clockFmt;
+
   // Linescore
   lsLastT1 = entry.t1Score;
   lsLastT2 = entry.t2Score;
@@ -970,6 +1040,8 @@ function tick(autoAdvance = true) {
   else if (timelineIdx >= timeline.length) {
     document.getElementById('lbFinal').style.display = '';
     document.getElementById('lbClock').textContent   = 'Final';
+    document.getElementById('sbPeriod').textContent  = 'Final';
+    document.getElementById('sbClock').textContent   = '';
     document.getElementById('stepBtn').disabled = true;
   }
 }
@@ -1077,6 +1149,8 @@ function resetSim() {
   timeline = []; timelineIdx = 0; currentQuarter = 0;
   lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
   t1Order = []; t2Order = [];
+  document.getElementById('stickyBug').classList.remove('sb-visible');
+  if (bugObserver) { bugObserver.disconnect(); bugObserver = null; }
   document.getElementById('gameArea').style.display = 'none';
 }
 
