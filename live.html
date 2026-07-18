@@ -248,7 +248,7 @@
 
 <div id="stickyBug" class="sticky-bug">
   <div class="sb-team">
-    <img id="sbLogo1" class="sb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+    <img id="sbLogo1" class="sb-logo" alt="" onerror="this.style.visibility='hidden'">
     <span id="sbAbbr1" class="sb-abbr"></span>
     <span id="sbScore1" class="sb-score">0</span>
   </div>
@@ -259,7 +259,7 @@
   <div class="sb-team">
     <span id="sbScore2" class="sb-score">0</span>
     <span id="sbAbbr2" class="sb-abbr"></span>
-    <img id="sbLogo2" class="sb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+    <img id="sbLogo2" class="sb-logo" alt="" onerror="this.style.visibility='hidden'">
   </div>
 </div>
 
@@ -273,9 +273,9 @@
         <select id="t1" onchange="updateLogoPreview()"></select>
       </div>
       <div class="matchup-logos" id="matchupLogos" style="display:none">
-        <img id="logo1" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo1" class="preview-logo" alt="" onerror="this.style.visibility='hidden'">
         <span class="preview-at">@</span>
-        <img id="logo2" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo2" class="preview-logo" alt="" onerror="this.style.visibility='hidden'">
       </div>
       <div class="form-group">
         <label for="t2">Home Team</label>
@@ -300,7 +300,7 @@
     <div class="live-board" id="liveBoard">
       <div class="lb-score-row">
         <div class="lb-team">
-          <img id="lbLogo1" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+          <img id="lbLogo1" class="lb-logo" alt="" onerror="this.style.visibility='hidden'">
           <span id="lbAbbr1" class="lb-abbr"></span>
           <span id="lbScore1" class="lb-score">0</span>
         </div>
@@ -312,7 +312,7 @@
         <div class="lb-team">
           <span id="lbScore2" class="lb-score">0</span>
           <span id="lbAbbr2" class="lb-abbr"></span>
-          <img id="lbLogo2" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+          <img id="lbLogo2" class="lb-logo" alt="" onerror="this.style.visibility='hidden'">
         </div>
       </div>
     </div>
@@ -331,7 +331,7 @@
       <div>
         <div class="bs-section">
           <div class="bs-hdr">
-            <img id="bsLogo1" class="bs-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+            <img id="bsLogo1" class="bs-logo" alt="" onerror="this.style.visibility='hidden'">
             <span id="bsName1" class="bs-name"></span>
             <span class="bs-label">Away</span>
           </div>
@@ -339,7 +339,7 @@
         </div>
         <div class="bs-section">
           <div class="bs-hdr">
-            <img id="bsLogo2" class="bs-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+            <img id="bsLogo2" class="bs-logo" alt="" onerror="this.style.visibility='hidden'">
             <span id="bsName2" class="bs-name"></span>
             <span class="bs-label">Home</span>
           </div>
@@ -912,6 +912,11 @@ function startLiveSim() {
     currentQuarter = 0;
     lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
     t1Order = []; t2Order = [];
+
+    // Reset logo visibility in case a prior onerror hid them
+    ['lbLogo1','lbLogo2','sbLogo1','sbLogo2','bsLogo1','bsLogo2'].forEach(id => {
+      document.getElementById(id).style.visibility = '';
+    });
 
     // Wire up scoreboard
     document.getElementById('lbAbbr1').textContent  = t1Abbr;
