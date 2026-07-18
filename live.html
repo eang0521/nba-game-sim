@@ -98,7 +98,11 @@
     .lb-final { font-size: 0.7rem; font-weight: 700; color: #69db7c; text-transform: uppercase; letter-spacing: 0.12em; }
 
     /* ── Linescore ───────────────────────────── */
-    .lb-linescore { margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid #1a2235; }
+    .lb-linescore {
+      background: #141929; border: 1px solid #1e2d5a; border-radius: 10px;
+      padding: 0.65rem 1.75rem; margin-bottom: 1rem;
+      display: flex; justify-content: center;
+    }
     .ls-table { width: auto; margin: 0 auto; border-collapse: collapse; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
     .ls-table th, .ls-table td { text-align: center; padding: 0.18rem 0.5rem; }
     .ls-table td:first-child { text-align: left; font-weight: 700; color: #c5d0fc; min-width: 2.5rem; }
@@ -317,9 +321,10 @@
           <img id="lbLogo2" class="lb-logo" src="" alt="" onerror="this.style.visibility='hidden'">
         </div>
       </div>
-      <div class="lb-linescore">
-        <table class="ls-table" id="linescoreTable"></table>
-      </div>
+    </div>
+
+    <div class="lb-linescore">
+      <table class="ls-table" id="linescoreTable"></table>
     </div>
 
     <div class="live-controls">
@@ -950,8 +955,8 @@ function startLiveSim() {
     document.getElementById('sbClock').textContent = '12:00';
     if (bugObserver) bugObserver.disconnect();
     bugObserver = new IntersectionObserver(entries => {
-      document.getElementById('stickyBug').classList.toggle('sb-visible', !entries[0].isIntersecting);
-    }, { threshold: 0 });
+      document.getElementById('stickyBug').classList.toggle('sb-visible', entries[0].intersectionRatio < 1);
+    }, { threshold: 1 });
     bugObserver.observe(document.getElementById('liveBoard'));
 
     btn.textContent = 'Simulate'; btn.disabled = false;
