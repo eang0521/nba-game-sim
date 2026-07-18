@@ -119,6 +119,9 @@
     .btn-pause:hover { background: #2d3f6e; }
     .btn-reset { background: none; color: #475569; border: 1px solid #1e2d5a; border-radius: 6px; }
     .btn-reset:hover { color: #94a3b8; border-color: #2d3f6e; }
+    .btn-step { background: none; color: #748ffc; border: 1px solid #2d3f6e; border-radius: 6px; }
+    .btn-step:hover:not([disabled]) { background: #1e2d5a; color: #c5d0fc; }
+    .btn-step[disabled] { color: #2d3a5c; border-color: #1a2235; cursor: default; }
 
     /* ── Game grid ──────────────────────────── */
     .game-grid {
@@ -281,6 +284,7 @@
 
     <div class="live-controls">
       <button class="btn-ctrl btn-pause" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+      <button class="btn-ctrl btn-step" id="stepBtn" onclick="stepForward()" disabled>Step →</button>
       <button class="btn-ctrl btn-reset" onclick="resetSim()">↺ Reset</button>
     </div>
 
@@ -887,6 +891,7 @@ function startLiveSim() {
     document.getElementById('boxScore1').innerHTML  = '';
     document.getElementById('boxScore2').innerHTML  = '';
     document.getElementById('pauseBtn').textContent = '⏸ Pause';
+    document.getElementById('stepBtn').disabled = true;
     document.getElementById('gameArea').style.display = '';
 
     btn.textContent = 'Simulate'; btn.disabled = false;
@@ -898,12 +903,13 @@ function scheduleNext() {
   if (timelineIdx >= timeline.length) {
     document.getElementById('lbFinal').style.display = '';
     document.getElementById('lbClock').textContent   = 'Final';
+    document.getElementById('stepBtn').disabled = true;
     return;
   }
   simTimeout = setTimeout(tick, getDelay());
 }
 
-function tick() {
+function tick(autoAdvance = true) {
   if (isPaused || timelineIdx >= timeline.length) return;
   const entry = timeline[timelineIdx++];
   const feed = document.getElementById('pbpFeed');
@@ -960,7 +966,12 @@ function tick() {
   renderBoxScore('boxScore1', entry.t1Snap, t1Order);
   renderBoxScore('boxScore2', entry.t2Snap, t2Order);
 
-  scheduleNext();
+  if (autoAdvance) scheduleNext();
+  else if (timelineIdx >= timeline.length) {
+    document.getElementById('lbFinal').style.display = '';
+    document.getElementById('lbClock').textContent   = 'Final';
+    document.getElementById('stepBtn').disabled = true;
+  }
 }
 
 function renderLinescore(currentQ, t1Total, t2Total) {
@@ -1047,12 +1058,22 @@ function renderBoxScore(elId, snap, order) {
 function togglePause() {
   isPaused = !isPaused;
   document.getElementById('pauseBtn').textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+  document.getElementById('stepBtn').disabled = !isPaused;
   if (!isPaused) scheduleNext();
+}
+
+function stepForward() {
+  if (timelineIdx >= timeline.length) return;
+  isPaused = false;     // let tick() execute
+  tick(false);          // process one event, don't schedule next
+  isPaused = true;      // stay paused
 }
 
 function resetSim() {
   if (simTimeout) { clearTimeout(simTimeout); simTimeout = null; }
   isPaused = false;
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  document.getElementById('stepBtn').disabled = true;
   timeline = []; timelineIdx = 0; currentQuarter = 0;
   lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
   t1Order = []; t2Order = [];
