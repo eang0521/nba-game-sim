@@ -155,8 +155,22 @@
       display: flex; flex-direction: column;
     }
     .pbp-event {
+      display: flex; align-items: baseline; gap: 0.5rem;
+      padding: 0.35rem 0.75rem 0.35rem 1rem;
+      border-left: 2px solid transparent;
+      font-size: 0.82rem; line-height: 1.5;
+      transition: background 0.1s;
+    }
+    .pbp-event:hover { background: #172035; }
+    .pbp-clock {
       font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.76rem; line-height: 1.75; padding: 0.04rem 1rem; display: block;
+      font-size: 0.68rem; color: #475569;
+      white-space: nowrap; flex-shrink: 0; min-width: 2.8rem;
+    }
+    .pbp-text { flex: 1; }
+    .pbp-score {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.68rem; color: #69db7c; white-space: nowrap; flex-shrink: 0;
     }
     .pbp-divider {
       text-align: center; font-size: 0.65rem; font-weight: 700;
@@ -165,13 +179,13 @@
       border-top: 1px solid #1e2d5a; border-bottom: 1px solid #1e2d5a;
       margin: 0.25rem 0; flex-shrink: 0;
     }
-    .ev-make    { color: #69db7c; }
+    .ev-make    { color: #69db7c; border-left-color: #2f9e4a; }
     .ev-miss    { color: #4b5e7a; }
-    .ev-foul    { color: #ffa94d; }
-    .ev-steal   { color: #4dabf7; }
-    .ev-block   { color: #da77f2; }
+    .ev-foul    { color: #ffa94d; border-left-color: #d97706; }
+    .ev-steal   { color: #4dabf7; border-left-color: #1e6fa8; }
+    .ev-block   { color: #da77f2; border-left-color: #9b30b8; }
     .ev-reb     { color: #38d9a9; }
-    .ev-misc    { color: #748ffc; font-style: italic; }
+    .ev-misc    { color: #748ffc; }
     .ev-neutral { color: #94a3b8; }
   </style>
 </head>
@@ -850,14 +864,15 @@ function scheduleNext() {
 function tick() {
   if (isPaused || timelineIdx >= timeline.length) return;
   const entry = timeline[timelineIdx++];
+  const feed = document.getElementById('pbpFeed');
 
-  // Quarter divider when period changes
+  // Quarter divider — prepend before the first event of the new period
   if (entry.quarter !== currentQuarter) {
     currentQuarter = entry.quarter;
     const div = document.createElement('div');
     div.className = 'pbp-divider';
     div.textContent = `— ${periodLabel(entry.quarter)} —`;
-    document.getElementById('pbpFeed').appendChild(div);
+    feed.prepend(div);
   }
 
   // Scoreboard
@@ -870,13 +885,20 @@ function tick() {
   document.getElementById('lbPeriod').textContent = periodLabel(entry.quarter);
   document.getElementById('lbClock').textContent  = entry.clockFmt;
 
-  // PBP line
-  const span = document.createElement('span');
-  span.className = `pbp-event ${logCss(entry.text)}`;
-  span.textContent = entry.text;
-  const feed = document.getElementById('pbpFeed');
-  feed.appendChild(span);
-  feed.scrollTop = feed.scrollHeight;
+  // PBP line — split clock / event text / score tag into separate spans
+  const raw = entry.text;
+  const spIdx = raw.indexOf(' ');
+  const clock = spIdx >= 0 ? raw.slice(0, spIdx) : '';
+  const afterClock = spIdx >= 0 ? raw.slice(spIdx + 1) : raw;
+  const scoreMatch = afterClock.match(/^(.*?)(\s*\[.+\])$/);
+  const mainText = scoreMatch ? scoreMatch[1] : afterClock;
+  const scoreTag = scoreMatch ? scoreMatch[2].trim() : '';
+
+  const row = document.createElement('div');
+  row.className = `pbp-event ${logCss(entry.text)}`;
+  row.innerHTML = `<span class="pbp-clock">${esc(clock)}</span><span class="pbp-text">${esc(mainText)}</span>${scoreTag ? `<span class="pbp-score">${esc(scoreTag)}</span>` : ''}`;
+  feed.prepend(row);
+  feed.scrollTop = 0;
 
   // Lineups
   renderLineup('lineup1', entry.t1Court);
