@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Excel / raw data (run pipeline scripts to regenerate)
+*.xlsx
+
+# Intermediate pipeline temp file (copy of bbref_stats.csv)
+bbref_work.csv
+
+# Old/superseded data files
+nba_11_26_ratings.csv
+nba_11_26_ratings.xlsx
+nba_rosters26*.json
+nba_rosters26*.xlsx
+nba_teams*.json
+nba_rosters*.xlsx
+bball_teams.json
+pro_league_teams.json
+
+# FBA / N3BL league files (separate project)
+fba_*.json
+fba_rosters*.xlsx
+n3bl_*.py
+n3bl_nba*.py
+bballsim*.py
+n3bl_nba26_season_box_scores.docx
+FBA_Logs.docx
+
+# Unused old scripts
+xlsx_to_json.py
+convert_nba_rosters.py
+nfl_test.py
+csv_to_json_old.py
+web_sim.py
+nba26_game_sim.py
+n3bl_nba26_season_word.py
+
+# Intermediate work files
+bbref_work.csv
+bbref_ratings_work.csv
