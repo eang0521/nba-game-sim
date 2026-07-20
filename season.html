@@ -118,9 +118,13 @@
     .series-games summary::-webkit-details-marker { display:none; }
     .series-games[open] summary { color:#4c6ef5; }
     .game-list { margin-top:.3rem; padding:.35rem .5rem; background:#0c101a; border-radius:5px; }
-    .game-row { padding:.15rem 0; font-size:.72rem; color:#94a3b8; border-bottom:1px solid #172035; }
+    .game-row { padding:.18rem 0; font-size:.72rem; color:#94a3b8; border-bottom:1px solid #172035; }
     .game-row:last-child { border-bottom:none; }
     .game-row strong { color:#e2e8f0; }
+    .game-leaders { display:block; font-size:.67rem; color:#64748b; padding-left:.4rem; margin-top:.05rem; }
+    .series-leaders { font-size:.7rem; color:#94a3b8; margin-top:.3rem; line-height:1.4; }
+    .series-leaders .sl-w { color:#c8d3f5; font-weight:600; }
+    .series-leaders .sl-l { color:#64748b; }
     .champion-banner {
       background:linear-gradient(135deg,#1a2235 0%,#1e3a5f 100%);
       border:1px solid #748ffc; border-radius:10px;
@@ -625,7 +629,15 @@ function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
     ar.pf+=awayTeam.score; ar.pa+=homeTeam.score; ar.g++;
     if (homeTeam.score>awayTeam.score){hr.w++;ar.l++;}else{hr.l++;ar.w++;}
   }
-  return {homeScore:homeTeam.score, awayScore:awayTeam.score};
+  // Capture per-player scoring for playoff series use
+  const gamePlayers = {};
+  for (const team of [homeTeam, awayTeam]) {
+    for (const p of team.players) {
+      if (p.seconds_played > 0)
+        gamePlayers[p.name] = {team: team.abbr, pts: p.points};
+    }
+  }
+  return {homeScore:homeTeam.score, awayScore:awayTeam.score, gamePlayers};
 }
 
 function accumPlayerStats(team, abbr) {
@@ -653,13 +665,19 @@ function getSeriesConfig(round) {
   return { pattern:[true,true,false,false,true,false,true], winsNeeded:4 };
 }
 
+// First initial + last name: "LeBron James" → "L. James"
+function shortName(n) {
+  const i = n.indexOf(' ');
+  return i < 0 ? n : n[0] + '. ' + n.slice(i + 1);
+}
+
 function simSeries(t1, t2, teamsData, round=1) {
   const {pattern, winsNeeded} = getSeriesConfig(round);
-  // Home court goes to the team with the better regular-season win %
   const rec1=teamRecords[t1]||{w:0,g:1}, rec2=teamRecords[t2]||{w:0,g:1};
   const t1SeriesHome = (rec1.w/Math.max(1,rec1.g)) >= (rec2.w/Math.max(1,rec2.g));
   let w1=0,w2=0,gn=0;
   const games=[];
+  const seriesPts = {}; // name → {team, pts, gp}
   while (w1<winsNeeded && w2<winsNeeded) {
     const seriesHomeIsHome = pattern[gn]??true;
     const t1Home = t1SeriesHome ? seriesHomeIsHome : !seriesHomeIsHome;
@@ -667,10 +685,35 @@ function simSeries(t1, t2, teamsData, round=1) {
     const r=simGame(home,away,teamsData,false);
     const t1Won=(t1Home&&r.homeScore>r.awayScore)||(!t1Home&&r.awayScore>r.homeScore);
     if(t1Won)w1++;else w2++;
-    games.push({home,away,hs:r.homeScore,as:r.awayScore,t1Won});
+    // Per-game top scorer for each team (option B)
+    let homeLeader=null, awayLeader=null;
+    for (const [name,ps] of Object.entries(r.gamePlayers)) {
+      const entry={name,pts:ps.pts};
+      if (ps.team===home) { if (!homeLeader||ps.pts>homeLeader.pts) homeLeader=entry; }
+      else                { if (!awayLeader||ps.pts>awayLeader.pts) awayLeader=entry; }
+      // Accumulate series totals
+      if (!seriesPts[name]) seriesPts[name]={team:ps.team,pts:0,gp:0};
+      seriesPts[name].pts+=ps.pts; seriesPts[name].gp++;
+    }
+    games.push({home,away,hs:r.homeScore,as:r.awayScore,t1Won,homeLeader,awayLeader});
     gn++;
   }
-  return {winner:w1>=winsNeeded?t1:t2,loser:w1>=winsNeeded?t2:t1,wins:w1>=winsNeeded?w1:w2,losses:w1>=winsNeeded?w2:w1,games};
+  // Series leading scorer per team (option A)
+  const seriesLeader = (abbr) => {
+    let best=null;
+    for (const [name,s] of Object.entries(seriesPts)) {
+      if (s.team!==abbr||s.gp===0) continue;
+      const ppg=s.pts/s.gp;
+      if (!best||ppg>best.ppg) best={name,ppg};
+    }
+    return best;
+  };
+  return {
+    winner:w1>=winsNeeded?t1:t2, loser:w1>=winsNeeded?t2:t1,
+    wins:w1>=winsNeeded?w1:w2,   losses:w1>=winsNeeded?w2:w1,
+    games,
+    leaders:{[t1]:seriesLeader(t1),[t2]:seriesLeader(t2)}
+  };
 }
 
 // ── Main simulation entry ─────────────────────────────────────────────
@@ -962,9 +1005,23 @@ function renderPlayoffBracket() {
   };
 
   const seriesCard=(s,isFinals=false)=>{
+    // Option B: per-game scoring leaders in the game log
     const gameRows=s.games.map((g,i)=>{
-      return `<div class="game-row">G${i+1}: ${esc(g.home)} <strong>${g.hs}</strong>–<strong>${g.as}</strong> ${esc(g.away)}</div>`;
+      let leaders='';
+      if (g.homeLeader||g.awayLeader) {
+        const hl=g.homeLeader?`${esc(shortName(g.homeLeader.name))} ${g.homeLeader.pts}`:'';
+        const al=g.awayLeader?`${esc(shortName(g.awayLeader.name))} ${g.awayLeader.pts}`:'';
+        leaders=`<span class="game-leaders">${[hl,al].filter(Boolean).join(' · ')}</span>`;
+      }
+      return `<div class="game-row">G${i+1}: ${esc(g.home)} <strong>${g.hs}</strong>–<strong>${g.as}</strong> ${esc(g.away)}${leaders}</div>`;
     }).join('');
+    // Option A: series leading scorers
+    const wL=s.leaders?.[s.winner], lL=s.leaders?.[s.loser];
+    const leadersHtml=(wL||lL)?`<div class="series-leaders">${
+      wL?`<span class="sl-w">${esc(shortName(wL.name))} ${wL.ppg.toFixed(1)}</span>`:''}${
+      wL&&lL?' <span style="color:#334155">·</span> ':''}${
+      lL?`<span class="sl-l">${esc(shortName(lL.name))} ${lL.ppg.toFixed(1)}</span>`:''
+    } <span style="color:#334155;font-size:.62rem">PPG</span></div>`:'';
     const borderStyle=isFinals?' style="border-color:#748ffc"':'';
     return `<div class="series-card"${borderStyle}>
       <div class="series-summary">
@@ -973,6 +1030,7 @@ function renderPlayoffBracket() {
         <span class="def-word">def.</span>
         <span class="loser">${sl(s.loser)}${esc(s.loser)}</span>
       </div>
+      ${leadersHtml}
       <details class="series-games">
         <summary>Game log (${s.wins+s.losses} games) ▾</summary>
         <div class="game-list">${gameRows}</div>
