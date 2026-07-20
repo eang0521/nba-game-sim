@@ -241,6 +241,7 @@
     <a href="index.html" class="nav-link">Home</a>
     <a href="simulator.html" class="nav-link">Instant Results</a>
     <a href="live.html" class="nav-link active">Live Sim</a>
+    <a href="season.html" class="nav-link">Season</a>
     <a href="teams.html" class="nav-link">Teams</a>
     <a href="how-it-works.html" class="nav-link">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
@@ -249,7 +250,7 @@
 
 <div id="stickyBug" class="sticky-bug">
   <div class="sb-team">
-    <img id="sbLogo1" class="sb-logo" alt="" onerror="this.style.visibility='hidden'">
+    <img id="sbLogo1" class="sb-logo" alt="" onerror="logoFallback(this)">
     <span id="sbAbbr1" class="sb-abbr"></span>
     <span id="sbScore1" class="sb-score">0</span>
   </div>
@@ -260,7 +261,7 @@
   <div class="sb-team">
     <span id="sbScore2" class="sb-score">0</span>
     <span id="sbAbbr2" class="sb-abbr"></span>
-    <img id="sbLogo2" class="sb-logo" alt="" onerror="this.style.visibility='hidden'">
+    <img id="sbLogo2" class="sb-logo" alt="" onerror="logoFallback(this)">
   </div>
 </div>
 
@@ -270,13 +271,17 @@
     <h2>Live Simulation</h2>
     <div class="form-row">
       <div class="form-group">
+        <label for="year">Season</label>
+        <select id="year" onchange="onYearChange()"></select>
+      </div>
+      <div class="form-group">
         <label for="t1">Away Team</label>
         <select id="t1" onchange="updateLogoPreview()"></select>
       </div>
       <div class="matchup-logos" id="matchupLogos" style="display:none">
-        <img id="logo1" class="preview-logo" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo1" class="preview-logo" alt="" onerror="logoFallback(this)">
         <span class="preview-at">@</span>
-        <img id="logo2" class="preview-logo" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo2" class="preview-logo" alt="" onerror="logoFallback(this)">
       </div>
       <div class="form-group">
         <label for="t2">Home Team</label>
@@ -301,7 +306,7 @@
     <div class="live-board" id="liveBoard">
       <div class="lb-score-row">
         <div class="lb-team">
-          <img id="lbLogo1" class="lb-logo" alt="" onerror="this.style.visibility='hidden'">
+          <img id="lbLogo1" class="lb-logo" alt="" onerror="logoFallback(this)">
           <span id="lbAbbr1" class="lb-abbr"></span>
           <span id="lbScore1" class="lb-score">0</span>
         </div>
@@ -313,7 +318,7 @@
         <div class="lb-team">
           <span id="lbScore2" class="lb-score">0</span>
           <span id="lbAbbr2" class="lb-abbr"></span>
-          <img id="lbLogo2" class="lb-logo" alt="" onerror="this.style.visibility='hidden'">
+          <img id="lbLogo2" class="lb-logo" alt="" onerror="logoFallback(this)">
         </div>
       </div>
     </div>
@@ -332,7 +337,7 @@
       <div>
         <div class="bs-section">
           <div class="bs-hdr">
-            <img id="bsLogo1" class="bs-logo" alt="" onerror="this.style.visibility='hidden'">
+            <img id="bsLogo1" class="bs-logo" alt="" onerror="logoFallback(this)">
             <span id="bsName1" class="bs-name"></span>
             <span class="bs-label">Away</span>
           </div>
@@ -340,7 +345,7 @@
         </div>
         <div class="bs-section">
           <div class="bs-hdr">
-            <img id="bsLogo2" class="bs-logo" alt="" onerror="this.style.visibility='hidden'">
+            <img id="bsLogo2" class="bs-logo" alt="" onerror="logoFallback(this)">
             <span id="bsName2" class="bs-name"></span>
             <span class="bs-label">Home</span>
           </div>
@@ -360,7 +365,32 @@
 'use strict';
 
 // ── Globals ──────────────────────────────────────────────────────────
+let allData   = {};
 let teamsData = {};
+
+function seasonLabel(year) {
+  return `${year - 1}-${String(year).slice(2)}`;
+}
+
+function populateTeams() {
+  const year = document.getElementById('year').value;
+  teamsData = allData[year] || {};
+  const abbrs = Object.keys(teamsData).sort();
+  ['t1', 't2'].forEach((id, i) => {
+    const sel  = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = '';
+    abbrs.forEach(abbr => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = abbr;
+      if (abbr === (prev || abbrs[i])) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+  updateLogoPreview();
+}
+
+function onYearChange() { populateTeams(); }
 let simTimeout = null;
 let timeline = [];
 let timelineIdx = 0;
@@ -397,8 +427,22 @@ function esc(str) {
 function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
 
 function espnLogo(abbr) {
-  const map = { GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh' };
+  const map = {
+    GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh',
+    BRK:'bkn', PHO:'phx', CHO:'cha', CHA:'cha',
+    NJN:'bkn', NOH:'no', NOK:'no', CHH:'no',
+  };
   return `https://a.espncdn.com/i/teamlogos/nba/500/${map[abbr] || abbr.toLowerCase()}.png`;
+}
+
+function bbrefLogo(abbr) {
+  const year = document.getElementById('year')?.value || '2026';
+  return `https://cdn.ssref.net/req/202606291/tlogo/bbr/${abbr}-${year}.png`;
+}
+
+function logoFallback(img) {
+  img.onerror = function() { this.style.visibility = 'hidden'; };
+  img.src = bbrefLogo(img.alt);
 }
 
 function applyHomeBonus(team) {
@@ -869,8 +913,8 @@ function updateLogoPreview() {
   if (!t1 || !t2) return;
   const el1 = document.getElementById('logo1');
   const el2 = document.getElementById('logo2');
-  el1.style.visibility = 'visible'; el1.src = espnLogo(t1); el1.alt = t1;
-  el2.style.visibility = 'visible'; el2.src = espnLogo(t2); el2.alt = t2;
+  el1.onerror = logoFallback; el1.style.visibility = 'visible'; el1.alt = t1; el1.src = espnLogo(t1);
+  el2.onerror = logoFallback; el2.style.visibility = 'visible'; el2.alt = t2; el2.src = espnLogo(t2);
   document.getElementById('matchupLogos').style.display = 'flex';
 }
 
@@ -914,19 +958,21 @@ function startLiveSim() {
     lsT1 = []; lsT2 = []; lsQStart1 = 0; lsQStart2 = 0; lsLastT1 = 0; lsLastT2 = 0;
     t1Order = []; t2Order = [];
 
-    // Reset logo visibility in case a prior onerror hid them
+    // Reset logo visibility and onerror handlers in case a prior fallback replaced them
     ['lbLogo1','lbLogo2','sbLogo1','sbLogo2','bsLogo1','bsLogo2'].forEach(id => {
-      document.getElementById(id).style.visibility = '';
+      const el = document.getElementById(id);
+      el.style.visibility = '';
+      el.onerror = logoFallback;
     });
 
     // Wire up scoreboard
     document.getElementById('lbAbbr1').textContent  = t1Abbr;
     document.getElementById('lbAbbr2').textContent  = t2Abbr;
-    document.getElementById('lbLogo1').src = espnLogo(t1Abbr);
-    document.getElementById('lbLogo2').src = espnLogo(t2Abbr);
-    document.getElementById('bsLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('lbLogo1').alt = t1Abbr; document.getElementById('lbLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('lbLogo2').alt = t2Abbr; document.getElementById('lbLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('bsLogo1').alt = t1Abbr; document.getElementById('bsLogo1').src = espnLogo(t1Abbr);
     document.getElementById('bsName1').textContent  = t1Abbr;
-    document.getElementById('bsLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('bsLogo2').alt = t2Abbr; document.getElementById('bsLogo2').src = espnLogo(t2Abbr);
     document.getElementById('bsName2').textContent  = t2Abbr;
     document.getElementById('lbScore1').textContent = '0';
     document.getElementById('lbScore2').textContent = '0';
@@ -943,11 +989,11 @@ function startLiveSim() {
     document.getElementById('gameArea').style.display = '';
 
     // Sticky bug — populate team info and start observing the main scoreboard
-    document.getElementById('sbLogo1').src = espnLogo(t1Abbr);
+    document.getElementById('sbLogo1').alt = t1Abbr; document.getElementById('sbLogo1').src = espnLogo(t1Abbr);
     document.getElementById('sbAbbr1').textContent = t1Abbr;
     document.getElementById('sbScore1').textContent = '0';
     document.getElementById('sbScore1').className = 'sb-score';
-    document.getElementById('sbLogo2').src = espnLogo(t2Abbr);
+    document.getElementById('sbLogo2').alt = t2Abbr; document.getElementById('sbLogo2').src = espnLogo(t2Abbr);
     document.getElementById('sbAbbr2').textContent = t2Abbr;
     document.getElementById('sbScore2').textContent = '0';
     document.getElementById('sbScore2').className = 'sb-score';
@@ -1164,23 +1210,22 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !document.getElementById('simBtn').disabled) startLiveSim();
 });
 
-fetch('nba_rosters26_v3.json')
+fetch('nba_rosters_all.json')
   .then(r => r.json())
   .then(data => {
-    teamsData = data;
-    const abbrs = Object.keys(data).sort();
-    ['t1','t2'].forEach((id, i) => {
-      const sel = document.getElementById(id);
-      abbrs.forEach(abbr => {
-        const opt = document.createElement('option');
-        opt.value = opt.textContent = abbr;
-        if (abbr === abbrs[i]) opt.selected = true;
-        sel.appendChild(opt);
-      });
+    allData = data;
+    const years = Object.keys(data).map(Number).sort((a, b) => b - a);
+    const yearSel = document.getElementById('year');
+    years.forEach(year => {
+      const opt = document.createElement('option');
+      opt.value = year;
+      opt.textContent = seasonLabel(year);
+      if (year === years[0]) opt.selected = true;
+      yearSel.appendChild(opt);
     });
-    updateLogoPreview();
+    populateTeams();
   })
-  .catch(() => showError('Could not load nba_rosters26_v3.json. Make sure it is in the same folder as this page.'));
+  .catch(() => showError('Could not load nba_rosters_all.json. Make sure it is in the same folder as this page.'));
 </script>
 </body>
 </html>

@@ -261,6 +261,7 @@
     <a href="index.html" class="nav-link">Home</a>
     <a href="simulator.html" class="nav-link active">Instant Results</a>
     <a href="live.html" class="nav-link">Live Sim</a>
+    <a href="season.html" class="nav-link">Season</a>
     <a href="teams.html" class="nav-link">Teams</a>
     <a href="how-it-works.html" class="nav-link">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
@@ -272,13 +273,17 @@
     <h2>Simulate a Game</h2>
     <div class="form-row">
       <div class="form-group">
+        <label for="year">Season</label>
+        <select id="year" onchange="onYearChange()"></select>
+      </div>
+      <div class="form-group">
         <label for="t1">Away Team</label>
         <select id="t1" onchange="updateLogoPreview()"></select>
       </div>
       <div class="matchup-logos" id="matchupLogos" style="display:none">
-        <img id="logo1" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo1" class="preview-logo" src="" alt="" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
         <span class="preview-at">@</span>
-        <img id="logo2" class="preview-logo" src="" alt="" onerror="this.style.visibility='hidden'">
+        <img id="logo2" class="preview-logo" src="" alt="" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
       </div>
       <div class="form-group">
         <label for="t2">Home Team</label>
@@ -310,7 +315,32 @@
 'use strict';
 
 // ── Globals ─────────────────────────────────────────────────────────
+let allData   = {};
 let teamsData = {};
+
+function seasonLabel(year) {
+  return `${year - 1}-${String(year).slice(2)}`;
+}
+
+function populateTeams() {
+  const year = document.getElementById('year').value;
+  teamsData = allData[year] || {};
+  const abbrs = Object.keys(teamsData).sort();
+  ['t1', 't2'].forEach((id, i) => {
+    const sel  = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = '';
+    abbrs.forEach(abbr => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = abbr;
+      if (abbr === (prev || abbrs[i])) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+  updateLogoPreview();
+}
+
+function onYearChange() { populateTeams(); }
 
 // ── Utilities ────────────────────────────────────────────────────────
 function rollD(sides, num = 1) {
@@ -328,9 +358,19 @@ function esc(str) {
 function periodLabel(q) { return q <= 4 ? `Q${q}` : `OT${q - 4}`; }
 
 function espnLogo(abbr) {
-  const map = { GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh' };
+  const map = {
+    GSW:'gs', NOP:'no', NYK:'ny', SAS:'sa', UTA:'utah', WAS:'wsh',
+    BRK:'bkn', PHO:'phx', CHO:'cha', CHA:'cha',
+    NJN:'bkn', NOH:'no', NOK:'no', CHH:'no',
+  };
   return `https://a.espncdn.com/i/teamlogos/nba/500/${map[abbr] || abbr.toLowerCase()}.png`;
 }
+
+function bbrefLogo(abbr) {
+  const year = document.getElementById('year')?.value || '2026';
+  return `https://cdn.ssref.net/req/202606291/tlogo/bbr/${abbr}-${year}.png`;
+}
+
 
 function applyHomeBonus(team) {
   team.players.forEach(p => {
@@ -1004,13 +1044,13 @@ function renderHistoryEntry(e) {
     <div class="scoreboard">
       <div class="score-teams">
         <div class="score-team">
-          <img class="score-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.style.visibility='hidden'">
+          <img class="score-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
           <div class="team-abbr">${esc(e.t1)}</div>
           <div class="team-score${t1w ? ' winner' : ''}">${e.t1Score}</div>
         </div>
         <div class="score-sep">–</div>
         <div class="score-team">
-          <img class="score-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.style.visibility='hidden'">
+          <img class="score-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
           <div class="team-abbr">${esc(e.t2)}</div>
           <div class="team-score${!t1w ? ' winner' : ''}">${e.t2Score}</div>
         </div>
@@ -1072,7 +1112,7 @@ function renderHistory() {
     return `<details class="history-item" data-index="${i}" ontoggle="accordionHistory(this)">
       <summary>
         <div class="history-team">
-          <img class="history-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.style.visibility='hidden'">
+          <img class="history-logo" src="${espnLogo(e.t1)}" alt="${esc(e.t1)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
           <span class="history-abbr">${esc(e.t1)}</span>
           <span class="history-score${t1win ? ' win' : ''}">${e.t1Score}</span>
         </div>
@@ -1080,7 +1120,7 @@ function renderHistory() {
         <div class="history-team">
           <span class="history-score${!t1win ? ' win' : ''}">${e.t2Score}</span>
           <span class="history-abbr">${esc(e.t2)}</span>
-          <img class="history-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.style.visibility='hidden'">
+          <img class="history-logo" src="${espnLogo(e.t2)}" alt="${esc(e.t2)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
         </div>
         ${otBadge}
         <span class="history-spacer"></span>
@@ -1114,8 +1154,8 @@ function updateLogoPreview() {
   if (!t1 || !t2) return;
   const el1 = document.getElementById('logo1');
   const el2 = document.getElementById('logo2');
-  el1.style.visibility = 'visible'; el1.src = espnLogo(t1); el1.alt = t1;
-  el2.style.visibility = 'visible'; el2.src = espnLogo(t2); el2.alt = t2;
+  el1.style.visibility = 'visible'; el1.alt = t1; el1.src = espnLogo(t1);
+  el2.style.visibility = 'visible'; el2.alt = t2; el2.src = espnLogo(t2);
   document.getElementById('matchupLogos').style.display = 'flex';
 }
 
@@ -1228,9 +1268,9 @@ function runSeries() {
     document.getElementById('seriesContent').innerHTML = `
       <div class="series-banner">
         <div class="series-logos">
-          <img class="series-logo" src="${espnLogo(t1Abbr)}" alt="${esc(t1Abbr)}" onerror="this.style.visibility='hidden'">
+          <img class="series-logo" src="${espnLogo(t1Abbr)}" alt="${esc(t1Abbr)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
           <span class="series-logo-sep">vs</span>
-          <img class="series-logo" src="${espnLogo(t2Abbr)}" alt="${esc(t2Abbr)}" onerror="this.style.visibility='hidden'">
+          <img class="series-logo" src="${espnLogo(t2Abbr)}" alt="${esc(t2Abbr)}" onerror="this.onerror=function(){this.style.visibility='hidden'};this.src=bbrefLogo(this.alt)">
         </div>
         <div>
           <div class="series-title">${esc(winner)} wins the series ${winW}–${winL}</div>
@@ -1257,23 +1297,22 @@ document.addEventListener('keydown', e => {
 
 // ── Boot ─────────────────────────────────────────────────────────────
 renderHistory();
-fetch('nba_rosters26_v3.json')
+fetch('nba_rosters_all.json')
   .then(r => r.json())
   .then(data => {
-    teamsData = data;
-    const abbrs = Object.keys(data).sort();
-    ['t1','t2'].forEach((id, i) => {
-      const sel = document.getElementById(id);
-      abbrs.forEach(abbr => {
-        const opt = document.createElement('option');
-        opt.value = opt.textContent = abbr;
-        if (abbr === abbrs[i]) opt.selected = true;
-        sel.appendChild(opt);
-      });
+    allData = data;
+    const years = Object.keys(data).map(Number).sort((a, b) => b - a);
+    const yearSel = document.getElementById('year');
+    years.forEach(year => {
+      const opt = document.createElement('option');
+      opt.value = year;
+      opt.textContent = seasonLabel(year);
+      if (year === years[0]) opt.selected = true;
+      yearSel.appendChild(opt);
     });
-    updateLogoPreview();
+    populateTeams();
   })
-  .catch(() => showError('Could not load nba_rosters26_v3.json. Make sure it is in the same folder as this page.'));
+  .catch(() => showError('Could not load nba_rosters_all.json. Make sure it is in the same folder as this page.'));
 </script>
 </body>
 </html>

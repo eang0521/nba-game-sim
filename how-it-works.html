@@ -107,6 +107,7 @@
     <a href="index.html" class="nav-link">Home</a>
     <a href="simulator.html" class="nav-link">Instant Results</a>
     <a href="live.html" class="nav-link">Live Sim</a>
+    <a href="season.html" class="nav-link">Season</a>
     <a href="teams.html" class="nav-link">Teams</a>
     <a href="how-it-works.html" class="nav-link active">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
@@ -116,7 +117,50 @@
 <div class="container">
 
   <h1 class="page-title">How This Works</h1>
-  <p class="page-subtitle">A quick guide to running a simulation and understanding what the numbers mean.</p>
+  <p class="page-subtitle">A guide to the Season Simulator, single-game and series modes, and what the numbers mean.</p>
+
+  <!-- ── Season Simulator ──────────────────────── -->
+  <div class="section">
+    <div class="section-title">Season Simulator</div>
+    <p>The Season Simulator generates a full 82-game regular season, builds standings, runs the play-in tournament (for 2021 and later), and lets you simulate the playoffs one round at a time.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Pick a season year</strong>
+          <span>Choose any available NBA season from the dropdown. The roster and team data for that year loads automatically. Seasons with fewer than 30 franchises are also supported — the schedule is padded so every team still plays exactly 82 games (41 home, 41 away).</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Click Simulate Season</strong>
+          <span>All 82 games per team are simulated instantly using the same engine as a single-game sim. Standings update in real time as each game resolves. Teams are seeded within their conference by win total, then point differential, then head-to-head record as a tiebreaker.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Play-in tournament (2021 and later)</strong>
+          <span>Seeds 7–10 in each conference compete in a mini-bracket before the main playoffs. The 7 vs. 8 winner locks in the 7 seed. The 9 vs. 10 loser is eliminated. The two remaining teams play for the 8 seed. For pre-2021 seasons the top 8 seeds advance directly.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Round-by-round playoffs</strong>
+          <span>Click the button to simulate one round at a time — First Round, Conference Semifinals, Conference Finals, then the NBA Finals. The bracket uses the fixed 1v8, 2v7, 3v6, 4v5 first-round matchups with no reseeding. Each series follows the standard 2-2-1-1-1 home schedule, and home court advantage gives the higher seed +4 OVR per player per game. Expand any series card to see the score of every individual game.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Statistical leaderboards</strong>
+          <span>After the regular season, leaderboards show the top 10 players league-wide for Points, Rebounds, Assists, Steals, Blocks, +/-, FG%, and 3P%. Minimum qualifiers apply — at least 150 FGA for FG%, 82 3PA for 3P%, and 41 games played for counting-stat leaderboards. The qualifier for the active category is shown below the table.</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Running a Simulation ───────────────────── -->
   <div class="section">
@@ -126,7 +170,7 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <strong>Pick two teams</strong>
-          <span>Use the Home Team and Away Team dropdowns on the Simulator page. All 30 teams from the 2026 season are available. You cannot simulate a team against itself.</span>
+          <span>Use the Home Team and Away Team dropdowns on the Simulator page. Select a season year to load that year's rosters, then pick any two teams. You cannot simulate a team against itself.</span>
         </div>
       </div>
       <div class="step">

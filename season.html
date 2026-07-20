@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Season Simulator — NBA Game Simulator</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:2rem; }
+    .page-title  { font-size:1.5rem; font-weight:900; color:#fff; }
+    .page-subtitle { color:#64748b; font-size:.88rem; margin-top:.2rem; }
+    .ctrl-row { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
+    select, .btn {
+      background:#141929; color:#e2e8f0; border:1px solid #2d3f6e;
+      border-radius:6px; padding:.5rem .9rem; font-size:.88rem; cursor:pointer;
+    }
+    .btn { font-weight:700; transition:background .15s; }
+    .btn:hover:not(:disabled) { background:#1e2d5a; }
+    .btn:disabled { opacity:.45; cursor:default; }
+    .btn-primary { background:#3b5bdb; border-color:#3b5bdb; color:#fff; }
+    .btn-primary:hover:not(:disabled) { background:#4c6ef5; }
+
+    /* ── Sections ─────── */
+    section { margin-bottom:2.5rem; }
+    .section-title { font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid #1e2d5a; }
+
+    /* ── Standings ─────── */
+    .standings-wrap { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    @media(max-width:700px){ .standings-wrap { grid-template-columns:1fr; } }
+    .standings-conf { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#748ffc; margin-bottom:.5rem; }
+    .std-table { width:100%; border-collapse:collapse; font-size:.78rem; }
+    .std-table th, .std-table td { padding:.35rem .6rem; text-align:right; border-bottom:1px solid #1a2235; }
+    .std-table th { background:#0f1117; color:#748ffc; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+    .std-table td:first-child, .std-table th:first-child { text-align:left; }
+    .std-table tbody tr:hover td { background:#172035; }
+    .std-table .playoff-line td { border-top:2px solid #3b5bdb; }
+    .std-table .playin-line td { border-top:1px dashed #748ffc; }
+    .seed-num { color:#64748b; font-size:.68rem; margin-right:.3rem; }
+    .pos-diff { color:#69db7c; } .neg-diff { color:#f87171; }
+
+    /* ── Leaders layout ─────── */
+    .leaders-layout { display:flex; gap:2rem; align-items:flex-start; }
+    .leaders-left { flex-shrink:0; width:440px; }
+    .leaders-right { flex:1; min-width:0; }
+    @media(max-width:800px){ .leaders-layout { flex-direction:column; } .leaders-left { width:100%; } }
+
+    /* ── Leaders ─────── */
+    .leader-tabs { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1rem; }
+    .leader-tab { background:#141929; border:1px solid #2d3f6e; border-radius:5px; padding:.3rem .7rem; font-size:.75rem; font-weight:700; cursor:pointer; color:#94a3b8; }
+    .leader-tab.active { background:#3b5bdb; border-color:#3b5bdb; color:#fff; }
+    .leader-table { width:100%; border-collapse:collapse; font-size:.78rem; table-layout:fixed; }
+    .leader-table col.c-rank  { width:28px; }
+    .leader-table col.c-name  { width:auto; }
+    .leader-table col.c-logo  { width:72px; }
+    .leader-table col.c-gp    { width:42px; }
+    .leader-table col.c-stat  { width:62px; }
+    .leader-table th, .leader-table td { padding:.32rem .5rem; border-bottom:1px solid #1a2235; text-align:right; white-space:nowrap; overflow:hidden; }
+    .leader-table th { background:#0f1117; color:#748ffc; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+    .leader-table td:first-child, .leader-table th:first-child { text-align:left; }
+    .leader-table td:nth-child(2), .leader-table th:nth-child(2) { text-align:left; text-overflow:ellipsis; }
+    .leader-table td:nth-child(2) { color:#c8d3f5; font-size:.75rem; }
+    .leader-table td:nth-child(3), .leader-table th:nth-child(3) { text-align:center; }
+    .leader-table tbody tr:nth-child(odd) td { background:#0c101a; }
+    .leader-table tbody tr:hover td { background:#172035 !important; }
+    .leader-table .rank-col { color:#748ffc; font-size:.7rem; }
+    .stat-val { font-weight:800; color:#fff; }
+    .leader-qualifier { font-size:.66rem; color:#475569; margin-top:.4rem; }
+
+    /* ── Team player stats ─────── */
+    .team-stats-ctrl { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; }
+    .team-stats-sub-label { font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#c5d0fc; white-space:nowrap; }
+    #teamStatsSel { font-size:.82rem; }
+    .ts-wrap { overflow-x:auto; }
+    .ts-table { border-collapse:collapse; font-size:.75rem; table-layout:fixed; min-width:540px; }
+    .ts-table col.tc-name { width:130px; }
+    .ts-table col.tc-gp   { width:28px; }
+    .ts-table col.tc-mpg  { width:36px; }
+    .ts-table col.tc-ppg  { width:36px; }
+    .ts-table col.tc-rpg  { width:36px; }
+    .ts-table col.tc-apg  { width:36px; }
+    .ts-table col.tc-spg  { width:36px; }
+    .ts-table col.tc-bpg  { width:36px; }
+    .ts-table col.tc-fgp  { width:42px; }
+    .ts-table col.tc-3pp  { width:40px; }
+    .ts-table col.tc-ftp  { width:40px; }
+    .ts-table col.tc-pm   { width:38px; }
+    .ts-table th, .ts-table td { padding:.3rem .45rem; border-bottom:1px solid #1a2235; text-align:right; white-space:nowrap; overflow:hidden; }
+    .ts-table th { background:#0f1117; color:#748ffc; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+    .ts-table td:first-child, .ts-table th:first-child { text-align:left; text-overflow:ellipsis; }
+    .ts-table tbody tr:nth-child(odd) td { background:#0c101a; }
+    .ts-table tbody tr:hover td { background:#172035; }
+
+    /* ── Play-In ─────── */
+    .playin-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1rem; }
+    @media(max-width:600px){ .playin-grid { grid-template-columns:1fr; } }
+    .playin-conf-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#748ffc; margin-bottom:.6rem; }
+    .playin-game { background:#141929; border:1px solid #1e2d5a; border-radius:8px; padding:.75rem 1rem; margin-bottom:.6rem; font-size:.82rem; }
+    .playin-game .result { color:#69db7c; font-weight:700; margin-top:.2rem; font-size:.78rem; }
+    .playin-game .elim { color:#f87171; }
+
+    /* ── Playoffs ─────── */
+    .bracket-grid { display:flex; gap:1.5rem; flex-wrap:wrap; }
+    .bracket-conf { flex:1; min-width:260px; }
+    .bracket-conf-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#748ffc; margin-bottom:.75rem; }
+    .bracket-round { margin-bottom:1rem; }
+    .round-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#475569; margin-bottom:.4rem; }
+    .series-card { background:#141929; border:1px solid #1e2d5a; border-radius:8px; padding:.6rem .9rem; margin-bottom:.5rem; font-size:.8rem; }
+    .series-card.pending { border-style:dashed; color:#475569; }
+    .series-summary { display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; }
+    .series-card .winner { font-weight:800; color:#fff; }
+    .series-card .loser  { color:#64748b; }
+    .def-word { color:#475569; font-size:.75rem; }
+    .vs-word  { color:#475569; font-size:.75rem; }
+    .series-record { color:#748ffc; font-size:.72rem; font-weight:700; }
+    .series-games { margin-top:.5rem; }
+    .series-games summary { font-size:.68rem; color:#748ffc; cursor:pointer; user-select:none; list-style:none; }
+    .series-games summary::-webkit-details-marker { display:none; }
+    .series-games[open] summary { color:#4c6ef5; }
+    .game-list { margin-top:.3rem; padding:.35rem .5rem; background:#0c101a; border-radius:5px; }
+    .game-row { padding:.15rem 0; font-size:.72rem; color:#94a3b8; border-bottom:1px solid #172035; }
+    .game-row:last-child { border-bottom:none; }
+    .game-row strong { color:#e2e8f0; }
+    .champion-banner {
+      background:linear-gradient(135deg,#1a2235 0%,#1e3a5f 100%);
+      border:1px solid #748ffc; border-radius:10px;
+      padding:1.2rem 1.5rem; margin-bottom:2rem;
+      font-size:1.2rem; font-weight:900; color:#fff; text-align:center;
+    }
+    .finals-section { margin-top:1.5rem; }
+    .finals-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#748ffc; margin-bottom:.6rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="simulator.html" class="nav-link">Instant Results</a>
+    <a href="live.html" class="nav-link">Live Sim</a>
+    <a href="season.html" class="nav-link active">Season</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="how-it-works.html" class="nav-link">How This Works</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Season Simulator</div>
+      <div class="page-subtitle">Full 82-game season · Play-In · Best-of-7 playoffs</div>
+    </div>
+    <div class="ctrl-row">
+      <select id="year"></select>
+      <button id="simBtn" class="btn btn-primary" onclick="runSeason()">Simulate Season</button>
+    </div>
+  </div>
+
+  <div id="results" style="display:none">
+
+    <!-- Standings -->
+    <section id="standingsSection">
+      <div class="section-title">Standings</div>
+      <div class="standings-wrap" id="standingsContent"></div>
+    </section>
+
+    <!-- Statistical Leaders -->
+    <section id="leadersSection">
+      <div class="section-title">Statistical Leaders</div>
+      <div class="leaders-layout">
+        <div class="leaders-left">
+          <div class="leader-tabs" id="leaderTabs"></div>
+          <div id="leaderTable"></div>
+        </div>
+        <div class="leaders-right">
+          <div class="team-stats-ctrl">
+            <span class="team-stats-sub-label">Team Player Stats</span>
+            <img id="teamStatsLogo" alt="" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;flex-shrink:0" onerror="this.style.display='none'">
+            <select id="teamStatsSel" onchange="renderTeamStats(this.value)"></select>
+          </div>
+          <div id="teamStatsTable" class="ts-wrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Play-In Tournament -->
+    <section id="playinSection" style="display:none">
+      <div class="section-title">Play-In Tournament</div>
+      <div id="playinContent"></div>
+      <button id="playinBtn" class="btn btn-primary" onclick="runPlayIn()">Simulate Play-In</button>
+    </section>
+
+    <!-- Playoffs -->
+    <section id="playoffsSection" style="display:none">
+      <div class="section-title">Playoffs</div>
+      <div id="playoffsContent"></div>
+      <button id="playoffsBtn" class="btn btn-primary" onclick="advancePlayoffs()" style="display:none">Simulate First Round</button>
+    </section>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Team metadata ─────────────────────────────────────────────────────
+const TEAM_INFO = {
+  ATL:{name:'Atlanta Hawks',          espn:'atl',  conf:'East',div:'Southeast'},
+  BOS:{name:'Boston Celtics',         espn:'bos',  conf:'East',div:'Atlantic' },
+  BRK:{name:'Brooklyn Nets',          espn:'bkn',  conf:'East',div:'Atlantic' },
+  CHA:{name:'Charlotte Bobcats',      espn:'cha',  conf:'East',div:'Southeast'},
+  CHO:{name:'Charlotte Hornets',      espn:'cha',  conf:'East',div:'Southeast'},
+  CHI:{name:'Chicago Bulls',          espn:'chi',  conf:'East',div:'Central'  },
+  CLE:{name:'Cleveland Cavaliers',    espn:'cle',  conf:'East',div:'Central'  },
+  DAL:{name:'Dallas Mavericks',       espn:'dal',  conf:'West',div:'Southwest'},
+  DEN:{name:'Denver Nuggets',         espn:'den',  conf:'West',div:'Northwest'},
+  DET:{name:'Detroit Pistons',        espn:'det',  conf:'East',div:'Central'  },
+  GSW:{name:'Golden State Warriors',  espn:'gs',   conf:'West',div:'Pacific'  },
+  HOU:{name:'Houston Rockets',        espn:'hou',  conf:'West',div:'Southwest'},
+  IND:{name:'Indiana Pacers',         espn:'ind',  conf:'East',div:'Central'  },
+  LAC:{name:'LA Clippers',            espn:'lac',  conf:'West',div:'Pacific'  },
+  LAL:{name:'Los Angeles Lakers',     espn:'lal',  conf:'West',div:'Pacific'  },
+  MEM:{name:'Memphis Grizzlies',      espn:'mem',  conf:'West',div:'Southwest'},
+  MIA:{name:'Miami Heat',             espn:'mia',  conf:'East',div:'Southeast'},
+  MIL:{name:'Milwaukee Bucks',        espn:'mil',  conf:'East',div:'Central'  },
+  MIN:{name:'Minnesota Timberwolves', espn:'min',  conf:'West',div:'Northwest'},
+  NOP:{name:'New Orleans Pelicans',   espn:'no',   conf:'West',div:'Southwest'},
+  NYK:{name:'New York Knicks',        espn:'ny',   conf:'East',div:'Atlantic' },
+  OKC:{name:'Oklahoma City Thunder',  espn:'okc',  conf:'West',div:'Northwest'},
+  ORL:{name:'Orlando Magic',          espn:'orl',  conf:'East',div:'Southeast'},
+  PHI:{name:'Philadelphia 76ers',     espn:'phi',  conf:'East',div:'Atlantic' },
+  PHO:{name:'Phoenix Suns',           espn:'phx',  conf:'West',div:'Pacific'  },
+  POR:{name:'Portland Trail Blazers', espn:'por',  conf:'West',div:'Northwest'},
+  SAC:{name:'Sacramento Kings',       espn:'sac',  conf:'West',div:'Pacific'  },
+  SAS:{name:'San Antonio Spurs',      espn:'sa',   conf:'West',div:'Southwest'},
+  TOR:{name:'Toronto Raptors',        espn:'tor',  conf:'East',div:'Atlantic' },
+  UTA:{name:'Utah Jazz',              espn:'utah', conf:'West',div:'Northwest'},
+  WAS:{name:'Washington Wizards',     espn:'wsh',  conf:'East',div:'Southeast'},
+  CHH:{name:'Charlotte Hornets',      espn:'cha',  conf:'East',div:'Southeast'},
+  NJN:{name:'New Jersey Nets',        espn:'njn',  conf:'East',div:'Atlantic' },
+  SEA:{name:'Seattle SuperSonics',    espn:'sea',  conf:'West',div:'Northwest'},
+  NOH:{name:'New Orleans Hornets',    espn:'no',   conf:'West',div:'Southwest'},
+  NOK:{name:'NO/OKC Hornets',         espn:'no',   conf:'West',div:'Southwest'},
+};
+
+// ── State ─────────────────────────────────────────────────────────────
+let allData = {};
+let teamRecords     = {};
+let playerSeasonStats = {};
+let confStandings   = { East:[], West:[] };
+let playInSeeds     = { East:{}, West:{} };
+let currentYear     = 2026;
+let currentTeamsData = {};
+let playInDone      = false;
+
+function seasonLabel(y) { return `${y-1}-${String(y).slice(2)}`; }
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function espnLogo(abbr) {
+  const m={GSW:'gs',NOP:'no',NYK:'ny',SAS:'sa',UTA:'utah',WAS:'wsh',BRK:'bkn',PHO:'phx',CHO:'cha',CHA:'cha',NJN:'bkn',NOH:'no',NOK:'no',CHH:'no'};
+  return `https://a.espncdn.com/i/teamlogos/nba/500/${m[abbr]||abbr.toLowerCase()}.png`;
+}
+function bbrefLogo(abbr, year) {
+  return `https://cdn.ssref.net/req/202606291/tlogo/bbr/${abbr}-${year}.png`;
+}
+function teamLogo(abbr, year) {
+  const info = TEAM_INFO[abbr];
+  return info?.espn
+    ? `https://a.espncdn.com/i/teamlogos/nba/500/${info.espn}.png`
+    : bbrefLogo(abbr, year);
+}
+
+// ── Dice ──────────────────────────────────────────────────────────────
+function rollD(sides, num=1) {
+  let t=0; for(let i=0;i<num;i++) t+=Math.floor(Math.random()*sides)+1; return t;
+}
+
+// ── Player ────────────────────────────────────────────────────────────
+class Player {
+  constructor(name,t_2pt,t_3pt,t_def,t_reb) {
+    this.name=name; this.t_2pt=t_2pt; this.t_3pt=t_3pt; this.t_def=t_def; this.t_reb=t_reb;
+    this.ovr=t_2pt+t_3pt+t_def+t_reb;
+    this.pv=t_reb-t_3pt+0.01*t_2pt+0.0001*t_def;
+    this.off=t_2pt+t_3pt+0.01*this.ovr;
+    this.ft_chance=Math.max(1,Math.min(90,Math.round(50+t_2pt*0.4+t_3pt*1.0)));
+    this.seconds_played=0; this.points=0;
+    this.fg_made=0; this.fg_attempted=0;
+    this.tpt_made=0; this.tpt_attempted=0;
+    this.ft_made=0; this.ft_attempted=0;
+    this.rebounds=0; this.assists=0; this.steals=0; this.blocks=0;
+    this.fouls=0; this.plus_minus=0;
+    this.on_court=false; this.fouled_out=false;
+    this.positions_played={1:0,2:0,3:0,4:0,5:0}; this.current_position=null; this.team_ref=null;
+  }
+}
+
+// ── Team ─────────────────────────────────────────────────────────────
+class Team {
+  constructor(abbr,playerData) {
+    this.abbr=abbr;
+    this.players=playerData.map(p=>new Player(p.name,p.t_2pt,p.t_3pt,p.t_def,p.t_reb));
+    this.score=0; this.court=[];
+    this.defensive_fouls_qtr=0; this.foul_in_last_2_mins=false;
+  }
+  byPv() { const s=[...this.court].sort((a,b)=>a.pv-b.pv); s.forEach((p,i)=>p.current_position=i+1); return s; }
+  byOff() { return [...this.court].sort((a,b)=>b.off-a.off); }
+}
+
+// ── Game ─────────────────────────────────────────────────────────────
+class Game {
+  constructor(t1,t2,silent=false) {
+    this.t1=t1; this.t2=t2; this.silent=silent;
+    this.quarter=0; this.clock=0;
+    this.possession=null; this.jumpball_winner=null;
+    this.subs_waiting=false;
+    this.t1_q_scores=[]; this.t2_q_scores=[];
+    this.t1_last=0; this.t2_last=0; this.logs={};
+  }
+  fmt() { const m=Math.floor(this.clock/60),s=this.clock%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+  log(msg) {
+    if(this.silent) return;
+    if(!this.logs[this.quarter]) this.logs[this.quarter]=[];
+    this.logs[this.quarter].push(`${this.fmt()} ${msg}`);
+  }
+  pm(scoringTeam,pts) {
+    const other=scoringTeam===this.t1?this.t2:this.t1;
+    scoringTeam.court.forEach(p=>p.plus_minus+=pts);
+    other.court.forEach(p=>p.plus_minus-=pts);
+  }
+  thresh(roll,sz) {
+    const t=sz>=5?[6,11,15,18,20]:sz===4?[8,14,18,20]:sz===3?[9,16,20]:sz===2?[13,20]:[20];
+    for(let i=0;i<t.length;i++) if(roll<=t[i]) return i; return t.length-1;
+  }
+  startLineups() {
+    for(const team of [this.t1,this.t2]) {
+      team.court=[]; team.players.forEach(p=>p.on_court=false);
+      for(let s=0;s<5;s++) {
+        const bench=[...team.players].filter(p=>!p.on_court&&!p.fouled_out).sort((a,b)=>b.ovr-a.ovr);
+        if(!bench.length) break;
+        const r=rollD(20);
+        const idx=r<=6?0:r<=11?Math.min(1,bench.length-1):r<=15?Math.min(2,bench.length-1):r<=18?Math.min(3,bench.length-1):Math.min(4,bench.length-1);
+        bench[idx].on_court=true; team.court.push(bench[idx]);
+      }
+    }
+  }
+  subs(ftShooter=null,forced=[]) {
+    for(const team of [this.t1,this.t2]) {
+      const forcedTeam=forced.filter(p=>team.players.includes(p)&&p.on_court);
+      if(!this.subs_waiting&&!forcedTeam.length) continue;
+      let n=forcedTeam.length&&!this.subs_waiting?1:Math.min(5,this.thresh(rollD(20),5)+1);
+      n=Math.max(n,forcedTeam.length);
+      const courtPool=[...team.court].sort((a,b)=>a.ovr-b.ovr);
+      const initBench=team.players.filter(p=>!p.on_court&&!p.fouled_out);
+      const maxSubs=Math.min(n,courtPool.length,initBench.length);
+      const outList=[],inList=[];
+      for(let i=0;i<maxSubs;i++) {
+        let outP;
+        if(i<forcedTeam.length) { outP=forcedTeam[i]; }
+        else { const v=courtPool.filter(p=>!outList.includes(p)&&p!==ftShooter); if(!v.length) break; outP=v[this.thresh(rollD(20),v.length)]; }
+        const validIn=[...team.players].filter(p=>!p.on_court&&!p.fouled_out&&!inList.includes(p)).sort((a,b)=>b.ovr-a.ovr).slice(0,5);
+        if(!validIn.length) break;
+        outList.push(outP); inList.push(validIn[Math.min(this.thresh(rollD(20),5),validIn.length-1)]);
+      }
+      for(let i=0;i<outList.length;i++) {
+        const op=outList[i],ip=inList[i];
+        op.on_court=false; team.court=team.court.filter(p=>p!==op);
+        ip.on_court=true; team.court.push(ip);
+        this.log(`SUB: ${ip.name} in for ${op.name}`);
+      }
+    }
+    this.subs_waiting=false; this.t1.byPv(); this.t2.byPv();
+  }
+  tick(dice) {
+    const t=rollD(6,dice); this.clock=Math.max(0,this.clock-t);
+    for(const team of [this.t1,this.t2]) for(const p of team.court) { p.seconds_played+=t; if(p.current_position) p.positions_played[p.current_position]+=t; }
+    return this.clock>0;
+  }
+  bonus(defTeam) { return defTeam.defensive_fouls_qtr>=4||(this.clock<=120&&defTeam.foul_in_last_2_mins); }
+  foulOn(player) {
+    player.fouls++;
+    const f=[];
+    if(player.fouls>=6){player.fouled_out=true;f.push(player);this.log(`${player.name} fouled out!`);}
+    else if(player.fouls>=this.quarter+2){f.push(player);this.log(`${player.name} in foul trouble (${player.fouls}f).`);}
+    return f;
+  }
+  fts(shooter,n) {
+    if(!n) return true; let madeLast=false;
+    for(let i=0;i<n;i++) {
+      shooter.ft_attempted++;
+      if(rollD(100)<=shooter.ft_chance){shooter.points++;shooter.ft_made++;shooter.team_ref.score++;this.pm(shooter.team_ref,1);this.log(`${shooter.name} makes FT ${i+1}/${n}`);madeLast=(i===n-1);}
+      else{this.log(`${shooter.name} misses FT ${i+1}/${n}`);if(i===n-1) madeLast=false;}
+    } return madeLast;
+  }
+  assist(offPv,shooter) {
+    const r=rollD(100); let idx=-1;
+    if(r<=24) idx=0; else if(r<=42) idx=1; else if(r<=54) idx=2; else if(r<=60) idx=3;
+    if(idx>=0){const mates=offPv.filter(p=>p!==shooter);if(idx<mates.length){mates[idx].assists++;return mates[idx];}}
+    return null;
+  }
+  rebCycle(offTeam,defTeam,skipped) {
+    const offPv=offTeam.byPv(),defPv=defTeam.byPv(); let cycle=1;
+    while(this.clock>0) {
+      const order=[...defPv].reverse().concat([...offPv].reverse()); let grabbed=false;
+      for(const p of order) {
+        if(cycle===1&&p===skipped) continue;
+        const rating=Math.max(1,p.t_reb)+(cycle===1&&defPv.includes(p)?3:0);
+        if(rollD(100)<=rating){p.rebounds++;this.log(`${p.name} Rebound`);if(defPv.includes(p)){this.possession=defTeam;}else{this.possession=offTeam;this.poss(2);}grabbed=true;break;}
+      }
+      if(grabbed) break; this.clock--;cycle++;
+    }
+  }
+  poss(dice=4) {
+    if(this.clock<=0) return; if(!this.tick(dice)) return;
+    const off=this.possession,def=off===this.t1?this.t2:this.t1;
+    off.court.forEach(p=>p.team_ref=off); def.court.forEach(p=>p.team_ref=def);
+    let ev=rollD(6);
+    const offPv=off.byPv(),defPv=def.byPv();
+    if(ev===1) {
+      let stolen=false;
+      for(const d of defPv){if(rollD(100)<=Math.max(1,d.t_def)){d.steals++;this.log(`${d.name} Steal`);this.possession=def;stolen=true;break;}}
+      if(stolen) return; ev=Math.floor(Math.random()*4)+3;
+    }
+    if(ev===2) {
+      const foulType=rollD(10),foulPos=Math.floor((rollD(10)-1)/2);
+      if(foulType===1){
+        const fouler=offPv[foulPos],forced=this.foulOn(fouler); this.log(`${fouler.name} offensive foul`);
+        if(this.bonus(off)){const shooter=def.court[Math.floor(Math.random()*def.court.length)];this.subs(shooter,forced);if(!this.fts(shooter,2)) this.rebCycle(def,off,shooter);else this.possession=off;}
+        else{this.subs(null,forced);this.possession=def;}
+      } else {
+        const fouler=defPv[foulPos],forced=this.foulOn(fouler);
+        def.defensive_fouls_qtr++;if(this.clock<=120) def.foul_in_last_2_mins=true;
+        if(foulType<=6){
+          this.log(`${fouler.name} defensive foul`);
+          if(this.bonus(def)){const shooter=off.court[Math.floor(Math.random()*off.court.length)];this.subs(shooter,forced);if(!this.fts(shooter,2)) this.rebCycle(off,def,shooter);else this.possession=def;}
+          else{this.subs(null,forced);this.poss(2);}
+        } else {
+          this.log(`${fouler.name} shooting foul`);
+          const offOff=off.byOff(),shooter=offOff[this.thresh(rollD(20),5)];
+          const s2=Math.max(1,shooter.t_2pt),s3=Math.max(1,shooter.t_3pt);
+          const ratio=Math.round((s2*3)/((s2*3)+(s3*2))*100);
+          let is2=rollD(100)<=ratio; if(!is2&&rollD(6)<=4) is2=true;
+          const pts=is2?2:3,defender=defPv[shooter.current_position-1];
+          const diff=(is2?shooter.t_2pt:shooter.t_3pt)-defender.t_def;
+          const target=Math.round(diff*(is2?2/3:0.5))+(is2?54:36);
+          const m1=rollD(100)<=target,m2=rollD(100)<=target;
+          if(m1&&m2){
+            shooter.fg_attempted++;shooter.fg_made++;if(!is2){shooter.tpt_attempted++;shooter.tpt_made++;}
+            shooter.points+=pts;off.score+=pts;this.pm(off,pts);
+            const ast=this.assist(offPv,shooter);this.log(`${shooter.name} makes ${pts} (And-1!)${ast?` (${ast.name} Ast)`:''}`);
+            if(rollD(10)<=pts) this.subs_waiting=true;this.subs(shooter,forced);
+            if(!this.fts(shooter,1)) this.rebCycle(off,def,shooter);else this.possession=def;
+          } else {
+            this.log(`${shooter.name} misses ${pts} on foul`);this.subs(shooter,forced);
+            if(!this.fts(shooter,pts)) this.rebCycle(off,def,shooter);else this.possession=def;
+          }
+        }
+      } return;
+    }
+    const offOff=off.byOff(),shooter=offOff[this.thresh(rollD(20),5)];
+    const s2=Math.max(1,shooter.t_2pt),s3=Math.max(1,shooter.t_3pt);
+    const ratio=Math.round((s2*3)/((s2*3)+(s3*2))*100),is2=rollD(100)<=ratio,pts=is2?2:3;
+    const defender=defPv[shooter.current_position-1];
+    const diff=(is2?shooter.t_2pt:shooter.t_3pt)-defender.t_def;
+    const target=Math.round(diff*(is2?2/3:0.5))+(is2?54:36);
+    shooter.fg_attempted++; if(!is2) shooter.tpt_attempted++;
+    if(rollD(100)<=target){
+      shooter.fg_made++;if(!is2) shooter.tpt_made++;
+      shooter.points+=pts;off.score+=pts;this.pm(off,pts);
+      const ast=this.assist(offPv,shooter);this.log(`${shooter.name} makes ${pts}${ast?` (${ast.name} Ast)`:''}`);
+      if(rollD(10)<=pts) this.subs_waiting=true; this.possession=def;
+    } else {
+      let blocked=false;
+      if(rollD(100)<=Math.max(1,defender.t_def)&&rollD(6)<=defender.current_position+1){blocked=true;defender.blocks++;this.log(`${shooter.name} blocked by ${defender.name}`);}
+      if(!blocked) this.log(`${shooter.name} misses ${pts}`);
+      this.rebCycle(off,def,shooter);
+    }
+  }
+  playQuarter(mins) {
+    this.subs_waiting=false; this.clock=mins*60;
+    this.t1.defensive_fouls_qtr=0;this.t2.defensive_fouls_qtr=0;
+    this.t1.foul_in_last_2_mins=false;this.t2.foul_in_last_2_mins=false;
+    this.startLineups(); this.t1.byPv(); this.t2.byPv();
+    if(this.quarter===1||mins===5){
+      const c1=this.t1.byPv()[4],c2=this.t2.byPv()[4];
+      const r1=Math.max(1,c1.t_reb),r2=Math.max(1,c2.t_reb);
+      if(rollD(r1+r2)<=r1){this.possession=this.t1;if(this.quarter===1)this.jumpball_winner=this.t1;}
+      else{this.possession=this.t2;if(this.quarter===1)this.jumpball_winner=this.t2;}
+    } else if(this.quarter===2||this.quarter===3){
+      this.possession=this.jumpball_winner===this.t1?this.t2:this.t1;
+    } else { this.possession=this.jumpball_winner; }
+    while(this.clock>0) this.poss();
+    this.t1_q_scores.push(this.t1.score-this.t1_last);
+    this.t2_q_scores.push(this.t2.score-this.t2_last);
+    this.t1_last=this.t1.score; this.t2_last=this.t2.score;
+  }
+  run() {
+    for(let q=1;q<=4;q++){this.quarter=q;this.playQuarter(12);}
+    let ot=1; while(this.t1.score===this.t2.score){this.quarter=4+ot;this.playQuarter(5);ot++;}
+  }
+}
+
+function applyHomeBonus(team) {
+  team.players.forEach(p=>{
+    p.t_2pt+=1;p.t_3pt+=1;p.t_def+=1;p.t_reb+=1;
+    p.ovr=p.t_2pt+p.t_3pt+p.t_def+p.t_reb;
+    p.pv=p.t_reb-p.t_3pt+0.01*p.t_2pt+0.0001*p.t_def;
+    p.off=p.t_2pt+p.t_3pt+0.01*p.ovr;
+    p.ft_chance=Math.max(1,Math.min(90,Math.round(50+p.t_2pt*0.4+p.t_3pt*1.0)));
+  });
+}
+
+// ── Schedule generation ───────────────────────────────────────────────
+function generateSchedule(teamsData) {
+  const teams = Object.keys(teamsData).filter(t => !t.startsWith('['));
+  const divOf = {}, confOf = {};
+  const divMap = {};
+
+  for (const abbr of teams) {
+    const info = TEAM_INFO[abbr] || { conf:'West', div:'Other' };
+    divOf[abbr] = info.div; confOf[abbr] = info.conf;
+    const key = `${info.conf}|${info.div}`;
+    if (!divMap[key]) divMap[key] = [];
+    divMap[key].push(abbr);
+  }
+
+  const games = [];
+  function addSeries(t1, t2, n) {
+    let h1 = Math.floor(n/2), h2 = Math.floor(n/2);
+    if (n%2===1) { if (Math.random()<.5) h1++; else h2++; }
+    for (let i=0;i<h1;i++) games.push({home:t1,away:t2});
+    for (let i=0;i<h2;i++) games.push({home:t2,away:t1});
+  }
+
+  // Division: 4 games each pair
+  for (const divTeams of Object.values(divMap)) {
+    for (let i=0;i<divTeams.length;i++)
+      for (let j=i+1;j<divTeams.length;j++)
+        addSeries(divTeams[i], divTeams[j], 4);
+  }
+
+  // Intra-conference non-division: 6 × 4 games, 4 × 3 games per team
+  const confGroups = {};
+  for (const abbr of teams) {
+    const c = confOf[abbr];
+    if (!confGroups[c]) confGroups[c] = [];
+    confGroups[c].push(abbr);
+  }
+  for (const [, confTs] of Object.entries(confGroups)) {
+    const fourCount = {}; confTs.forEach(t => fourCount[t] = 0);
+    const pairs = [];
+    for (let i=0;i<confTs.length;i++)
+      for (let j=i+1;j<confTs.length;j++)
+        if (divOf[confTs[i]] !== divOf[confTs[j]])
+          pairs.push([confTs[i], confTs[j]]);
+    for (let i=pairs.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [pairs[i],pairs[j]]=[pairs[j],pairs[i]]; }
+    for (const [t1,t2] of pairs) {
+      const n = (fourCount[t1]<6 && fourCount[t2]<6) ? 4 : 3;
+      if (n===4) { fourCount[t1]++; fourCount[t2]++; }
+      addSeries(t1, t2, n);
+    }
+  }
+
+  // Inter-conference: 2 games each pair
+  const confKeys = Object.keys(confGroups);
+  for (let c=0;c<confKeys.length-1;c++)
+    for (const t1 of confGroups[confKeys[c]])
+      for (const t2 of confGroups[confKeys[c+1]])
+        addSeries(t1, t2, 2);
+
+  // Ensure every team reaches exactly 82 games.
+  // We only ever add a game between two teams that BOTH have < 82 total, so teams
+  // already at 82 (even with H/A coin-flip variance like 43H/39A) are never touched.
+  {
+    const H={}, A={};
+    teams.forEach(t=>{ H[t]=0; A[t]=0; });
+    games.forEach(g=>{ H[g.home]++; A[g.away]++; });
+
+    for (let iter=0; iter<50000; iter++) {
+      const short=teams.filter(t=>H[t]+A[t]<82);
+      if (!short.length) break;
+      // Shuffle so extra games are spread across different matchups each run
+      for (let i=short.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[short[i],short[j]]=[short[j],short[i]];}
+      let added=false;
+      outer: for (let i=0;i<short.length;i++) {
+        for (let j=i+1;j<short.length;j++) {
+          const t1=short[i], t2=short[j];
+          // Home = whichever team has fewer home games so far
+          const home=H[t1]<=H[t2]?t1:t2, away=home===t1?t2:t1;
+          games.push({home,away});
+          H[home]++; A[away]++;
+          added=true; break outer;
+        }
+      }
+      if (!added) break;
+    }
+  }
+
+  // Shuffle full game list
+  for (let i=games.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [games[i],games[j]]=[games[j],games[i]]; }
+  return games;
+}
+
+// ── Simulation helpers ────────────────────────────────────────────────
+function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
+  const homeRaw = teamsData[homeAbbr], awayRaw = teamsData[awayAbbr];
+  if (!homeRaw || !awayRaw) return null;
+  const homeTeam = new Team(homeAbbr, homeRaw);
+  const awayTeam = new Team(awayAbbr, awayRaw);
+  applyHomeBonus(homeTeam);
+  const game = new Game(homeTeam, awayTeam, true);
+  game.run();
+  if (recordStats) {
+    accumPlayerStats(homeTeam, homeAbbr);
+    accumPlayerStats(awayTeam, awayAbbr);
+    if (!teamRecords[homeAbbr]) teamRecords[homeAbbr]={w:0,l:0,pf:0,pa:0,g:0};
+    if (!teamRecords[awayAbbr]) teamRecords[awayAbbr]={w:0,l:0,pf:0,pa:0,g:0};
+    const hr=teamRecords[homeAbbr], ar=teamRecords[awayAbbr];
+    hr.pf+=homeTeam.score; hr.pa+=awayTeam.score; hr.g++;
+    ar.pf+=awayTeam.score; ar.pa+=homeTeam.score; ar.g++;
+    if (homeTeam.score>awayTeam.score){hr.w++;ar.l++;}else{hr.l++;ar.w++;}
+  }
+  return {homeScore:homeTeam.score, awayScore:awayTeam.score};
+}
+
+function accumPlayerStats(team, abbr) {
+  for (const p of team.players) {
+    if (p.seconds_played===0) continue;
+    if (!playerSeasonStats[p.name])
+      playerSeasonStats[p.name]={team:abbr,gp:0,sec:0,pts:0,reb:0,ast:0,stl:0,blk:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,pm:0};
+    const s=playerSeasonStats[p.name];
+    s.gp++;s.sec+=p.seconds_played;s.pts+=p.points;s.reb+=p.rebounds;s.ast+=p.assists;
+    s.stl+=p.steals;s.blk+=p.blocks;s.fgm+=p.fg_made;s.fga+=p.fg_attempted;
+    s.tpm+=p.tpt_made;s.tpa+=p.tpt_attempted;s.ftm+=p.ft_made;s.fta+=p.ft_attempted;s.pm+=p.plus_minus;
+  }
+}
+
+// Historical series formats by round:
+//   round 0 (First Round):  <=2002 → best-of-5, 2-2-1;  >=2003 → best-of-7, 2-2-1-1-1
+//   round 1 (Conf Semis):   always best-of-7, 2-2-1-1-1
+//   round 2 (Conf Finals):  always best-of-7, 2-2-1-1-1
+//   round 3 (NBA Finals):   <=2013 → best-of-7, 2-3-2;  >=2014 → best-of-7, 2-2-1-1-1
+function getSeriesConfig(round) {
+  if (round === 0 && currentYear <= 2002)
+    return { pattern:[true,true,false,false,true], winsNeeded:3 };
+  if (round === 3 && currentYear <= 2013)
+    return { pattern:[true,true,false,false,false,true,true], winsNeeded:4 };
+  return { pattern:[true,true,false,false,true,false,true], winsNeeded:4 };
+}
+
+function simSeries(t1, t2, teamsData, round=1) {
+  const {pattern, winsNeeded} = getSeriesConfig(round);
+  // Home court goes to the team with the better regular-season win %
+  const rec1=teamRecords[t1]||{w:0,g:1}, rec2=teamRecords[t2]||{w:0,g:1};
+  const t1SeriesHome = (rec1.w/Math.max(1,rec1.g)) >= (rec2.w/Math.max(1,rec2.g));
+  let w1=0,w2=0,gn=0;
+  const games=[];
+  while (w1<winsNeeded && w2<winsNeeded) {
+    const seriesHomeIsHome = pattern[gn]??true;
+    const t1Home = t1SeriesHome ? seriesHomeIsHome : !seriesHomeIsHome;
+    const home=t1Home?t1:t2, away=t1Home?t2:t1;
+    const r=simGame(home,away,teamsData,false);
+    const t1Won=(t1Home&&r.homeScore>r.awayScore)||(!t1Home&&r.awayScore>r.homeScore);
+    if(t1Won)w1++;else w2++;
+    games.push({home,away,hs:r.homeScore,as:r.awayScore,t1Won});
+    gn++;
+  }
+  return {winner:w1>=winsNeeded?t1:t2,loser:w1>=winsNeeded?t2:t1,wins:w1>=winsNeeded?w1:w2,losses:w1>=winsNeeded?w2:w1,games};
+}
+
+// ── Main simulation entry ─────────────────────────────────────────────
+function runSeason() {
+  const year = document.getElementById('year').value;
+  currentYear = parseInt(year);
+  currentTeamsData = allData[year];
+  if (!currentTeamsData) return;
+
+  teamRecords={}; playerSeasonStats={}; confStandings={East:[],West:[]};
+  playInSeeds={East:{},West:{}}; playInDone=false; playoffState=null;
+
+  const btn=document.getElementById('simBtn');
+  btn.disabled=true; btn.textContent='Simulating…';
+  document.getElementById('results').style.display='none';
+
+  setTimeout(()=>{
+    const schedule=generateSchedule(currentTeamsData);
+    for (const g of schedule) simGame(g.home,g.away,currentTeamsData);
+    buildStandings();
+    renderStandings();
+    renderLeaders('ppg');
+    renderLeaderTabs();
+    renderTeamStatsSel();
+    setupPostSeason();
+    document.getElementById('results').style.display='';
+    btn.disabled=false; btn.textContent='Re-Simulate';
+  }, 20);
+}
+
+// ── Standings ─────────────────────────────────────────────────────────
+function buildStandings() {
+  const east=[], west=[];
+  const realTeams = Object.keys(currentTeamsData).filter(t=>!t.startsWith('['));
+  for (const abbr of realTeams) {
+    const r=teamRecords[abbr]||{w:0,l:0,pf:0,pa:0,g:1};
+    const info=TEAM_INFO[abbr]||{conf:'West',div:'Other',name:abbr};
+    const entry={abbr,name:info.name||abbr,w:r.w,l:r.l,
+      pct:r.g>0?r.w/r.g:0,ppg:r.g>0?r.pf/r.g:0,
+      oppg:r.g>0?r.pa/r.g:0,diff:r.g>0?(r.pf-r.pa)/r.g:0};
+    (info.conf==='East'?east:west).push(entry);
+  }
+  const sortFn=(a,b)=>b.w-a.w||b.diff-a.diff;
+  east.sort(sortFn); west.sort(sortFn);
+  confStandings={East:east,West:west};
+}
+
+function renderStandings() {
+  const {East,West}=confStandings;
+  function table(list, conf) {
+    const hasPlayIn = currentYear>=2021;
+    let rows='';
+    list.forEach((t,i)=>{
+      const seed=i+1;
+      const playoff = seed<=6;
+      const playin  = hasPlayIn&&seed>=7&&seed<=10;
+      const cls = i===6&&hasPlayIn ? 'playin-line' : i===8&&!hasPlayIn ? 'playoff-line' : '';
+      const diffCls = t.diff>0?'pos-diff':t.diff<0?'neg-diff':'';
+      rows+=`<tr class="${cls}">
+        <td style="white-space:nowrap"><span class="seed-num">${seed}</span><img src="${esc(teamLogo(t.abbr,currentYear))}" alt="" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:.3rem" onerror="this.style.display='none'">${esc(t.abbr)}</td>
+        <td>${t.w}</td><td>${t.l}</td>
+        <td>${(t.pct).toFixed(3).replace(/^0/,'')}</td>
+        <td>${t.ppg.toFixed(1)}</td>
+        <td>${t.oppg.toFixed(1)}</td>
+        <td class="${diffCls}">${t.diff>=0?'+':''}${t.diff.toFixed(1)}</td>
+      </tr>`;
+    });
+    return `<div>
+      <div class="standings-conf">${esc(conf)} Conference</div>
+      <table class="std-table">
+        <thead><tr><th>Team</th><th>W</th><th>L</th><th>PCT</th><th>PPG</th><th>OPPG</th><th>DIFF</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+  document.getElementById('standingsContent').innerHTML=table(East,'Eastern')+table(West,'Western');
+}
+
+// ── Statistical Leaders ────────────────────────────────────────────────
+const STAT_DEFS = [
+  {key:'ppg', label:'PPG',   fn:s=>s.pts/s.gp,                               fmt:v=>v.toFixed(1),                        minGp:41, qualifier:'Min. 41 GP'},
+  {key:'rpg', label:'RPG',   fn:s=>s.reb/s.gp,                               fmt:v=>v.toFixed(1),                        minGp:41, qualifier:'Min. 41 GP'},
+  {key:'apg', label:'APG',   fn:s=>s.ast/s.gp,                               fmt:v=>v.toFixed(1),                        minGp:41, qualifier:'Min. 41 GP'},
+  {key:'spg', label:'SPG',   fn:s=>s.stl/s.gp,                               fmt:v=>v.toFixed(1),                        minGp:41, qualifier:'Min. 41 GP'},
+  {key:'bpg', label:'BPG',   fn:s=>s.blk/s.gp,                               fmt:v=>v.toFixed(1),                        minGp:41, qualifier:'Min. 41 GP'},
+  {key:'fgp', label:'FG%',   fn:s=>s.fga>=150?s.fgm/s.fga:null,             fmt:v=>(v*100).toFixed(1)+'%',              minGp:0,  qualifier:'Min. 150 FGA'},
+  {key:'3pp', label:'3P%',   fn:s=>s.tpa>=82?s.tpm/s.tpa:null,              fmt:v=>(v*100).toFixed(1)+'%',              minGp:0,  qualifier:'Min. 82 3PA'},
+  {key:'pm',  label:'+/-',   fn:s=>s.pm,                                     fmt:v=>(v>=0?'+':'')+v,                     minGp:41, qualifier:'Min. 41 GP · Season total'},
+];
+
+let activeLeaderStat = 'ppg';
+
+function renderLeaderTabs() {
+  const tabs=STAT_DEFS.map(d=>`<button class="leader-tab${d.key===activeLeaderStat?' active':''}" onclick="renderLeaders('${d.key}')">${d.label}</button>`).join('');
+  document.getElementById('leaderTabs').innerHTML=tabs;
+}
+
+function renderLeaders(statKey) {
+  activeLeaderStat=statKey;
+  const def=STAT_DEFS.find(d=>d.key===statKey)||STAT_DEFS[0];
+  renderLeaderTabs();
+
+  const players=Object.entries(playerSeasonStats)
+    .map(([name,s])=>({name,s,val:def.fn(s)}))
+    .filter(x=>x.val!==null && x.s.gp>=(def.minGp||0))
+    .sort((a,b)=>{
+      const diff = statKey==='+/-' ? b.val-a.val : Math.abs(b.val)-Math.abs(a.val);
+      return statKey==='pm' ? b.val-a.val : b.val-a.val;
+    })
+    .slice(0,25);
+
+  let rows='';
+  players.forEach((p,i)=>{
+    const s=p.s;
+    const logo=`<img src="${esc(teamLogo(s.team,currentYear))}" alt="${esc(s.team)}" title="${esc(s.team)}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle" onerror="this.style.display='none'">`;
+    rows+=`<tr>
+      <td class="rank-col">${i+1}</td>
+      <td>${esc(p.name)}</td>
+      <td>${logo} ${esc(s.team)}</td>
+      <td>${s.gp}</td>
+      <td class="stat-val">${def.fmt(p.val)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('leaderTable').innerHTML=`
+    <table class="leader-table">
+      <colgroup><col class="c-rank"><col class="c-name"><col class="c-logo"><col class="c-gp"><col class="c-stat"></colgroup>
+      <thead><tr><th>#</th><th>Player</th><th>Team</th><th>GP</th><th>${esc(def.label)}</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="leader-qualifier">${esc(def.qualifier||'')}</div>`;
+}
+
+// ── Post-season setup ─────────────────────────────────────────────────
+function setupPostSeason() {
+  const hasPlayIn = currentYear>=2021;
+  document.getElementById('playoffsContent').innerHTML='';
+  if (hasPlayIn) {
+    renderPlayInSetup();
+    document.getElementById('playinSection').style.display='';
+    document.getElementById('playoffsSection').style.display='none';
+    document.getElementById('playinBtn').style.display='';
+  } else {
+    document.getElementById('playinSection').style.display='none';
+    document.getElementById('playoffsSection').style.display='';
+    initPlayoffs();
+  }
+}
+
+function renderPlayInSetup() {
+  const {East,West}=confStandings;
+  let html='<div class="playin-grid">';
+  for (const [conf,list] of [['Eastern',East],['Western',West]]) {
+    if (list.length<10){html+=`<div></div>`;continue;}
+    const [s7,s8,s9,s10]=list.slice(6,10).map(t=>t.abbr);
+    html+=`<div>
+      <div class="playin-conf-label">${esc(conf)} Conference</div>
+      <div class="playin-game"><strong>#7 ${esc(s7)}</strong> vs <strong>#8 ${esc(s8)}</strong><div style="color:#94a3b8;font-size:.72rem;margin-top:.15rem">Winner → 7 seed</div></div>
+      <div class="playin-game"><strong>#9 ${esc(s9)}</strong> vs <strong>#10 ${esc(s10)}</strong><div style="color:#94a3b8;font-size:.72rem;margin-top:.15rem">Loser eliminated</div></div>
+    </div>`;
+  }
+  html+='</div>';
+  document.getElementById('playinContent').innerHTML=html;
+}
+
+function runPlayIn() {
+  const results={East:[],West:[]};
+  for (const [conf,list] of [['East',confStandings.East],['West',confStandings.West]]) {
+    if (list.length<10){ playInSeeds[conf]={s7:list[6]?.abbr,s8:list[7]?.abbr}; continue; }
+    const [s7,s8,s9,s10]=list.slice(6,10).map(t=>t.abbr);
+
+    function sg(t1,t2,t1Home){ const r=simGame(t1Home?t1:t2,t1Home?t2:t1,currentTeamsData,false); const t1Won=(t1Home&&r.homeScore>r.awayScore)||(!t1Home&&r.awayScore>r.homeScore); return{winner:t1Won?t1:t2,loser:t1Won?t2:t1,score:t1Home?`${r.homeScore}–${r.awayScore}`:`${r.awayScore}–${r.homeScore}`}; }
+
+    const g1=sg(s7,s8,true);
+    const g2=sg(s9,s10,true);
+    const g3=sg(g1.loser,g2.winner,true);
+
+    results[conf]=[
+      {label:`#7 ${s7} vs #8 ${s8}`,winner:g1.winner,loser:g1.loser,score:g1.score,note:'→ 7 seed'},
+      {label:`#9 ${s9} vs #10 ${s10}`,winner:g2.winner,loser:g2.loser,score:g2.score,note:'loser eliminated'},
+      {label:`8 seed qualifier`,winner:g3.winner,loser:g3.loser,score:g3.score,note:'→ 8 seed'},
+    ];
+    playInSeeds[conf]={s7:g1.winner,s8:g3.winner};
+  }
+  playInDone=true;
+  renderPlayInResults(results);
+  document.getElementById('playinBtn').style.display='none';
+  document.getElementById('playoffsSection').style.display='';
+  initPlayoffs();
+}
+
+function renderPlayInResults(results) {
+  let html='<div class="playin-grid">';
+  for (const [conf,games] of Object.entries(results)) {
+    if (!games.length){html+=`<div></div>`;continue;}
+    html+=`<div><div class="playin-conf-label">${esc(conf)}ern Conference</div>`;
+    for (const g of games) {
+      html+=`<div class="playin-game">
+        <div style="color:#94a3b8;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em">${esc(g.label)}</div>
+        <div class="result" style="margin-top:.3rem"><strong>${esc(g.winner)}</strong> def. <span style="color:#94a3b8">${esc(g.loser)}</span> <span style="color:#748ffc">${esc(g.score)}</span></div>
+        <div style="color:#64748b;font-size:.7rem;margin-top:.1rem">${esc(g.note)}</div>
+      </div>`;
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  document.getElementById('playinContent').innerHTML=html;
+}
+
+// ── Playoffs (round-by-round) ──────────────────────────────────────────
+let playoffState = null;
+
+function getPlayoffSeeds(conf) {
+  const list=confStandings[conf];
+  const seeds=[];
+  for (let i=0;i<Math.min(6,list.length);i++) seeds.push(list[i].abbr);
+  if (currentYear>=2021&&playInDone) {
+    seeds.push(playInSeeds[conf]?.s7||list[6]?.abbr);
+    seeds.push(playInSeeds[conf]?.s8||list[7]?.abbr);
+  } else {
+    for (let i=6;i<Math.min(8,list.length);i++) seeds.push(list[i].abbr);
+  }
+  return seeds;
+}
+
+function initPlayoffs() {
+  const seeds={East:[],West:[]}, seedNums={East:{},West:{}};
+  for (const conf of ['East','West']) {
+    const s=getPlayoffSeeds(conf);
+    seeds[conf]=s;
+    s.forEach((abbr,i)=>{ seedNums[conf][abbr]=i+1; });
+  }
+  playoffState={round:0,seedNums,seeds,r1:{East:[],West:[]},r2:{East:[],West:[]},cf:{East:null,West:null},finals:null};
+  renderPlayoffBracket();
+  const btn=document.getElementById('playoffsBtn');
+  btn.textContent='Simulate First Round'; btn.style.display=''; btn.disabled=false;
+}
+
+function advancePlayoffs() {
+  const btn=document.getElementById('playoffsBtn');
+  btn.disabled=true;
+  const ps=playoffState;
+  if (ps.round>=4) { initPlayoffs(); return; }
+  setTimeout(()=>{
+    if (ps.round===0) {
+      for (const conf of ['East','West']) {
+        const s=ps.seeds[conf];
+        ps.r1[conf]=[
+          simSeries(s[0],s[7],currentTeamsData,0),
+          simSeries(s[1],s[6],currentTeamsData,0),
+          simSeries(s[2],s[5],currentTeamsData,0),
+          simSeries(s[3],s[4],currentTeamsData,0),
+        ];
+      }
+      ps.round=1; btn.textContent='Simulate Conference Semifinals';
+    } else if (ps.round===1) {
+      for (const conf of ['East','West']) {
+        const r=ps.r1[conf];
+        ps.r2[conf]=[
+          simSeries(r[0].winner,r[3].winner,currentTeamsData,1),
+          simSeries(r[1].winner,r[2].winner,currentTeamsData,1),
+        ];
+      }
+      ps.round=2; btn.textContent='Simulate Conference Finals';
+    } else if (ps.round===2) {
+      for (const conf of ['East','West']) {
+        const r=ps.r2[conf];
+        ps.cf[conf]=simSeries(r[0].winner,r[1].winner,currentTeamsData,2);
+      }
+      ps.round=3; btn.textContent='Simulate NBA Finals';
+    } else if (ps.round===3) {
+      ps.finals=simSeries(ps.cf.East.winner,ps.cf.West.winner,currentTeamsData,3);
+      ps.round=4; btn.textContent='Re-Simulate Playoffs';
+    }
+    renderPlayoffBracket();
+    btn.disabled=false;
+  }, 20);
+}
+
+function renderPlayoffBracket() {
+  const ps=playoffState;
+  if (!ps) return;
+
+  const logoTag=(abbr)=>`<img src="${esc(teamLogo(abbr,currentYear))}" alt="${esc(abbr)}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:.3rem" onerror="this.style.display='none'">`;
+
+  const sl=(abbr)=>{
+    const n=ps.seedNums.East[abbr]??ps.seedNums.West[abbr];
+    return n!=null?`<span class="seed-num">#${n}</span> `:'';
+  };
+
+  const seriesCard=(s,isFinals=false)=>{
+    const gameRows=s.games.map((g,i)=>{
+      return `<div class="game-row">G${i+1}: ${esc(g.home)} <strong>${g.hs}</strong>–<strong>${g.as}</strong> ${esc(g.away)}</div>`;
+    }).join('');
+    const borderStyle=isFinals?' style="border-color:#748ffc"':'';
+    return `<div class="series-card"${borderStyle}>
+      <div class="series-summary">
+        <span class="winner">${logoTag(s.winner)}${sl(s.winner)}${esc(s.winner)}</span>
+        <span class="series-record">${s.wins}–${s.losses}</span>
+        <span class="def-word">def.</span>
+        <span class="loser">${sl(s.loser)}${esc(s.loser)}</span>
+      </div>
+      <details class="series-games">
+        <summary>Game log (${s.wins+s.losses} games) ▾</summary>
+        <div class="game-list">${gameRows}</div>
+      </details>
+    </div>`;
+  };
+
+  const pendingCard=(a1,a2)=>`<div class="series-card pending">
+    ${logoTag(a1)}${sl(a1)}${esc(a1)} <span class="vs-word">vs</span> ${logoTag(a2)}${sl(a2)}${esc(a2)}
+  </div>`;
+
+  const tbdCard=(msg)=>`<div class="series-card pending" style="font-style:italic;font-size:.73rem">${msg}</div>`;
+
+  let html='';
+  if (ps.round>=4&&ps.finals) {
+    const champ=ps.finals.winner;
+    html+=`<div class="champion-banner">${logoTag(champ)} ${esc(TEAM_INFO[champ]?.name||champ)} win the NBA Championship!</div>`;
+  }
+
+  html+='<div class="bracket-grid">';
+  for (const conf of ['East','West']) {
+    const s=ps.seeds[conf];
+    html+=`<div class="bracket-conf"><div class="bracket-conf-label">${esc(conf)}ern Conference</div>`;
+
+    html+=`<div class="bracket-round"><div class="round-label">First Round</div>`;
+    if (ps.round>=1) { for (const sr of ps.r1[conf]) html+=seriesCard(sr); }
+    else { html+=pendingCard(s[0],s[7])+pendingCard(s[1],s[6])+pendingCard(s[2],s[5])+pendingCard(s[3],s[4]); }
+    html+='</div>';
+
+    html+=`<div class="bracket-round"><div class="round-label">Conference Semifinals</div>`;
+    if (ps.round>=2) { for (const sr of ps.r2[conf]) html+=seriesCard(sr); }
+    else if (ps.round>=1) { html+=pendingCard(ps.r1[conf][0].winner,ps.r1[conf][3].winner)+pendingCard(ps.r1[conf][1].winner,ps.r1[conf][2].winner); }
+    else { html+=tbdCard('After First Round'); }
+    html+='</div>';
+
+    html+=`<div class="bracket-round"><div class="round-label">Conference Finals</div>`;
+    if (ps.round>=3&&ps.cf[conf]) { html+=seriesCard(ps.cf[conf]); }
+    else if (ps.round>=2) { html+=pendingCard(ps.r2[conf][0].winner,ps.r2[conf][1].winner); }
+    else { html+=tbdCard('After Semifinals'); }
+    html+='</div>';
+
+    html+='</div>';
+  }
+  html+='</div>';
+
+  html+=`<div class="finals-section"><div class="finals-label">NBA Finals</div>`;
+  if (ps.round>=4&&ps.finals) { html+=seriesCard(ps.finals,true); }
+  else if (ps.round>=3&&ps.cf.East&&ps.cf.West) { html+=pendingCard(ps.cf.East.winner,ps.cf.West.winner); }
+  else { html+=tbdCard('After Conference Finals'); }
+  html+='</div>';
+
+  document.getElementById('playoffsContent').innerHTML=html;
+}
+
+// ── Team Player Stats ─────────────────────────────────────────────────
+function renderTeamStatsSel() {
+  const sel = document.getElementById('teamStatsSel');
+  const teams = Object.keys(currentTeamsData).filter(t => !t.startsWith('['));
+  teams.sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = teams.map(t =>
+    `<option value="${esc(t)}">${esc(t)} — ${esc(TEAM_INFO[t]?.name || t)}</option>`
+  ).join('');
+  if (teams.length) renderTeamStats(teams[0]);
+}
+
+function renderTeamStats(abbr) {
+  const el = document.getElementById('teamStatsTable');
+  const logoEl = document.getElementById('teamStatsLogo');
+  if (!abbr) { el.innerHTML = ''; logoEl.style.display='none'; return; }
+  logoEl.src = teamLogo(abbr, currentYear);
+  logoEl.style.display = '';
+  const players = Object.entries(playerSeasonStats)
+    .filter(([, s]) => s.team === abbr)
+    .sort((a, b) => (b[1].sec / Math.max(1, b[1].gp)) - (a[1].sec / Math.max(1, a[1].gp)));
+  if (!players.length) {
+    el.innerHTML = '<p style="color:#64748b;font-size:.82rem;margin-top:.5rem">No stats available.</p>';
+    return;
+  }
+  // First pass: compute raw numeric values and find per-stat leaders
+  const computed = players.map(([name, s]) => {
+    const gp = s.gp || 1;
+    return { name, s,
+      mpgV: s.sec / 60 / gp, ppgV: s.pts / gp, rpgV: s.reb / gp,
+      apgV: s.ast / gp,      spgV: s.stl / gp,  bpgV: s.blk / gp };
+  });
+  const maxOf = k => Math.max(...computed.map(x => x[k]));
+  const maxMpg=maxOf('mpgV'), maxPpg=maxOf('ppgV'), maxRpg=maxOf('rpgV');
+  const maxApg=maxOf('apgV'), maxSpg=maxOf('spgV'), maxBpg=maxOf('bpgV');
+  const b = (v, max, fmt) => v === max ? `<strong>${fmt}</strong>` : fmt;
+
+  // Second pass: build rows
+  let rows = '';
+  for (const {name, s, mpgV, ppgV, rpgV, apgV, spgV, bpgV} of computed) {
+    const fgp = s.fga > 0 ? (s.fgm / s.fga * 100).toFixed(1) + '%' : '—';
+    const tpp = s.tpa > 0 ? (s.tpm / s.tpa * 100).toFixed(1) + '%' : '—';
+    const pm  = (s.pm >= 0 ? '+' : '') + s.pm;
+    rows += `<tr>
+      <td title="${esc(name)}">${esc(name)}</td>
+      <td>${s.gp}</td>
+      <td>${b(mpgV, maxMpg, mpgV.toFixed(1))}</td>
+      <td>${b(ppgV, maxPpg, ppgV.toFixed(1))}</td>
+      <td>${b(rpgV, maxRpg, rpgV.toFixed(1))}</td>
+      <td>${b(apgV, maxApg, apgV.toFixed(1))}</td>
+      <td>${b(spgV, maxSpg, spgV.toFixed(1))}</td>
+      <td>${b(bpgV, maxBpg, bpgV.toFixed(1))}</td>
+      <td>${fgp}</td><td>${tpp}</td><td>${pm}</td>
+    </tr>`;
+  }
+  el.innerHTML = `<table class="ts-table">
+    <colgroup>
+      <col class="tc-name"><col class="tc-gp"><col class="tc-mpg">
+      <col class="tc-ppg"><col class="tc-rpg"><col class="tc-apg">
+      <col class="tc-spg"><col class="tc-bpg">
+      <col class="tc-fgp"><col class="tc-3pp"><col class="tc-pm">
+    </colgroup>
+    <thead><tr>
+      <th>Player</th><th>GP</th><th>MPG</th>
+      <th>PPG</th><th>RPG</th><th>APG</th>
+      <th>SPG</th><th>BPG</th>
+      <th>FG%</th><th>3P%</th><th>+/-</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────
+fetch('nba_rosters_all.json')
+  .then(r=>r.json())
+  .then(data=>{
+    allData=data;
+    const years=Object.keys(data).map(Number).sort((a,b)=>b-a);
+    const sel=document.getElementById('year');
+    years.forEach(y=>{
+      const o=document.createElement('option');
+      o.value=y; o.textContent=seasonLabel(y);
+      if(y===years[0]) o.selected=true;
+      sel.appendChild(o);
+    });
+  })
+  .catch(()=>{ document.querySelector('.container').innerHTML+='<p style="color:#f87171">Could not load nba_rosters_all.json.</p>'; });
+</script>
+</body>
+</html>

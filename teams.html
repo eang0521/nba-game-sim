@@ -156,6 +156,7 @@
     <a href="index.html" class="nav-link">Home</a>
     <a href="simulator.html" class="nav-link">Instant Results</a>
     <a href="live.html" class="nav-link">Live Sim</a>
+    <a href="season.html" class="nav-link">Season</a>
     <a href="teams.html" class="nav-link active">Teams</a>
     <a href="how-it-works.html" class="nav-link">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
@@ -166,11 +167,14 @@
   <div class="page-header">
     <div>
       <div class="page-title">Teams</div>
-      <div class="page-subtitle">2026 season rosters with full player ratings</div>
+      <div class="page-subtitle" id="pageSubtitle">Loading…</div>
     </div>
-    <div class="search-wrap">
-      <span class="search-icon">&#9906;</span>
-      <input id="teamSearch" type="text" placeholder="Search teams…" oninput="filterTeamsDebounced()" autocomplete="off">
+    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+      <div class="search-wrap">
+        <span class="search-icon">&#9906;</span>
+        <input id="teamSearch" type="text" placeholder="Search teams…" oninput="filterTeamsDebounced()" autocomplete="off">
+      </div>
+      <select id="year" onchange="onYearChange()" style="background:#141929;color:#e2e8f0;border:1px solid #2d3f6e;border-radius:6px;padding:0.5rem 0.75rem;font-size:0.88rem;cursor:pointer"></select>
     </div>
   </div>
 
@@ -181,12 +185,29 @@
 <script>
 'use strict';
 
+// ── Globals ───────────────────────────────────────────────────────────
+let allData = {};
+
+function seasonLabel(year) {
+  return `${year - 1}-${String(year).slice(2)}`;
+}
+
+function onYearChange() {
+  const year = document.getElementById('year').value;
+  const label = seasonLabel(Number(year));
+  document.getElementById('pageSubtitle').textContent =
+    `${label} season rosters with full player ratings`;
+  render(allData[year]);
+  filterTeams();
+}
+
 // ── Team metadata ─────────────────────────────────────────────────────
 const TEAM_INFO = {
   ATL: { name: 'Atlanta Hawks',           espn: 'atl',  conf: 'East', div: 'Southeast' },
-  BKN: { name: 'Brooklyn Nets',           espn: 'bkn',  conf: 'East', div: 'Atlantic'  },
+  BRK: { name: 'Brooklyn Nets',           espn: 'bkn',  conf: 'East', div: 'Atlantic'  },
   BOS: { name: 'Boston Celtics',          espn: 'bos',  conf: 'East', div: 'Atlantic'  },
-  CHA: { name: 'Charlotte Hornets',       espn: 'cha',  conf: 'East', div: 'Southeast' },
+  CHA: { name: 'Charlotte Bobcats',       espn: 'cha',  conf: 'East', div: 'Southeast' },
+  CHO: { name: 'Charlotte Hornets',       espn: 'cha',  conf: 'East', div: 'Southeast' },
   CHI: { name: 'Chicago Bulls',           espn: 'chi',  conf: 'East', div: 'Central'   },
   CLE: { name: 'Cleveland Cavaliers',     espn: 'cle',  conf: 'East', div: 'Central'   },
   DAL: { name: 'Dallas Mavericks',        espn: 'dal',  conf: 'West', div: 'Southwest' },
@@ -206,17 +227,38 @@ const TEAM_INFO = {
   OKC: { name: 'Oklahoma City Thunder',   espn: 'okc',  conf: 'West', div: 'Northwest' },
   ORL: { name: 'Orlando Magic',           espn: 'orl',  conf: 'East', div: 'Southeast' },
   PHI: { name: 'Philadelphia 76ers',      espn: 'phi',  conf: 'East', div: 'Atlantic'  },
-  PHX: { name: 'Phoenix Suns',            espn: 'phx',  conf: 'West', div: 'Pacific'   },
+  PHO: { name: 'Phoenix Suns',            espn: 'phx',  conf: 'West', div: 'Pacific'   },
   POR: { name: 'Portland Trail Blazers',  espn: 'por',  conf: 'West', div: 'Northwest' },
   SAC: { name: 'Sacramento Kings',        espn: 'sac',  conf: 'West', div: 'Pacific'   },
   SAS: { name: 'San Antonio Spurs',       espn: 'sa',   conf: 'West', div: 'Southwest' },
   TOR: { name: 'Toronto Raptors',         espn: 'tor',  conf: 'East', div: 'Atlantic'  },
   UTA: { name: 'Utah Jazz',               espn: 'utah', conf: 'West', div: 'Northwest' },
   WAS: { name: 'Washington Wizards',      espn: 'wsh',  conf: 'East', div: 'Southeast' },
+
+  // ── Historical franchises ──────────────────────────────────────────────────
+  CHH: { name: 'Charlotte Hornets',   espn: 'cha', bbref: 'CHH', conf: 'East', div: 'Southeast' },
+  NJN: { name: 'New Jersey Nets',     espn: 'njn', bbref: 'NJN', conf: 'East', div: 'Atlantic'  },
+  SEA: { name: 'Seattle SuperSonics', espn: 'sea', bbref: 'SEA', conf: 'West', div: 'Northwest' },
+  NOH: { name: 'New Orleans Hornets', espn: 'no',  bbref: 'NOH', conf: 'West', div: 'Southwest' },
+  NOK: { name: 'NO/OKC Hornets',      espn: 'no',  bbref: 'NOK', conf: 'West', div: 'Southwest' },
 };
 
-function logoUrl(espn) {
-  return `https://a.espncdn.com/i/teamlogos/nba/500/${espn}.png`;
+function bbrefLogo(abbr, year) {
+  return `https://cdn.ssref.net/req/202606291/tlogo/bbr/${abbr}-${year}.png`;
+}
+
+function logoFallback(img) {
+  const bbrefUrl = img.dataset.bbref;
+  if (bbrefUrl && img.src !== bbrefUrl) {
+    img.onerror = function() {
+      this.style.display = 'none';
+      this.nextElementSibling.style.display = 'flex';
+    };
+    img.src = bbrefUrl;
+  } else {
+    img.style.display = 'none';
+    img.nextElementSibling.style.display = 'flex';
+  }
 }
 
 function esc(str) {
@@ -302,8 +344,11 @@ function buildRosterTable(players) {
 }
 
 function buildTeamCard(abbr, players, ratings, ranks) {
-  const info = TEAM_INFO[abbr];
-  const url  = logoUrl(info.espn);
+  const info     = TEAM_INFO[abbr] || { name: abbr, conf: '?', div: '?' };
+  const year     = document.getElementById('year').value;
+  const espnUrl  = info.espn ? `https://a.espncdn.com/i/teamlogos/nba/500/${info.espn}.png` : '';
+  const bbrefUrl = bbrefLogo(abbr, year);
+  const primary  = espnUrl || bbrefUrl;
   const chip = (label, val, rank) => `
     <div class="rating-chip">
       <span class="rating-chip-label">${label}</span>
@@ -313,8 +358,8 @@ function buildTeamCard(abbr, players, ratings, ranks) {
   return `
   <details class="team-card" data-name="${info.name.toLowerCase()} ${abbr.toLowerCase()}">
     <summary class="team-summary">
-      <img class="team-logo" src="${esc(url)}" alt="${esc(info.name)} logo"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img class="team-logo" src="${esc(primary)}" alt="${esc(abbr)}"
+           data-bbref="${esc(bbrefUrl)}" onerror="logoFallback(this)">
       <div class="team-logo-placeholder" style="display:none">${esc(abbr)}</div>
       <div class="team-meta">
         <div class="team-fullname">${esc(info.name)}</div>
@@ -353,12 +398,14 @@ function render(teamsData) {
   });
 
   const abbrs = allAbbrs.sort((a, b) =>
-    TEAM_INFO[a].name.localeCompare(TEAM_INFO[b].name)
+    (TEAM_INFO[a] || { name: a }).name.localeCompare((TEAM_INFO[b] || { name: b }).name)
   );
-  const east = abbrs.filter(a => TEAM_INFO[a].conf === 'East');
-  const west = abbrs.filter(a => TEAM_INFO[a].conf === 'West');
+  const east  = abbrs.filter(a => (TEAM_INFO[a] || {}).conf === 'East');
+  const west  = abbrs.filter(a => (TEAM_INFO[a] || {}).conf === 'West');
+  const other = abbrs.filter(a => !['East','West'].includes((TEAM_INFO[a] || {}).conf));
 
   function section(label, list) {
+    if (!list.length) return '';
     const cards = list.map(a => buildTeamCard(a, teamsData[a], ratings[a], ranks[a])).join('');
     return `<div class="conference-block">
       <div class="conference-label">${label}</div>
@@ -367,7 +414,9 @@ function render(teamsData) {
   }
 
   document.getElementById('conferenceContainer').innerHTML =
-    section('Eastern Conference', east) + section('Western Conference', west);
+    section('Eastern Conference', east) +
+    section('Western Conference', west) +
+    section('Other', other);
 }
 
 // ── Search / filter ───────────────────────────────────────────────────
@@ -400,12 +449,24 @@ function filterTeams() {
 const filterTeamsDebounced = debounce(filterTeams, 150);
 
 // ── Boot ─────────────────────────────────────────────────────────────
-fetch('nba_rosters26_v3.json')
+fetch('nba_rosters_all.json')
   .then(r => r.json())
-  .then(data => render(data))
+  .then(data => {
+    allData = data;
+    const years = Object.keys(data).map(Number).sort((a, b) => b - a);
+    const yearSel = document.getElementById('year');
+    years.forEach(year => {
+      const opt = document.createElement('option');
+      opt.value = year;
+      opt.textContent = seasonLabel(year);
+      if (year === years[0]) opt.selected = true;
+      yearSel.appendChild(opt);
+    });
+    onYearChange();
+  })
   .catch(() => {
     document.getElementById('conferenceContainer').innerHTML =
-      '<p style="color:#f87171;padding:2rem 0">Could not load nba_rosters26_v3.json.</p>';
+      '<p style="color:#f87171;padding:2rem 0">Could not load nba_rosters_all.json.</p>';
   });
 </script>
 </body>
