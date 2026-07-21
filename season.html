@@ -887,10 +887,7 @@ function renderAwards() {
     return `${(s.pts/g).toFixed(1)} PPG · ${(s.reb/g).toFixed(1)} RPG · ${(s.ast/g).toFixed(1)} APG`;
   };
   const defLine = s => {
-    const min = s.sec / 60;
-    const sp36 = ((s.stl / min) * 36).toFixed(1), bp36 = ((s.blk / min) * 36).toFixed(1);
-    const rb36 = ((s.reb / min) * 36).toFixed(1);
-    return `${sp36} SP36 · ${bp36} BP36 · ${rb36} RB36`;
+    return `${(s.stl/s.gp).toFixed(1)} SPG · ${(s.blk/s.gp).toFixed(1)} BPG · ${(s.reb/s.gp).toFixed(1)} RPG`;
   };
 
   // Award cards
@@ -906,7 +903,7 @@ function renderAwards() {
   const allRookie = royList.slice(0, 10);
 
   const ppgStr  = s => `${(s.pts/s.gp).toFixed(1)} PPG`;
-  const sblkStr = s => { const min=s.sec/60; return `${((s.stl/min)*36).toFixed(1)} SP36 · ${((s.blk/min)*36).toFixed(1)} BP36`; };
+  const sblkStr = s => `${(s.stl/s.gp).toFixed(1)} SPG · ${(s.blk/s.gp).toFixed(1)} BPG`;
 
   html += `<div class="allteams-wrap">`;
   html += `<div>`;
