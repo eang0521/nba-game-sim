@@ -783,7 +783,7 @@ function mvpScore(name, s) {
   const ppg = s.pts/s.gp, rpg = s.reb/s.gp, apg = s.ast/s.gp;
   const spg = s.stl/s.gp, bpg = s.blk/s.gp;
   const diff = (rec.pf - rec.pa) / rec.g;
-  return ppg + rpg + apg + spg + bpg + (ovr/3) + (rec.w/2) + diff;
+  return ppg + rpg + apg + spg + bpg + (ovr/3) + (rec.w/3) + diff;
 }
 
 function dpoyScore(name, s) {
