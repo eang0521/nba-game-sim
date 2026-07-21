@@ -91,6 +91,28 @@
     .ts-table tbody tr:nth-child(odd) td { background:#0c101a; }
     .ts-table tbody tr:hover td { background:#172035; }
 
+    /* ── Awards ─────── */
+    .awards-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+    @media(max-width:750px){ .awards-row { grid-template-columns:1fr; } }
+    .award-card { background:#141929; border:1px solid #1e2d5a; border-radius:10px; padding:.9rem 1.1rem; }
+    .award-label { font-size:.64rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#748ffc; margin-bottom:.55rem; }
+    .award-player-row { display:flex; align-items:center; gap:.55rem; margin-bottom:.4rem; }
+    .award-logo { width:28px; height:28px; object-fit:contain; flex-shrink:0; }
+    .award-name { font-size:.92rem; font-weight:800; color:#fff; line-height:1.2; }
+    .award-team-line { font-size:.7rem; color:#748ffc; font-weight:700; margin-top:.1rem; }
+    .award-stats { font-size:.72rem; color:#94a3b8; line-height:1.5; }
+    .award-empty { color:#475569; font-size:.78rem; padding:.25rem 0; }
+    .allteams-wrap { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem; }
+    @media(max-width:800px){ .allteams-wrap { grid-template-columns:1fr 1fr; } }
+    @media(max-width:500px){ .allteams-wrap { grid-template-columns:1fr; } }
+    .allteam-block { margin-bottom:.8rem; }
+    .allteam-label { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#475569; margin-bottom:.35rem; padding-bottom:.3rem; border-bottom:1px solid #1a2235; }
+    .allteam-table { width:100%; border-collapse:collapse; font-size:.77rem; }
+    .allteam-table td { padding:.26rem .45rem; border-bottom:1px solid #1a2235; color:#c8d3f5; vertical-align:middle; }
+    .allteam-table tr:last-child td { border-bottom:none; }
+    .allteam-rank { color:#475569; font-size:.66rem; width:16px; text-align:right; padding-right:.5rem !important; }
+    .allteam-stat { text-align:right; color:#64748b; font-size:.7rem; white-space:nowrap; }
+
     /* ── Play-In ─────── */
     .playin-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1rem; }
     @media(max-width:600px){ .playin-grid { grid-template-columns:1fr; } }
@@ -190,6 +212,12 @@
           <div id="teamStatsTable" class="ts-wrap"></div>
         </div>
       </div>
+    </section>
+
+    <!-- Season Awards -->
+    <section id="awardsSection">
+      <div class="section-title">Season Awards</div>
+      <div id="awardsContent"></div>
     </section>
 
     <!-- Play-In Tournament -->
@@ -717,6 +745,164 @@ function simSeries(t1, t2, teamsData, round=1) {
 }
 
 // ── Main simulation entry ─────────────────────────────────────────────
+// ── Awards ────────────────────────────────────────────────────────────
+
+function getPlayerRatings(name) {
+  for (const players of Object.values(currentTeamsData)) {
+    const p = (Array.isArray(players) ? players : players.players || []).find(p => p.name === name);
+    if (p) return p;
+  }
+  return null;
+}
+
+function isRookie(name) {
+  for (const offset of [1, 2]) {
+    const prevData = allData[String(currentYear - offset)];
+    if (!prevData) continue;
+    for (const players of Object.values(prevData)) {
+      if (players.find(p => p.name === name)) return false;
+    }
+  }
+  return true;
+}
+
+function mvpScore(name, s) {
+  if (s.gp < 55) return -1;
+  if (s.sec / s.gp / 60 < 24) return -1;
+  const rec = teamRecords[s.team];
+  if (!rec || !rec.g) return -1;
+  const ratings = getPlayerRatings(name);
+  const ovr = ratings ? ratings.t_2pt + ratings.t_3pt + ratings.t_def + ratings.t_reb : 0;
+  const ppg = s.pts/s.gp, rpg = s.reb/s.gp, apg = s.ast/s.gp;
+  const spg = s.stl/s.gp, bpg = s.blk/s.gp;
+  const diff = (rec.pf - rec.pa) / rec.g;
+  return ppg + rpg + apg + spg + bpg + (ovr/3) + (rec.w/2) + diff;
+}
+
+function dpoyScore(name, s) {
+  if (s.gp < 55) return -1;
+  if (s.sec / s.gp / 60 < 20) return -1;
+  const rec = teamRecords[s.team];
+  if (!rec || !rec.g) return -1;
+  const ratings = getPlayerRatings(name);
+  const defRat = ratings ? ratings.t_def : 50;
+  const spg = s.stl/s.gp, bpg = s.blk/s.gp;
+  const teamPA = rec.pa / rec.g;
+  // Use (leagueAvg - teamPA)/5 so good team defense adds to score rather than
+  // subtracting a fixed ~22 from everyone (which would make all scores negative)
+  const allRecs = Object.values(teamRecords).filter(r => r.g > 0);
+  const leagueAvgPA = allRecs.reduce((sum, r) => sum + r.pa/r.g, 0) / allRecs.length;
+  const rpg = s.reb / s.gp;
+  return spg + bpg + (defRat/10) + (leagueAvgPA - teamPA) / 5 + rpg/10;
+}
+
+function royScore(name, s) {
+  if (!isRookie(name)) return -1;
+  if (s.gp < 30) return -1;
+  const ratings = getPlayerRatings(name);
+  const ovr = ratings ? ratings.t_2pt + ratings.t_3pt + ratings.t_def + ratings.t_reb : 0;
+  const ppg = s.pts/s.gp, rpg = s.reb/s.gp, apg = s.ast/s.gp;
+  const spg = s.stl/s.gp, bpg = s.blk/s.gp;
+  return ppg + rpg + apg + spg + bpg + (ovr/3);
+}
+
+function awardCardHTML(labelText, winner, statFn) {
+  const logo = (abbr) => `<img class="award-logo" src="${esc(teamLogo(abbr,currentYear))}" alt="" onerror="this.style.display='none'">`;
+  if (!winner) {
+    return `<div class="award-card">
+      <div class="award-label">${esc(labelText)}</div>
+      <div class="award-empty">No qualifier</div>
+    </div>`;
+  }
+  const {n, s} = winner;
+  const rec = teamRecords[s.team];
+  const recStr = rec ? `${rec.w}–${rec.l}` : '';
+  return `<div class="award-card">
+    <div class="award-label">${esc(labelText)}</div>
+    <div class="award-player-row">
+      ${logo(s.team)}
+      <div>
+        <div class="award-name">${esc(n)}</div>
+        <div class="award-team-line">${esc(s.team)}${recStr ? ' · ' + recStr : ''}</div>
+      </div>
+    </div>
+    <div class="award-stats">${esc(statFn(s))}</div>
+  </div>`;
+}
+
+function allTeamHTML(entries, label, statFn, startRank = 1) {
+  let rows = '';
+  entries.forEach(({n: name}, i) => {
+    const s = playerSeasonStats[name];
+    const logo = s ? `<img src="${esc(teamLogo(s.team,currentYear))}" alt="" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-right:.25rem" onerror="this.style.display='none'">` : '';
+    const stat = s ? statFn(s) : '';
+    rows += `<tr>
+      <td class="allteam-rank">${startRank + i}</td>
+      <td>${logo}${esc(name)}</td>
+      <td class="allteam-stat">${esc(stat)}</td>
+    </tr>`;
+  });
+  return `<div class="allteam-block">
+    <div class="allteam-label">${esc(label)}</div>
+    <table class="allteam-table"><tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+function renderAwards() {
+  const entries = Object.entries(playerSeasonStats);
+
+  const ranked = (scoreFn) => entries
+    .map(([n, s]) => ({ n, s, score: scoreFn(n, s) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const mvpList  = ranked(mvpScore);
+  const dpoyList = ranked(dpoyScore);
+  const royList  = ranked(royScore);
+
+  const offLine = s => {
+    const g = s.gp;
+    return `${(s.pts/g).toFixed(1)} PPG · ${(s.reb/g).toFixed(1)} RPG · ${(s.ast/g).toFixed(1)} APG`;
+  };
+  const defLine = s => {
+    const g = s.gp;
+    return `${(s.stl/g).toFixed(1)} SPG · ${(s.blk/g).toFixed(1)} BPG · ${(s.reb/g).toFixed(1)} RPG`;
+  };
+
+  // Award cards
+  let html = `<div class="awards-row">`;
+  html += awardCardHTML('Most Valuable Player',       mvpList[0]  || null, offLine);
+  html += awardCardHTML('Defensive Player of the Year', dpoyList[0] || null, defLine);
+  html += awardCardHTML('Rookie of the Year',         royList[0]  || null, offLine);
+  html += `</div>`;
+
+  // All-NBA (top 15 by MVP score) + All-Defense (top 10 by DPOY score)
+  const allNBA    = mvpList.slice(0, 15);
+  const allDef    = dpoyList.slice(0, 10);
+  const allRookie = royList.slice(0, 10);
+
+  const ppgStr  = s => `${(s.pts/s.gp).toFixed(1)} PPG`;
+  const sblkStr = s => `${(s.stl/s.gp).toFixed(1)} SPG · ${(s.blk/s.gp).toFixed(1)} BPG`;
+
+  html += `<div class="allteams-wrap">`;
+  html += `<div>`;
+  html += allTeamHTML(allNBA.slice(0,  5), 'All-NBA First Team',  ppgStr,  1);
+  html += allTeamHTML(allNBA.slice(5, 10), 'All-NBA Second Team', ppgStr,  6);
+  html += allTeamHTML(allNBA.slice(10,15), 'All-NBA Third Team',  ppgStr, 11);
+  html += `</div>`;
+  html += `<div>`;
+  html += allTeamHTML(allDef.slice(0, 5), 'All-Defensive First Team',  sblkStr, 1);
+  html += allTeamHTML(allDef.slice(5,10), 'All-Defensive Second Team', sblkStr, 6);
+  html += `</div>`;
+  html += `<div>`;
+  if (allRookie.length > 0) html += allTeamHTML(allRookie.slice(0, 5), 'All-Rookie First Team',  ppgStr, 1);
+  if (allRookie.length > 5) html += allTeamHTML(allRookie.slice(5,10), 'All-Rookie Second Team', ppgStr, 6);
+  html += `</div>`;
+  html += `</div>`;
+
+  document.getElementById('awardsContent').innerHTML = html;
+}
+
 function runSeason() {
   const year = document.getElementById('year').value;
   currentYear = parseInt(year);
@@ -738,6 +924,7 @@ function runSeason() {
     renderLeaders('ppg');
     renderLeaderTabs();
     renderTeamStatsSel();
+    renderAwards();
     setupPostSeason();
     document.getElementById('results').style.display='';
     btn.disabled=false; btn.textContent='Re-Simulate';
