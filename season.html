@@ -1293,8 +1293,7 @@ function renderPlayoffBracket() {
     const fmvpStat = fmvp ? (()=>{
       const s=fmvp.s;
       const ppg=(s.pts/s.gp).toFixed(1), rpg=(s.reb/s.gp).toFixed(1), apg=(s.ast/s.gp).toFixed(1);
-      const spg=(s.stl/s.gp).toFixed(1), bpg=(s.blk/s.gp).toFixed(1);
-      return `${ppg} PPG · ${rpg} RPG · ${apg} APG · ${spg} SPG · ${bpg} BPG`;
+      return `${ppg} PPG · ${rpg} RPG · ${apg} APG`;
     })() : '';
     html+=`<div class="champ-footer">
       <div class="champ-footer-row">
