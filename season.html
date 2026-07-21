@@ -151,11 +151,16 @@
     .champion-banner {
       background:linear-gradient(135deg,#1a2235 0%,#1e3a5f 100%);
       border:1px solid #748ffc; border-radius:10px;
-      padding:1.2rem 1.5rem; margin-bottom:2rem;
+      padding:1.2rem 1.5rem; margin-bottom:1rem;
       font-size:1.2rem; font-weight:900; color:#fff; text-align:center;
     }
     .finals-section { margin-top:1.5rem; }
     .finals-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#748ffc; margin-bottom:.6rem; }
+    .champ-footer { margin-top:1.25rem; }
+    .champ-footer-row { display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap; }
+    .champ-footer-row .champion-banner { flex:1; min-width:200px; margin-bottom:0; }
+    .finals-mvp-card { flex-shrink:0; width:200px; }
+    @media(max-width:600px){ .finals-mvp-card { width:100%; } }
   </style>
 </head>
 <body>
@@ -807,6 +812,20 @@ function royScore(name, s) {
   return ppg + rpg + apg + spg + bpg + (ovr/3);
 }
 
+function computeFinalsMVP(winnerAbbr) {
+  let best = null, bestScore = -Infinity;
+  for (const [name, s] of Object.entries(playerSeasonStats)) {
+    if (s.team !== winnerAbbr || s.gp < 1) continue;
+    const ratings = getPlayerRatings(name);
+    const ovr = ratings ? ratings.t_2pt + ratings.t_3pt + ratings.t_def + ratings.t_reb : 0;
+    const ppg = s.pts/s.gp, rpg = s.reb/s.gp, apg = s.ast/s.gp;
+    const spg = s.stl/s.gp, bpg = s.blk/s.gp;
+    const score = ppg + rpg + apg + spg + bpg + (ovr/3);
+    if (score > bestScore) { bestScore = score; best = { name, s, score }; }
+  }
+  return best;
+}
+
 function awardCardHTML(labelText, winner, statFn) {
   const logo = (abbr) => `<img class="award-logo" src="${esc(teamLogo(abbr,currentYear))}" alt="" onerror="this.style.display='none'">`;
   if (!winner) {
@@ -1233,11 +1252,6 @@ function renderPlayoffBracket() {
   const tbdCard=(msg)=>`<div class="series-card pending" style="font-style:italic;font-size:.73rem">${msg}</div>`;
 
   let html='';
-  if (ps.round>=4&&ps.finals) {
-    const champ=ps.finals.winner;
-    html+=`<div class="champion-banner">${logoTag(champ)} ${esc(TEAM_INFO[champ]?.name||champ)} win the NBA Championship!</div>`;
-  }
-
   html+='<div class="bracket-grid">';
   for (const conf of ['East','West']) {
     const s=ps.seeds[conf];
@@ -1269,6 +1283,35 @@ function renderPlayoffBracket() {
   else if (ps.round>=3&&ps.cf.East&&ps.cf.West) { html+=pendingCard(ps.cf.East.winner,ps.cf.West.winner); }
   else { html+=tbdCard('After Conference Finals'); }
   html+='</div>';
+
+  if (ps.round>=4&&ps.finals) {
+    const champ=ps.finals.winner;
+    const fmvp=computeFinalsMVP(champ);
+    const fmvpRatings = fmvp ? getPlayerRatings(fmvp.name) : null;
+    const fmvpOvr = fmvpRatings ? fmvpRatings.t_2pt + fmvpRatings.t_3pt + fmvpRatings.t_def + fmvpRatings.t_reb : 0;
+    const fmvpStat = fmvp ? (()=>{
+      const s=fmvp.s;
+      const ppg=(s.pts/s.gp).toFixed(1), rpg=(s.reb/s.gp).toFixed(1), apg=(s.ast/s.gp).toFixed(1);
+      const spg=(s.stl/s.gp).toFixed(1), bpg=(s.blk/s.gp).toFixed(1);
+      return `${ppg} PPG · ${rpg} RPG · ${apg} APG · ${spg} SPG · ${bpg} BPG`;
+    })() : '';
+    html+=`<div class="champ-footer">
+      <div class="champ-footer-row">
+        <div class="champion-banner">${logoTag(champ)} ${esc(TEAM_INFO[champ]?.name||champ)} win the NBA Championship!</div>
+        ${fmvp ? `<div class="award-card finals-mvp-card">
+          <div class="award-label">Finals MVP</div>
+          <div class="award-player-row">
+            <img class="award-logo" src="${esc(teamLogo(fmvp.s.team,currentYear))}" alt="" onerror="this.style.display='none'">
+            <div>
+              <div class="award-name">${esc(fmvp.name)}</div>
+              <div class="award-team-line">${esc(fmvp.s.team)} · OVR ${fmvpOvr}</div>
+            </div>
+          </div>
+          <div class="award-stats">${esc(fmvpStat)}</div>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }
 
   document.getElementById('playoffsContent').innerHTML=html;
 }
