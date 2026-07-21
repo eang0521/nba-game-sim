@@ -668,7 +668,7 @@ function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
   for (const team of [homeTeam, awayTeam]) {
     for (const p of team.players) {
       if (p.seconds_played > 0)
-        gamePlayers[p.name] = {team: team.abbr, pts: p.points};
+        gamePlayers[p.name] = {team: team.abbr, pts: p.points, reb: p.rebounds, ast: p.assists, stl: p.steals, blk: p.blocks};
     }
   }
   return {homeScore:homeTeam.score, awayScore:awayTeam.score, gamePlayers};
@@ -726,8 +726,9 @@ function simSeries(t1, t2, teamsData, round=1) {
       if (ps.team===home) { if (!homeLeader||ps.pts>homeLeader.pts) homeLeader=entry; }
       else                { if (!awayLeader||ps.pts>awayLeader.pts) awayLeader=entry; }
       // Accumulate series totals
-      if (!seriesPts[name]) seriesPts[name]={team:ps.team,pts:0,gp:0};
-      seriesPts[name].pts+=ps.pts; seriesPts[name].gp++;
+      if (!seriesPts[name]) seriesPts[name]={team:ps.team,pts:0,reb:0,ast:0,stl:0,blk:0,gp:0};
+      seriesPts[name].pts+=ps.pts; seriesPts[name].reb+=ps.reb||0; seriesPts[name].ast+=ps.ast||0;
+      seriesPts[name].stl+=ps.stl||0; seriesPts[name].blk+=ps.blk||0; seriesPts[name].gp++;
     }
     games.push({home,away,hs:r.homeScore,as:r.awayScore,t1Won,homeLeader,awayLeader});
     gn++;
@@ -745,7 +746,7 @@ function simSeries(t1, t2, teamsData, round=1) {
   return {
     winner:w1>=winsNeeded?t1:t2, loser:w1>=winsNeeded?t2:t1,
     wins:w1>=winsNeeded?w1:w2,   losses:w1>=winsNeeded?w2:w1,
-    games,
+    games, seriesStats: seriesPts,
     leaders:{[t1]:seriesLeader(t1),[t2]:seriesLeader(t2)}
   };
 }
@@ -812,9 +813,9 @@ function royScore(name, s) {
   return ppg + rpg + apg + spg + bpg + (ovr/3);
 }
 
-function computeFinalsMVP(winnerAbbr) {
+function computeFinalsMVP(winnerAbbr, seriesStats) {
   let best = null, bestScore = -Infinity;
-  for (const [name, s] of Object.entries(playerSeasonStats)) {
+  for (const [name, s] of Object.entries(seriesStats)) {
     if (s.team !== winnerAbbr || s.gp < 1) continue;
     const ratings = getPlayerRatings(name);
     const ovr = ratings ? ratings.t_2pt + ratings.t_3pt + ratings.t_def + ratings.t_reb : 0;
@@ -1286,7 +1287,7 @@ function renderPlayoffBracket() {
 
   if (ps.round>=4&&ps.finals) {
     const champ=ps.finals.winner;
-    const fmvp=computeFinalsMVP(champ);
+    const fmvp=computeFinalsMVP(champ, ps.finals.seriesStats||{});
     const fmvpRatings = fmvp ? getPlayerRatings(fmvp.name) : null;
     const fmvpOvr = fmvpRatings ? fmvpRatings.t_2pt + fmvpRatings.t_3pt + fmvpRatings.t_def + fmvpRatings.t_reb : 0;
     const fmvpStat = fmvp ? (()=>{
