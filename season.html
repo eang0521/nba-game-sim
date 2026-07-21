@@ -800,8 +800,8 @@ function dpoyScore(name, s) {
   // subtracting a fixed ~22 from everyone (which would make all scores negative)
   const allRecs = Object.values(teamRecords).filter(r => r.g > 0);
   const leagueAvgPA = allRecs.reduce((sum, r) => sum + r.pa/r.g, 0) / allRecs.length;
-  const rpg = s.reb / s.gp;
-  return sp36 + bp36 + (defRat/10) + (leagueAvgPA - teamPA) / 5 + rpg/10;
+  const rb36 = (s.reb / minPlayed) * 36;
+  return sp36 + bp36 + (defRat/10) + (leagueAvgPA - teamPA) / 5 + rb36/10;
 }
 
 function royScore(name, s) {
@@ -889,7 +889,8 @@ function renderAwards() {
   const defLine = s => {
     const min = s.sec / 60;
     const sp36 = ((s.stl / min) * 36).toFixed(1), bp36 = ((s.blk / min) * 36).toFixed(1);
-    return `${sp36} SP36 · ${bp36} BP36 · ${(s.reb/s.gp).toFixed(1)} RPG`;
+    const rb36 = ((s.reb / min) * 36).toFixed(1);
+    return `${sp36} SP36 · ${bp36} BP36 · ${rb36} RB36`;
   };
 
   // Award cards
