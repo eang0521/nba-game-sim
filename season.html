@@ -817,7 +817,7 @@ function dpoyScore(name, s) {
   const allRecs = Object.values(teamRecords).filter(r => r.g > 0);
   const leagueAvgPA = allRecs.reduce((sum, r) => sum + r.pa/r.g, 0) / allRecs.length;
   const rb36 = (s.reb / minPlayed) * 36;
-  return sp36 + bp36 + (defRat/10) + (leagueAvgPA - teamPA) / 5 + rb36/10;
+  return sp36 + bp36 + (defRat/8) + (leagueAvgPA - teamPA) / 4 + rb36/8;
 }
 
 function royScore(name, s) {
