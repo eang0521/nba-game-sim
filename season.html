@@ -624,30 +624,33 @@ function generateSchedule(teamsData) {
         addSeries(t1, t2, 2);
 
   // Ensure every team reaches exactly 82 games.
-  // We only ever add a game between two teams that BOTH have < 82 total, so teams
-  // already at 82 (even with H/A coin-flip variance like 43H/39A) are never touched.
+  // Sort short teams by deficit (fewest games first) so the most-deficit team always
+  // pairs with another high-deficit team rather than a near-82 team. This prevents
+  // a lone team being stranded when all other teams happen to finish first (which
+  // can occur with odd team counts and uneven division sizes, e.g. 1987 ATL having
+  // no division opponents). Fallback: if only 1 team remains short, force it to
+  // play any team — partner goes to 83 games, which is acceptable for a simulator.
   {
     const H={}, A={};
     teams.forEach(t=>{ H[t]=0; A[t]=0; });
     games.forEach(g=>{ H[g.home]++; A[g.away]++; });
 
     for (let iter=0; iter<50000; iter++) {
-      const short=teams.filter(t=>H[t]+A[t]<82);
+      // Sort ascending by games played (most deficit first), random tie-break
+      const short=teams.filter(t=>H[t]+A[t]<82)
+        .sort((a,b)=>(H[a]+A[a])-(H[b]+A[b])||Math.random()-0.5);
       if (!short.length) break;
-      // Shuffle so extra games are spread across different matchups each run
-      for (let i=short.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[short[i],short[j]]=[short[j],short[i]];}
-      let added=false;
-      outer: for (let i=0;i<short.length;i++) {
-        for (let j=i+1;j<short.length;j++) {
-          const t1=short[i], t2=short[j];
-          // Home = whichever team has fewer home games so far
-          const home=H[t1]<=H[t2]?t1:t2, away=home===t1?t2:t1;
-          games.push({home,away});
-          H[home]++; A[away]++;
-          added=true; break outer;
-        }
+      let t1, t2;
+      if (short.length >= 2) {
+        t1=short[0]; t2=short[1];
+      } else {
+        // Isolated: pair with whatever team has fewest games overall
+        t1=short[0];
+        t2=[...teams].filter(t=>t!==t1).sort((a,b)=>(H[a]+A[a])-(H[b]+A[b]))[0];
       }
-      if (!added) break;
+      const home=H[t1]<=H[t2]?t1:t2, away=home===t1?t2:t1;
+      games.push({home,away});
+      H[home]++; A[away]++;
     }
   }
 
