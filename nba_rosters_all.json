@@ -124673,10 +124673,10 @@
       },
       {
         "name": "Tari Eason",
-        "t_2pt": 13,
+        "t_2pt": 18,
         "t_3pt": 15,
-        "t_def": 15,
-        "t_reb": 16
+        "t_def": 25,
+        "t_reb": 18
       },
       {
         "name": "Steven Adams",
@@ -124759,10 +124759,10 @@
       },
       {
         "name": "Ivica Zubac",
-        "t_2pt": 20,
+        "t_2pt": 24,
         "t_3pt": 11,
-        "t_def": 13,
-        "t_reb": 22
+        "t_def": 18,
+        "t_reb": 26
       },
       {
         "name": "Jay Huff",
@@ -125166,10 +125166,10 @@
     "MIA": [
       {
         "name": "Giannis Antetokounmpo",
-        "t_2pt": 34,
-        "t_3pt": 15,
-        "t_def": 19,
-        "t_reb": 27
+        "t_2pt": 42,
+        "t_3pt": 13,
+        "t_def": 24,
+        "t_reb": 32
       },
       {
         "name": "Bam Adebayo",
@@ -125729,9 +125729,9 @@
       },
       {
         "name": "Jalen Williams",
-        "t_2pt": 22,
-        "t_3pt": 15,
-        "t_def": 17,
+        "t_2pt": 25,
+        "t_3pt": 21,
+        "t_def": 24,
         "t_reb": 17
       },
       {
@@ -125829,9 +125829,9 @@
       },
       {
         "name": "Franz Wagner",
-        "t_2pt": 22,
-        "t_3pt": 18,
-        "t_def": 16,
+        "t_2pt": 27,
+        "t_3pt": 20,
+        "t_def": 20,
         "t_reb": 18
       },
       {
@@ -126236,10 +126236,10 @@
     "SAC": [
       {
         "name": "Domantas Sabonis",
-        "t_2pt": 19,
-        "t_3pt": 13,
-        "t_def": 12,
-        "t_reb": 22
+        "t_2pt": 23,
+        "t_3pt": 14,
+        "t_def": 14,
+        "t_reb": 28
       },
       {
         "name": "DeMar DeRozan",
@@ -126578,10 +126578,10 @@
       },
       {
         "name": "Jaren Jackson Jr.",
-        "t_2pt": 17,
-        "t_3pt": 16,
-        "t_def": 19,
-        "t_reb": 14
+        "t_2pt": 22,
+        "t_3pt": 19,
+        "t_def": 22,
+        "t_reb": 15
       },
       {
         "name": "Kyle Filipowski",
