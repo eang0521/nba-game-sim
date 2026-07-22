@@ -1,0 +1,339 @@
+{
+  "ATL": [
+    {
+      "name": "Buddy Hield",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 12,
+      "t_reb": 12
+    },
+    {
+      "name": "Keaton Wallace",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Tony Bradley",
+      "t_2pt": 11,
+      "t_3pt": 10,
+      "t_def": 8,
+      "t_reb": 13
+    },
+    {
+      "name": "Gabe Vincent",
+      "t_2pt": 8,
+      "t_3pt": 13,
+      "t_def": 9,
+      "t_reb": 10
+    }
+  ],
+  "BOS": [
+    {
+      "name": "Chris Boucher",
+      "t_2pt": 10,
+      "t_3pt": 11,
+      "t_def": 11,
+      "t_reb": 11
+    },
+    {
+      "name": "Dalano Banton",
+      "t_2pt": 10,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 11
+    }
+  ],
+  "BRK": [
+    {
+      "name": "Jalen Wilson",
+      "t_2pt": 9,
+      "t_3pt": 11,
+      "t_def": 8,
+      "t_reb": 11
+    },
+    {
+      "name": "Ben Saraf",
+      "t_2pt": 10,
+      "t_3pt": 9,
+      "t_def": 10,
+      "t_reb": 10
+    }
+  ],
+  "CHI": [
+    {
+      "name": "Nick Richards",
+      "t_2pt": 9,
+      "t_3pt": 8,
+      "t_def": 8,
+      "t_reb": 12
+    },
+    {
+      "name": "Kam Jones",
+      "t_2pt": 9,
+      "t_3pt": 10,
+      "t_def": 8,
+      "t_reb": 10
+    },
+    {
+      "name": "Rob Dillingham",
+      "t_2pt": 10,
+      "t_3pt": 8,
+      "t_def": 10,
+      "t_reb": 8
+    }
+  ],
+  "CHO": [
+    {
+      "name": "Pat Connaughton",
+      "t_2pt": 11,
+      "t_3pt": 13,
+      "t_def": 9,
+      "t_reb": 13
+    },
+    {
+      "name": "Tre Mann",
+      "t_2pt": 9,
+      "t_3pt": 11,
+      "t_def": 9,
+      "t_reb": 10
+    },
+    {
+      "name": "Dorian Finney-Smith",
+      "t_2pt": 9,
+      "t_3pt": 10,
+      "t_def": 9,
+      "t_reb": 11
+    }
+  ],
+  "DAL": [
+    {
+      "name": "Caleb Martin",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 14,
+      "t_reb": 12
+    },
+    {
+      "name": "Dwight Powell",
+      "t_2pt": 11,
+      "t_3pt": 10,
+      "t_def": 12,
+      "t_reb": 14
+    }
+  ],
+  "DET": [
+    {
+      "name": "Chaz Lanier",
+      "t_2pt": 9,
+      "t_3pt": 11,
+      "t_def": 7,
+      "t_reb": 11
+    }
+  ],
+  "HOU": [
+    {
+      "name": "Bogdan Bogdanović",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 9,
+      "t_reb": 12
+    },
+    {
+      "name": "Jae'Sean Tate",
+      "t_2pt": 11,
+      "t_3pt": 10,
+      "t_def": 8,
+      "t_reb": 12
+    },
+    {
+      "name": "Jeff Green",
+      "t_2pt": 7,
+      "t_3pt": 8,
+      "t_def": 5,
+      "t_reb": 9
+    }
+  ],
+  "IND": [
+    {
+      "name": "Ethan Thompson",
+      "t_2pt": 10,
+      "t_3pt": 12,
+      "t_def": 10,
+      "t_reb": 10
+    }
+  ],
+  "LAL": [
+    {
+      "name": "Jaden Hardy",
+      "t_2pt": 10,
+      "t_3pt": 17,
+      "t_def": 8,
+      "t_reb": 10
+    },
+    {
+      "name": "Maxi Kleber",
+      "t_2pt": 9,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 10
+    }
+  ],
+  "MEM": [
+    {
+      "name": "Walter Clayton",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 11
+    },
+    {
+      "name": "Rayan Rupert",
+      "t_2pt": 9,
+      "t_3pt": 12,
+      "t_def": 13,
+      "t_reb": 11
+    },
+    {
+      "name": "Tyler Burton",
+      "t_2pt": 9,
+      "t_3pt": 11,
+      "t_def": 9,
+      "t_reb": 11
+    },
+    {
+      "name": "Jahmai Mashack",
+      "t_2pt": 8,
+      "t_3pt": 8,
+      "t_def": 11,
+      "t_reb": 9
+    },
+    {
+      "name": "Toby Okani",
+      "t_2pt": 0,
+      "t_3pt": 1,
+      "t_def": 0,
+      "t_reb": 1
+    }
+  ],
+  "MIL": [
+    {
+      "name": "Cole Anthony",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Cam Thomas",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 7,
+      "t_reb": 11
+    },
+    {
+      "name": "Gary Trent Jr.",
+      "t_2pt": 8,
+      "t_3pt": 14,
+      "t_def": 8,
+      "t_reb": 9
+    }
+  ],
+  "ORL": [
+    {
+      "name": "Jonathan Isaac",
+      "t_2pt": 10,
+      "t_3pt": 11,
+      "t_def": 15,
+      "t_reb": 13
+    }
+  ],
+  "PHO": [
+    {
+      "name": "Amir Coffey",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 10,
+      "t_reb": 12
+    }
+  ],
+  "SAC": [
+    {
+      "name": "Killian Hayes",
+      "t_2pt": 9,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 10
+    }
+  ],
+  "SAS": [
+    {
+      "name": "Jayden Quaintance",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 10,
+      "t_reb": 13
+    },
+    {
+      "name": "Lindy Waters III",
+      "t_2pt": 10,
+      "t_3pt": 14,
+      "t_def": 8,
+      "t_reb": 12
+    },
+    {
+      "name": "Bismack Biyombo",
+      "t_2pt": 7,
+      "t_3pt": 8,
+      "t_def": 6,
+      "t_reb": 8
+    }
+  ],
+  "UTA": [
+    {
+      "name": "Cody Williams",
+      "t_2pt": 13,
+      "t_3pt": 8,
+      "t_def": 12,
+      "t_reb": 9
+    },
+    {
+      "name": "Elijah Harkless",
+      "t_2pt": 9,
+      "t_3pt": 10,
+      "t_def": 11,
+      "t_reb": 11
+    }
+  ],
+  "WAS": [
+    {
+      "name": "Anthony Gill",
+      "t_2pt": 12,
+      "t_3pt": 10,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Bub Carrington",
+      "t_2pt": 10,
+      "t_3pt": 16,
+      "t_def": 10,
+      "t_reb": 9
+    },
+    {
+      "name": "Khris Middleton",
+      "t_2pt": 10,
+      "t_3pt": 11,
+      "t_def": 10,
+      "t_reb": 11
+    },
+    {
+      "name": "Leaky Black",
+      "t_2pt": 8,
+      "t_3pt": 9,
+      "t_def": 9,
+      "t_reb": 10
+    }
+  ]
+}
