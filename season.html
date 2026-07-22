@@ -104,6 +104,7 @@
     .award-empty { color:#475569; font-size:.78rem; padding:.25rem 0; }
     .allteams-wrap { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem; }
     .allteams-wrap > div { min-width:0; }
+    .allteams-wrap .award-card { margin-bottom:1rem; }
     @media(max-width:800px){ .allteams-wrap { grid-template-columns:1fr 1fr; } }
     @media(max-width:500px){ .allteams-wrap { grid-template-columns:1fr; } }
     .allteam-block { margin-bottom:.8rem; }
@@ -908,14 +909,6 @@ function renderAwards() {
     return `${(s.stl/s.gp).toFixed(1)} SPG · ${(s.blk/s.gp).toFixed(1)} BPG · ${(s.reb/s.gp).toFixed(1)} RPG`;
   };
 
-  // Award cards
-  let html = `<div class="awards-row">`;
-  html += awardCardHTML('Most Valuable Player',         mvpList[0]  || null, offLine);
-  html += awardCardHTML('Defensive Player of the Year', dpoyList[0] || null, defLine);
-  if (hasRookieData) html += awardCardHTML('Rookie of the Year', royList[0] || null, offLine);
-  html += `</div>`;
-
-  // All-NBA (top 15 by MVP score) + All-Defense (top 10 by DPOY score)
   const allNBA    = mvpList.slice(0, 15);
   const allDef    = dpoyList.slice(0, 10);
   const allRookie = royList.slice(0, 10);
@@ -923,22 +916,30 @@ function renderAwards() {
   const ppgStr  = s => `${(s.pts/s.gp).toFixed(1)} PPG`;
   const sblkStr = s => `${(s.stl/s.gp).toFixed(1)} SPG · ${(s.blk/s.gp).toFixed(1)} BPG`;
 
-  html += `<div class="allteams-wrap">`;
+  // Each column: award card on top, allteam blocks below — single grid guarantees alignment
+  let html = `<div class="allteams-wrap">`;
+
   html += `<div>`;
+  html += awardCardHTML('Most Valuable Player', mvpList[0] || null, offLine);
   html += allTeamHTML(allNBA.slice(0,  5), 'All-NBA First Team',  ppgStr,  1);
   html += allTeamHTML(allNBA.slice(5, 10), 'All-NBA Second Team', ppgStr,  6);
   html += allTeamHTML(allNBA.slice(10,15), 'All-NBA Third Team',  ppgStr, 11);
   html += `</div>`;
+
   html += `<div>`;
+  html += awardCardHTML('Defensive Player of the Year', dpoyList[0] || null, defLine);
   html += allTeamHTML(allDef.slice(0, 5), 'All-Defensive First Team',  sblkStr, 1);
   html += allTeamHTML(allDef.slice(5,10), 'All-Defensive Second Team', sblkStr, 6);
   html += `</div>`;
-  html += `<div>`;
+
   if (hasRookieData) {
+    html += `<div>`;
+    html += awardCardHTML('Rookie of the Year', royList[0] || null, offLine);
     if (allRookie.length > 0) html += allTeamHTML(allRookie.slice(0, 5), 'All-Rookie First Team',  ppgStr, 1);
     if (allRookie.length > 5) html += allTeamHTML(allRookie.slice(5,10), 'All-Rookie Second Team', ppgStr, 6);
+    html += `</div>`;
   }
-  html += `</div>`;
+
   html += `</div>`;
 
   document.getElementById('awardsContent').innerHTML = html;
