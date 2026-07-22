@@ -92,7 +92,7 @@
     .ts-table tbody tr:hover td { background:#172035; }
 
     /* ── Awards ─────── */
-    .awards-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+    .awards-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; margin-bottom:1.5rem; }
     @media(max-width:750px){ .awards-row { grid-template-columns:1fr; } }
     .award-card { background:#141929; border:1px solid #1e2d5a; border-radius:10px; padding:.9rem 1.1rem; }
     .award-label { font-size:.64rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#748ffc; margin-bottom:.55rem; }
@@ -778,7 +778,7 @@ function getPlayerRatings(name) {
 }
 
 function isRookie(name) {
-  for (const offset of [1, 2]) {
+  for (const offset of [1, 2, 3]) {
     const prevData = allData[String(currentYear - offset)];
     if (!prevData) continue;
     for (const players of Object.values(prevData)) {
@@ -887,6 +887,9 @@ function allTeamHTML(entries, label, statFn, startRank = 1) {
 
 function renderAwards() {
   const entries = Object.entries(playerSeasonStats);
+  // ROY/All-Rookie require at least one prior season of data to confirm who is
+  // actually a new player vs. someone returning from injury or time abroad.
+  const hasRookieData = !!allData[String(currentYear - 1)];
 
   const ranked = (scoreFn) => entries
     .map(([n, s]) => ({ n, s, score: scoreFn(n, s) }))
@@ -895,7 +898,7 @@ function renderAwards() {
 
   const mvpList  = ranked(mvpScore);
   const dpoyList = ranked(dpoyScore);
-  const royList  = ranked(royScore);
+  const royList  = hasRookieData ? ranked(royScore) : [];
 
   const offLine = s => {
     const g = s.gp;
@@ -907,9 +910,9 @@ function renderAwards() {
 
   // Award cards
   let html = `<div class="awards-row">`;
-  html += awardCardHTML('Most Valuable Player',       mvpList[0]  || null, offLine);
+  html += awardCardHTML('Most Valuable Player',         mvpList[0]  || null, offLine);
   html += awardCardHTML('Defensive Player of the Year', dpoyList[0] || null, defLine);
-  html += awardCardHTML('Rookie of the Year',         royList[0]  || null, offLine);
+  if (hasRookieData) html += awardCardHTML('Rookie of the Year', royList[0] || null, offLine);
   html += `</div>`;
 
   // All-NBA (top 15 by MVP score) + All-Defense (top 10 by DPOY score)
@@ -931,8 +934,10 @@ function renderAwards() {
   html += allTeamHTML(allDef.slice(5,10), 'All-Defensive Second Team', sblkStr, 6);
   html += `</div>`;
   html += `<div>`;
-  if (allRookie.length > 0) html += allTeamHTML(allRookie.slice(0, 5), 'All-Rookie First Team',  ppgStr, 1);
-  if (allRookie.length > 5) html += allTeamHTML(allRookie.slice(5,10), 'All-Rookie Second Team', ppgStr, 6);
+  if (hasRookieData) {
+    if (allRookie.length > 0) html += allTeamHTML(allRookie.slice(0, 5), 'All-Rookie First Team',  ppgStr, 1);
+    if (allRookie.length > 5) html += allTeamHTML(allRookie.slice(5,10), 'All-Rookie Second Team', ppgStr, 6);
+  }
   html += `</div>`;
   html += `</div>`;
 
