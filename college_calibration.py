@@ -163,12 +163,16 @@ save_json(DRAFT_CACHE, draft_cache)
 print(f'Draft cache saved → {DRAFT_CACHE}')
 
 # Build normalized-name → (canonical_name, url_path) lookup
+# Also build name → pick number (dict insertion order = draft board order)
 name_to_url: dict[str, tuple[str, str]] = {}
+name_to_pick: dict[str, int] = {}
 for draft_year_str, players in draft_cache.items():
-    for name, url_path in players.items():
+    for pick_num, (name, url_path) in enumerate(players.items(), 1):
         key = norm_name(name)
         if key not in name_to_url:
             name_to_url[key] = (name, url_path)
+        if key not in name_to_pick:
+            name_to_pick[key] = pick_num
 
 # ── 3. Scrape college stats for each rookie ───────────────────────────────────
 college_cache: dict = load_json(COLLEGE_CACHE)
@@ -334,6 +338,15 @@ for _, rrow in rookie_ratings.iterrows():
     except Exception:
         record['c_2P'] = record['c_2PA'] = record['c_2Ppct'] = np.nan
 
+    # Draft pick position — use 1/pick so the value curve is nonlinear:
+    # pick 1 → 1.0, pick 5 → 0.2, pick 30 → 0.033 (matches real draft value drop-off)
+    nname = norm_name(player)
+    pick = name_to_pick.get(nname)
+    if pick is None:
+        alt = re.sub(r'\s+(jr\.?|sr\.?|ii+|iv|v)$', '', nname)
+        pick = name_to_pick.get(alt)
+    record['c_inv_pick'] = (1.0 / pick) if pick is not None else np.nan
+
     rows.append(record)
 
 cal = pd.DataFrame(rows)
@@ -382,30 +395,45 @@ for t in targets:
         print(f'    {feat:<14s}  r = {r:+.3f}  {bar}')
 
 # ── OLS regression ────────────────────────────────────────────────────────────
+components = ['2PS', '3PS', 'DEF', 'REB']
+
 print('\n' + '='*65)
-print('OLS REGRESSION  (all college features → NBA rating)')
+print('OLS REGRESSION — Stage 1: OVR')
 print('='*65)
 
 X_raw = cal_clean[features].values
-X     = np.column_stack([np.ones(len(X_raw)), X_raw])  # add intercept
+X     = np.column_stack([np.ones(len(X_raw)), X_raw])
 
-for t in targets:
-    y = cal_clean[t].values
-    try:
-        beta, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
-        y_hat  = X @ beta
-        ss_res = np.sum((y - y_hat) ** 2)
-        ss_tot = np.sum((y - np.mean(y)) ** 2)
-        r2     = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
+y = cal_clean['OVR'].values
+beta, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
+y_hat  = X @ beta
+ss_res = np.sum((y - y_hat) ** 2)
+ss_tot = np.sum((y - np.mean(y)) ** 2)
+r2     = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
+print(f'\n  OVR  (R² = {r2:.3f}, n = {len(y)}):')
+coefs = pd.Series(beta[1:], index=features)
+for feat in coefs.abs().sort_values(ascending=False).head(5).index:
+    print(f'    {feat:<14s}  β = {coefs[feat]:+.4f}')
+print(f'    intercept    β = {beta[0]:+.4f}')
 
-        print(f'\n  {t}  (R² = {r2:.3f}, n = {len(y)}):')
-        coefs = pd.Series(beta[1:], index=features)
-        top_coefs = coefs.abs().sort_values(ascending=False).head(5)
-        for feat in top_coefs.index:
-            print(f'    {feat:<14s}  β = {coefs[feat]:+.4f}')
-        print(f'    intercept    β = {beta[0]:+.4f}')
-    except Exception as e:
-        print(f'\n  {t}: regression failed — {e}')
+print('\n' + '='*65)
+print('OLS REGRESSION — Stage 2: Component shares (comp/OVR)')
+print('='*65)
+
+for comp in components:
+    share_col = f'share_{comp}'
+    cal_clean = cal_clean.copy()
+    cal_clean[share_col] = cal_clean[comp] / cal_clean['OVR']
+    y_s = cal_clean[share_col].values
+    beta_s, _, _, _ = np.linalg.lstsq(X, y_s, rcond=None)
+    y_hat_s  = X @ beta_s
+    ss_res_s = np.sum((y_s - y_hat_s) ** 2)
+    ss_tot_s = np.sum((y_s - np.mean(y_s)) ** 2)
+    r2_s     = 1 - ss_res_s / ss_tot_s if ss_tot_s > 0 else 0.0
+    print(f'\n  {comp} share  (R² = {r2_s:.3f}, mean share = {y_s.mean():.3f}):')
+    coefs_s = pd.Series(beta_s[1:], index=features)
+    for feat in coefs_s.abs().sort_values(ascending=False).head(5).index:
+        print(f'    {feat:<14s}  β = {coefs_s[feat]:+.4f}')
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 print('\n' + '='*65)

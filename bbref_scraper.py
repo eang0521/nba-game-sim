@@ -2,7 +2,7 @@
 bbref_scraper.py
 
 Scrapes per-game and advanced stats from Basketball-Reference for NBA seasons
-2011-12 through 2025-26 (and any custom range you set below).
+1986-87 through 2025-26 (and any custom range you set below).
 
 Output: bbref_stats.csv
 
@@ -34,7 +34,7 @@ from bs4 import BeautifulSoup, Comment
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 # End-year of each season to scrape (2012 = 2011-12 season)
-SEASONS = list(range(2002, 2027))
+SEASONS = list(range(1987, 2027))
 
 OUTPUT_FILE = 'bbref_stats.csv'
 

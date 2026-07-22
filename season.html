@@ -185,10 +185,10 @@
   <div class="page-header">
     <div>
       <div class="page-title">Season Simulator</div>
-      <div class="page-subtitle">Full 82-game season · Play-In · Best-of-7 playoffs</div>
+      <div class="page-subtitle" id="pageSubtitle">Full 82-game season · Play-In · Best-of-7 playoffs</div>
     </div>
     <div class="ctrl-row">
-      <select id="year"></select>
+      <select id="year" onchange="updateSubtitle(this.value)"></select>
       <button id="simBtn" class="btn btn-primary" onclick="runSeason()">Simulate Season</button>
     </div>
   </div>
@@ -280,10 +280,12 @@ const TEAM_INFO = {
   UTA:{name:'Utah Jazz',              espn:'utah', conf:'West',div:'Northwest'},
   WAS:{name:'Washington Wizards',     espn:'wsh',  conf:'East',div:'Southeast'},
   CHH:{name:'Charlotte Hornets',      espn:'cha',  conf:'East',div:'Southeast'},
-  NJN:{name:'New Jersey Nets',        espn:'njn',  conf:'East',div:'Atlantic' },
+  NJN:{name:'New Jersey Nets',        espn:'bkn',  conf:'East',div:'Atlantic' },
   SEA:{name:'Seattle SuperSonics',    espn:'sea',  conf:'West',div:'Northwest'},
   NOH:{name:'New Orleans Hornets',    espn:'no',   conf:'West',div:'Southwest'},
   NOK:{name:'NO/OKC Hornets',         espn:'no',   conf:'West',div:'Southwest'},
+  VAN:{name:'Vancouver Grizzlies',    espn:null,   conf:'West',div:'Northwest'},
+  WSB:{name:'Washington Bullets',     espn:'wsh',  conf:'East',div:'Atlantic' },
 };
 
 // ── State ─────────────────────────────────────────────────────────────
@@ -297,6 +299,16 @@ let currentTeamsData = {};
 let playInDone      = false;
 
 function seasonLabel(y) { return `${y-1}-${String(y).slice(2)}`; }
+
+function updateSubtitle(year) {
+  const y = parseInt(year);
+  const parts = ['Full 82-game season'];
+  if (y >= 2021) parts.push('Play-In');
+  parts.push(y <= 2003 ? 'Best-of-5 first round' : 'Best-of-7 playoffs');
+  if (y <= 2013) parts.push('2-3-2 Finals');
+  document.getElementById('pageSubtitle').textContent = parts.join(' · ');
+}
+
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -309,7 +321,7 @@ function bbrefLogo(abbr, year) {
 }
 function teamLogo(abbr, year) {
   const info = TEAM_INFO[abbr];
-  return info?.espn
+  return (info && info.espn)
     ? `https://a.espncdn.com/i/teamlogos/nba/500/${info.espn}.png`
     : bbrefLogo(abbr, year);
 }
@@ -687,12 +699,12 @@ function accumPlayerStats(team, abbr) {
 }
 
 // Historical series formats by round:
-//   round 0 (First Round):  <=2002 → best-of-5, 2-2-1;  >=2003 → best-of-7, 2-2-1-1-1
+//   round 0 (First Round):  <=2003 → best-of-5, 2-2-1;  >=2004 → best-of-7, 2-2-1-1-1
 //   round 1 (Conf Semis):   always best-of-7, 2-2-1-1-1
 //   round 2 (Conf Finals):  always best-of-7, 2-2-1-1-1
-//   round 3 (NBA Finals):   <=2013 → best-of-7, 2-3-2;  >=2014 → best-of-7, 2-2-1-1-1
+//   round 3 (NBA Finals):   1986-2013 → best-of-7, 2-3-2;  >=2014 → best-of-7, 2-2-1-1-1
 function getSeriesConfig(round) {
-  if (round === 0 && currentYear <= 2002)
+  if (round === 0 && currentYear <= 2003)
     return { pattern:[true,true,false,false,true], winsNeeded:3 };
   if (round === 3 && currentYear <= 2013)
     return { pattern:[true,true,false,false,false,true,true], winsNeeded:4 };
@@ -1400,6 +1412,7 @@ fetch('nba_rosters_all.json')
       if(y===years[0]) o.selected=true;
       sel.appendChild(o);
     });
+    if(years.length) updateSubtitle(years[0]);
   })
   .catch(()=>{ document.querySelector('.container').innerHTML+='<p style="color:#f87171">Could not load nba_rosters_all.json.</p>'; });
 </script>
