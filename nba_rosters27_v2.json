@@ -93,17 +93,17 @@
     },
     {
       "name": "Kingston Flemings",
-      "t_2pt": 14,
+      "t_2pt": 13,
       "t_3pt": 13,
       "t_def": 12,
       "t_reb": 13
     },
     {
       "name": "Zuby Ejiofor",
-      "t_2pt": 14,
+      "t_2pt": 15,
       "t_3pt": 12,
-      "t_def": 16,
-      "t_reb": 16
+      "t_def": 17,
+      "t_reb": 17
     },
     {
       "name": "Aaron Wiggins",
@@ -242,7 +242,7 @@
     },
     {
       "name": "Chris Cenac Jr.",
-      "t_2pt": 12,
+      "t_2pt": 11,
       "t_3pt": 12,
       "t_def": 12,
       "t_reb": 14
@@ -364,9 +364,9 @@
     {
       "name": "Joshua Jefferson",
       "t_2pt": 13,
-      "t_3pt": 12,
+      "t_3pt": 13,
       "t_def": 14,
-      "t_reb": 14
+      "t_reb": 15
     },
     {
       "name": "Julius Randle",
@@ -470,7 +470,7 @@
     },
     {
       "name": "Caleb Wilson",
-      "t_2pt": 16,
+      "t_2pt": 17,
       "t_3pt": 12,
       "t_def": 15,
       "t_reb": 17
@@ -607,8 +607,8 @@
       "name": "Christian Anderson Jr.",
       "t_2pt": 13,
       "t_3pt": 16,
-      "t_def": 13,
-      "t_reb": 13
+      "t_def": 12,
+      "t_reb": 12
     },
     {
       "name": "Grayson Allen",
@@ -820,7 +820,7 @@
     {
       "name": "Morez Johnson Jr.",
       "t_2pt": 14,
-      "t_3pt": 12,
+      "t_3pt": 11,
       "t_def": 13,
       "t_reb": 15
     },
@@ -1183,7 +1183,7 @@
     {
       "name": "Yaxel Lendeborg",
       "t_2pt": 14,
-      "t_3pt": 15,
+      "t_3pt": 16,
       "t_def": 16,
       "t_reb": 15
     }
@@ -1304,9 +1304,9 @@
     {
       "name": "Bruce Thornton",
       "t_2pt": 13,
-      "t_3pt": 14,
+      "t_3pt": 15,
       "t_def": 11,
-      "t_reb": 14
+      "t_reb": 13
     },
     {
       "name": "Marcus Smart",
@@ -1424,10 +1424,10 @@
     },
     {
       "name": "Braden Smith",
-      "t_2pt": 14,
+      "t_2pt": 13,
       "t_3pt": 15,
       "t_def": 14,
-      "t_reb": 14
+      "t_reb": 13
     }
   ],
   "LAC": [
@@ -1526,7 +1526,7 @@
       "name": "Keaton Wagler",
       "t_2pt": 14,
       "t_3pt": 16,
-      "t_def": 13,
+      "t_def": 14,
       "t_reb": 15
     },
     {
@@ -1625,9 +1625,9 @@
     {
       "name": "Cameron Carr",
       "t_2pt": 12,
-      "t_3pt": 13,
+      "t_3pt": 14,
       "t_def": 11,
-      "t_reb": 13
+      "t_reb": 12
     },
     {
       "name": "Walker Kessler",
@@ -1766,9 +1766,9 @@
     },
     {
       "name": "Cameron Boozer",
-      "t_2pt": 18,
+      "t_2pt": 19,
       "t_3pt": 15,
-      "t_def": 17,
+      "t_def": 16,
       "t_reb": 18
     },
     {
@@ -1901,10 +1901,10 @@
     },
     {
       "name": "Maliq Brown",
-      "t_2pt": 13,
-      "t_3pt": 12,
+      "t_2pt": 12,
+      "t_3pt": 11,
       "t_def": 17,
-      "t_reb": 15
+      "t_reb": 14
     }
   ],
   "MIL": [
@@ -2022,10 +2022,10 @@
     },
     {
       "name": "Nate Ament",
-      "t_2pt": 12,
+      "t_2pt": 13,
       "t_3pt": 12,
       "t_def": 12,
-      "t_reb": 13
+      "t_reb": 14
     },
     {
       "name": "Caris LeVert",
@@ -2445,12 +2445,12 @@
       "name": "Aday Mara",
       "t_2pt": 14,
       "t_3pt": 10,
-      "t_def": 14,
-      "t_reb": 14
+      "t_def": 15,
+      "t_reb": 16
     },
     {
       "name": "Bennett Stirtz",
-      "t_2pt": 13,
+      "t_2pt": 12,
       "t_3pt": 15,
       "t_def": 11,
       "t_reb": 12
@@ -2671,8 +2671,8 @@
     },
     {
       "name": "Labaron Philon Jr.",
-      "t_2pt": 14,
-      "t_3pt": 14,
+      "t_2pt": 13,
+      "t_3pt": 15,
       "t_def": 11,
       "t_reb": 13
     },
@@ -2682,6 +2682,13 @@
       "t_3pt": 11,
       "t_def": 13,
       "t_reb": 16
+    },
+    {
+      "name": "LeBron James",
+      "t_2pt": 26,
+      "t_3pt": 17,
+      "t_def": 20,
+      "t_reb": 18
     }
   ],
   "PHO": [
@@ -2779,8 +2786,8 @@
     {
       "name": "Koa Peat",
       "t_2pt": 12,
-      "t_3pt": 11,
-      "t_def": 10,
+      "t_3pt": 10,
+      "t_def": 11,
       "t_reb": 13
     },
     {
@@ -3007,7 +3014,7 @@
     {
       "name": "Darius Acuff Jr.",
       "t_2pt": 14,
-      "t_3pt": 15,
+      "t_3pt": 14,
       "t_def": 11,
       "t_reb": 13
     },
@@ -3128,14 +3135,14 @@
     {
       "name": "Jayden Quaintance",
       "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 10,
+      "t_3pt": 10,
+      "t_def": 11,
       "t_reb": 13
     },
     {
       "name": "Tarris Reed Jr.",
       "t_2pt": 14,
-      "t_3pt": 11,
+      "t_3pt": 10,
       "t_def": 14,
       "t_reb": 15
     },
@@ -3241,10 +3248,10 @@
     },
     {
       "name": "Allen Graves",
-      "t_2pt": 13,
-      "t_3pt": 14,
+      "t_2pt": 14,
+      "t_3pt": 13,
       "t_def": 17,
-      "t_reb": 15
+      "t_reb": 16
     },
     {
       "name": "Kyle Anderson",
@@ -3477,7 +3484,7 @@
     {
       "name": "AJ Dybantsa",
       "t_2pt": 24,
-      "t_3pt": 14,
+      "t_3pt": 15,
       "t_def": 16,
       "t_reb": 17
     },

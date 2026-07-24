@@ -5,10 +5,10 @@
     "pick": 1,
     "age": 19,
     "t_2pt": 24,
-    "t_3pt": 14,
+    "t_3pt": 15,
     "t_def": 16,
     "t_reb": 17,
-    "ovr": 71,
+    "ovr": 72,
     "has_college_stats": true
   },
   {
@@ -28,9 +28,9 @@
     "draft_year": 2026,
     "pick": 3,
     "age": 19,
-    "t_2pt": 18,
+    "t_2pt": 19,
     "t_3pt": 15,
-    "t_def": 17,
+    "t_def": 16,
     "t_reb": 18,
     "ovr": 68,
     "has_college_stats": true
@@ -40,11 +40,11 @@
     "draft_year": 2026,
     "pick": 4,
     "age": 20,
-    "t_2pt": 16,
+    "t_2pt": 17,
     "t_3pt": 12,
     "t_def": 15,
     "t_reb": 17,
-    "ovr": 60,
+    "ovr": 61,
     "has_college_stats": true
   },
   {
@@ -54,9 +54,9 @@
     "age": 19,
     "t_2pt": 14,
     "t_3pt": 16,
-    "t_def": 13,
+    "t_def": 14,
     "t_reb": 15,
-    "ovr": 58,
+    "ovr": 59,
     "has_college_stats": true
   },
   {
@@ -77,10 +77,10 @@
     "pick": 7,
     "age": 19,
     "t_2pt": 14,
-    "t_3pt": 15,
+    "t_3pt": 14,
     "t_def": 11,
     "t_reb": 13,
-    "ovr": 53,
+    "ovr": 52,
     "has_college_stats": true
   },
   {
@@ -88,11 +88,11 @@
     "draft_year": 2026,
     "pick": 8,
     "age": 19,
-    "t_2pt": 14,
+    "t_2pt": 13,
     "t_3pt": 13,
     "t_def": 12,
     "t_reb": 13,
-    "ovr": 52,
+    "ovr": 51,
     "has_college_stats": true
   },
   {
@@ -101,10 +101,10 @@
     "pick": 9,
     "age": 20,
     "t_2pt": 14,
-    "t_3pt": 12,
+    "t_3pt": 11,
     "t_def": 13,
     "t_reb": 15,
-    "ovr": 54,
+    "ovr": 53,
     "has_college_stats": true
   },
   {
@@ -125,10 +125,10 @@
     "pick": 11,
     "age": 24,
     "t_2pt": 14,
-    "t_3pt": 15,
+    "t_3pt": 16,
     "t_def": 16,
     "t_reb": 15,
-    "ovr": 60,
+    "ovr": 61,
     "has_college_stats": true
   },
   {
@@ -138,9 +138,9 @@
     "age": 21,
     "t_2pt": 14,
     "t_3pt": 10,
-    "t_def": 14,
-    "t_reb": 14,
-    "ovr": 52,
+    "t_def": 15,
+    "t_reb": 16,
+    "ovr": 55,
     "has_college_stats": true
   },
   {
@@ -148,11 +148,11 @@
     "draft_year": 2026,
     "pick": 13,
     "age": 19,
-    "t_2pt": 12,
+    "t_2pt": 13,
     "t_3pt": 12,
     "t_def": 12,
-    "t_reb": 13,
-    "ovr": 49,
+    "t_reb": 14,
+    "ovr": 51,
     "has_college_stats": true
   },
   {
@@ -184,11 +184,11 @@
     "draft_year": 2026,
     "pick": 16,
     "age": 23,
-    "t_2pt": 13,
+    "t_2pt": 12,
     "t_3pt": 15,
     "t_def": 11,
     "t_reb": 12,
-    "ovr": 51,
+    "ovr": 50,
     "has_college_stats": true
   },
   {
@@ -210,9 +210,9 @@
     "age": 20,
     "t_2pt": 13,
     "t_3pt": 16,
-    "t_def": 13,
-    "t_reb": 13,
-    "ovr": 55,
+    "t_def": 12,
+    "t_reb": 12,
+    "ovr": 53,
     "has_college_stats": true
   },
   {
@@ -220,11 +220,11 @@
     "draft_year": 2026,
     "pick": 19,
     "age": 20,
-    "t_2pt": 13,
-    "t_3pt": 14,
+    "t_2pt": 14,
+    "t_3pt": 13,
     "t_def": 17,
-    "t_reb": 15,
-    "ovr": 59,
+    "t_reb": 16,
+    "ovr": 60,
     "has_college_stats": true
   },
   {
@@ -233,8 +233,8 @@
     "pick": 20,
     "age": 19,
     "t_2pt": 11,
-    "t_3pt": 11,
-    "t_def": 10,
+    "t_3pt": 10,
+    "t_def": 11,
     "t_reb": 13,
     "ovr": 45,
     "has_college_stats": true
@@ -256,8 +256,8 @@
     "draft_year": 2026,
     "pick": 22,
     "age": 20,
-    "t_2pt": 14,
-    "t_3pt": 14,
+    "t_2pt": 13,
+    "t_3pt": 15,
     "t_def": 11,
     "t_reb": 13,
     "ovr": 52,
@@ -268,11 +268,11 @@
     "draft_year": 2026,
     "pick": 23,
     "age": 22,
-    "t_2pt": 14,
+    "t_2pt": 15,
     "t_3pt": 12,
-    "t_def": 16,
-    "t_reb": 16,
-    "ovr": 58,
+    "t_def": 17,
+    "t_reb": 17,
+    "ovr": 61,
     "has_college_stats": true
   },
   {
@@ -281,9 +281,9 @@
     "pick": 24,
     "age": 21,
     "t_2pt": 12,
-    "t_3pt": 13,
+    "t_3pt": 14,
     "t_def": 11,
-    "t_reb": 13,
+    "t_reb": 12,
     "ovr": 49,
     "has_college_stats": true
   },
@@ -305,10 +305,10 @@
     "pick": 26,
     "age": 23,
     "t_2pt": 14,
-    "t_3pt": 11,
+    "t_3pt": 10,
     "t_def": 14,
     "t_reb": 15,
-    "ovr": 54,
+    "ovr": 53,
     "has_college_stats": true
   },
   {
@@ -316,11 +316,11 @@
     "draft_year": 2026,
     "pick": 27,
     "age": 19,
-    "t_2pt": 12,
+    "t_2pt": 11,
     "t_3pt": 12,
     "t_def": 12,
     "t_reb": 14,
-    "ovr": 50,
+    "ovr": 49,
     "has_college_stats": true
   },
   {
@@ -329,10 +329,10 @@
     "pick": 28,
     "age": 22,
     "t_2pt": 13,
-    "t_3pt": 12,
+    "t_3pt": 13,
     "t_def": 14,
-    "t_reb": 14,
-    "ovr": 53,
+    "t_reb": 15,
+    "ovr": 55,
     "has_college_stats": true
   },
   {
@@ -353,8 +353,8 @@
     "pick": 30,
     "age": 19,
     "t_2pt": 12,
-    "t_3pt": 11,
-    "t_def": 10,
+    "t_3pt": 10,
+    "t_def": 11,
     "t_reb": 13,
     "ovr": 46,
     "has_college_stats": true
@@ -365,9 +365,9 @@
     "pick": 31,
     "age": 23,
     "t_2pt": 13,
-    "t_3pt": 14,
+    "t_3pt": 15,
     "t_def": 11,
-    "t_reb": 14,
+    "t_reb": 13,
     "ovr": 52,
     "has_college_stats": true
   },
@@ -376,10 +376,10 @@
     "draft_year": 2026,
     "pick": 32,
     "age": 25,
-    "t_2pt": 12,
+    "t_2pt": 13,
     "t_3pt": 16,
     "t_def": 13,
-    "t_reb": 14,
+    "t_reb": 13,
     "ovr": 55,
     "has_college_stats": true
   },
@@ -389,10 +389,10 @@
     "pick": 33,
     "age": 20,
     "t_2pt": 11,
-    "t_3pt": 14,
+    "t_3pt": 15,
     "t_def": 10,
     "t_reb": 12,
-    "ovr": 47,
+    "ovr": 48,
     "has_college_stats": true
   },
   {
@@ -403,8 +403,8 @@
     "t_2pt": 11,
     "t_3pt": 14,
     "t_def": 11,
-    "t_reb": 12,
-    "ovr": 48,
+    "t_reb": 11,
+    "ovr": 47,
     "has_college_stats": true
   },
   {
@@ -424,11 +424,11 @@
     "draft_year": 2026,
     "pick": 36,
     "age": 22,
-    "t_2pt": 12,
+    "t_2pt": 14,
     "t_3pt": 12,
-    "t_def": 13,
-    "t_reb": 15,
-    "ovr": 52,
+    "t_def": 14,
+    "t_reb": 16,
+    "ovr": 56,
     "has_college_stats": true
   },
   {
@@ -448,11 +448,11 @@
     "draft_year": 2026,
     "pick": 38,
     "age": 23,
-    "t_2pt": 14,
+    "t_2pt": 13,
     "t_3pt": 15,
     "t_def": 14,
-    "t_reb": 14,
-    "ovr": 57,
+    "t_reb": 13,
+    "ovr": 55,
     "has_college_stats": true
   },
   {
@@ -473,10 +473,10 @@
     "pick": 40,
     "age": 23,
     "t_2pt": 13,
-    "t_3pt": 12,
+    "t_3pt": 11,
     "t_def": 14,
     "t_reb": 15,
-    "ovr": 54,
+    "ovr": 53,
     "has_college_stats": true
   },
   {
@@ -486,9 +486,9 @@
     "age": 23,
     "t_2pt": 11,
     "t_3pt": 11,
-    "t_def": 11,
+    "t_def": 10,
     "t_reb": 12,
-    "ovr": 45,
+    "ovr": 44,
     "has_college_stats": true
   },
   {
@@ -496,11 +496,11 @@
     "draft_year": 2026,
     "pick": 42,
     "age": 22,
-    "t_2pt": 13,
+    "t_2pt": 12,
     "t_3pt": 15,
     "t_def": 13,
     "t_reb": 12,
-    "ovr": 53,
+    "ovr": 52,
     "has_college_stats": true
   },
   {
@@ -509,10 +509,10 @@
     "pick": 43,
     "age": 22,
     "t_2pt": 11,
-    "t_3pt": 13,
+    "t_3pt": 14,
     "t_def": 9,
     "t_reb": 12,
-    "ovr": 45,
+    "ovr": 46,
     "has_college_stats": true
   },
   {
@@ -520,11 +520,11 @@
     "draft_year": 2026,
     "pick": 44,
     "age": 22,
-    "t_2pt": 13,
-    "t_3pt": 12,
+    "t_2pt": 12,
+    "t_3pt": 11,
     "t_def": 17,
-    "t_reb": 15,
-    "ovr": 57,
+    "t_reb": 14,
+    "ovr": 54,
     "has_college_stats": true
   },
   {
@@ -533,10 +533,10 @@
     "pick": 45,
     "age": 22,
     "t_2pt": 11,
-    "t_3pt": 14,
-    "t_def": 10,
-    "t_reb": 12,
-    "ovr": 47,
+    "t_3pt": 15,
+    "t_def": 11,
+    "t_reb": 11,
+    "ovr": 48,
     "has_college_stats": true
   },
   {
@@ -559,8 +559,8 @@
     "t_2pt": 10,
     "t_3pt": 15,
     "t_def": 10,
-    "t_reb": 12,
-    "ovr": 47,
+    "t_reb": 11,
+    "ovr": 46,
     "has_college_stats": true
   },
   {
@@ -595,8 +595,8 @@
     "t_2pt": 12,
     "t_3pt": 12,
     "t_def": 11,
-    "t_reb": 12,
-    "ovr": 47,
+    "t_reb": 13,
+    "ovr": 48,
     "has_college_stats": true
   },
   {
@@ -616,11 +616,11 @@
     "draft_year": 2026,
     "pick": 52,
     "age": 22,
-    "t_2pt": 12,
+    "t_2pt": 13,
     "t_3pt": 13,
-    "t_def": 11,
+    "t_def": 12,
     "t_reb": 14,
-    "ovr": 50,
+    "ovr": 52,
     "has_college_stats": true
   },
   {
@@ -628,8 +628,8 @@
     "draft_year": 2026,
     "pick": 53,
     "age": 23,
-    "t_2pt": 13,
-    "t_3pt": 12,
+    "t_2pt": 12,
+    "t_3pt": 13,
     "t_def": 16,
     "t_reb": 14,
     "ovr": 55,
@@ -691,8 +691,8 @@
     "t_2pt": 11,
     "t_3pt": 13,
     "t_def": 9,
-    "t_reb": 12,
-    "ovr": 45,
+    "t_reb": 11,
+    "ovr": 44,
     "has_college_stats": true
   },
   {
@@ -700,11 +700,11 @@
     "draft_year": 2026,
     "pick": 59,
     "age": 24,
-    "t_2pt": 13,
-    "t_3pt": 11,
+    "t_2pt": 12,
+    "t_3pt": 10,
     "t_def": 10,
-    "t_reb": 15,
-    "ovr": 49,
+    "t_reb": 14,
+    "ovr": 46,
     "has_college_stats": true
   },
   {

@@ -123,19 +123,12 @@ def safe_float(val):
 print(f'Loading calibration data from {CAL_FILE}...')
 cal = pd.read_csv(CAL_FILE, encoding='utf-8-sig')
 
-# ── Derived features (computed from existing per-game stats) ──────────────────
-# Shooting efficiency (much better predictors than raw FG%)
-cal['c_TSp']   = cal['c_PTS'] / (2 * (cal['c_FGA'] + 0.44 * cal['c_FTA']))
-cal['c_eFGp']  = (cal['c_FG'] + 0.5 * cal['c_3P']) / cal['c_FGA']
-cal['c_3PAr']  = cal['c_3PA'] / cal['c_FGA']
-cal['c_FTr']   = cal['c_FTA'] / cal['c_FGA']
-# Per-40-minute rate stats (pace-neutral, translate better than per-game)
-cal['c_STL40'] = cal['c_STL'] / cal['c_MP'] * 40
-cal['c_BLK40'] = cal['c_BLK'] / cal['c_MP'] * 40
-cal['c_AST40'] = cal['c_AST'] / cal['c_MP'] * 40
-cal['c_ORB40'] = cal['c_ORB'] / cal['c_MP'] * 40
-cal['c_TRB40'] = cal['c_TRB'] / cal['c_MP'] * 40
-cal['c_PTS40'] = cal['c_PTS'] / cal['c_MP'] * 40
+# New features from CBB Reference (genuinely new info — not derivable from per-game stats)
+# These are already in calibration_data.csv from enrich_college_adv.py:
+#   c_BPM, c_OBPM, c_DBPM, c_USGp, c_STLp, c_BLKp, c_ASTp, c_TOVp, c_ORBp, c_DRBp, c_TSp
+# We include them alongside the original per-game features.
+# Deliberately do NOT add derived features (c_eFGp, per-40 stats etc.) —
+# they're exact linear combinations of existing columns and break OLS.
 
 features   = [c for c in cal.columns if c.startswith('c_')]
 components = ['2PS', '3PS', 'DEF', 'REB']
@@ -144,23 +137,33 @@ all_cols   = components + ['OVR']
 for col in features + all_cols:
     cal[col] = pd.to_numeric(cal[col], errors='coerce')
 
-cal_clean = cal.dropna(subset=features + all_cols)
-print(f'Training on {len(cal_clean)} complete cases  ({len(cal)} total)')
+# The original 23 per-game features are required (non-null) to qualify as a training case.
+# CBB advanced stats (BPM, USG%, etc.) are imputed with column means for players who lack them.
+# This preserves 884 training cases while leveraging CBB data where available.
+ORIGINAL_FEATURES = {
+    'c_G','c_MP','c_FG','c_FGA','c_FGpct','c_3P','c_3PA','c_3Ppct',
+    'c_FT','c_FTA','c_FTpct','c_ORB','c_TRB','c_AST','c_STL','c_BLK',
+    'c_TOV','c_PF','c_PTS','c_2P','c_2PA','c_2Ppct','c_inv_pick',
+}
+base_features = [f for f in features if f in ORIGINAL_FEATURES]
+cal_clean = cal.dropna(subset=base_features + all_cols).copy()
 
-# Column means for imputing missing predictors on new players
+# Impute CBB advanced-stat columns with their per-column means
 feat_means = cal_clean[features].mean()
+for f in features:
+    if cal_clean[f].isna().any():
+        cal_clean[f] = cal_clean[f].fillna(feat_means[f])
+
+print(f'Training on {len(cal_clean)} complete cases  ({len(cal)} total)')
 
 X_train = np.column_stack([np.ones(len(cal_clean)), cal_clean[features].values])
 
-# Stage 1: predict OVR
-components = ['2PS', '3PS', 'DEF', 'REB']
 y_ovr = cal_clean['OVR'].values
 ovr_beta, _, _, _ = np.linalg.lstsq(X_train, y_ovr, rcond=None)
 y_hat = X_train @ ovr_beta
 r2_ovr = 1 - np.sum((y_ovr - y_hat)**2) / np.sum((y_ovr - y_ovr.mean())**2)
 print(f'  OVR: R² = {r2_ovr:.3f}')
 
-# Stage 2: predict component shares (comp / OVR) — captures player archetype
 share_betas = {}
 mean_shares = {}
 for comp in components:
@@ -173,7 +176,6 @@ for comp in components:
     print(f'  {comp} share: R² = {r2_s:.3f}  (mean share = {share.mean():.3f})')
 
 # Pick-only OVR model for international/HS players (no college stats to lean on)
-# Uses 1/pick directly — avoids college-stat baseline swamping the pick signal
 inv_pick_train = cal_clean['c_inv_pick'].values
 X_pick_only = np.column_stack([np.ones(len(inv_pick_train)), inv_pick_train])
 pick_only_beta, _, _, _ = np.linalg.lstsq(X_pick_only, y_ovr, rcond=None)
@@ -434,33 +436,7 @@ for name, url_path in draft_players.items():
                        else np.nan)
     feat['c_inv_pick'] = 1.0 / float(pick)
 
-    # ── Derived features (mirror what's added to cal at training time) ──────────
-    pts  = feat.get('c_PTS', np.nan)
-    mp   = safe_float(cstats.get('MP')) or np.nan
-    stl  = feat.get('c_STL', np.nan)
-    blk  = feat.get('c_BLK', np.nan)
-    ast  = feat.get('c_AST', np.nan)
-    orb  = feat.get('c_ORB', np.nan)
-    trb  = feat.get('c_TRB', np.nan)
-    fta_ = feat.get('c_FTA', np.nan)
-    tp_  = feat.get('c_3P', np.nan)
-
-    def _d(a, b, scale=1.0):
-        return a / b * scale if (not np.isnan(a) and not np.isnan(b) and b != 0) else np.nan
-
-    feat['c_TSp']   = _d(pts, 2 * (fga + 0.44 * fta_)) if not np.isnan(fga) and not np.isnan(fta_) else np.nan
-    feat['c_eFGp']  = _d(fg + 0.5 * tp_, fga) if not np.isnan(tp_) else np.nan
-    feat['c_3PAr']  = _d(feat.get('c_3PA', np.nan), fga)
-    feat['c_FTr']   = _d(fta_, fga)
-    feat['c_STL40'] = _d(stl, mp, 40)
-    feat['c_BLK40'] = _d(blk, mp, 40)
-    feat['c_AST40'] = _d(ast, mp, 40)
-    feat['c_ORB40'] = _d(orb, mp, 40)
-    feat['c_TRB40'] = _d(trb, mp, 40)
-    feat['c_PTS40'] = _d(pts, mp, 40)
-
-    # Advanced rate stats from adv_cache (populated by enrich_college_adv.py
-    # for calibration players, and by step 3 above for new draftees)
+    # Advanced rate stats from CBB Reference (via adv_cache)
     adv_entry = adv_cache.get(name, {})
     for dest_col in ADV_COL_SRC:
         feat[dest_col] = float(adv_entry[dest_col]) if dest_col in adv_entry else np.nan
