@@ -1,216 +1,109 @@
 {
-  "ATL": [
+  "PHI": [
     {
-      "name": "Jalen Johnson",
-      "t_2pt": 27,
+      "name": "Tyrese Maxey",
+      "t_2pt": 28,
+      "t_3pt": 28,
+      "t_def": 28,
+      "t_reb": 17
+    },
+    {
+      "name": "Jaylen Brown",
+      "t_2pt": 30,
       "t_3pt": 21,
-      "t_def": 21,
-      "t_reb": 27
+      "t_def": 18,
+      "t_reb": 20
     },
     {
-      "name": "Dyson Daniels",
-      "t_2pt": 22,
-      "t_3pt": 13,
-      "t_def": 25,
-      "t_reb": 19
-    },
-    {
-      "name": "Nickeil Alexander-Walker",
-      "t_2pt": 18,
-      "t_3pt": 26,
+      "name": "Joel Embiid",
+      "t_2pt": 26,
+      "t_3pt": 18,
       "t_def": 19,
+      "t_reb": 21
+    },
+    {
+      "name": "LeBron James",
+      "t_2pt": 26,
+      "t_3pt": 17,
+      "t_def": 20,
+      "t_reb": 18
+    },
+    {
+      "name": "VJ Edgecombe",
+      "t_2pt": 18,
+      "t_3pt": 20,
+      "t_def": 20,
+      "t_reb": 15
+    },
+    {
+      "name": "Anfernee Simons",
+      "t_2pt": 14,
+      "t_3pt": 23,
+      "t_def": 12,
       "t_reb": 14
     },
     {
-      "name": "Onyeka Okongwu",
-      "t_2pt": 17,
-      "t_3pt": 19,
-      "t_def": 20,
-      "t_reb": 19
+      "name": "Dominick Barlow",
+      "t_2pt": 15,
+      "t_3pt": 11,
+      "t_def": 19,
+      "t_reb": 15
     },
     {
-      "name": "CJ McCollum",
-      "t_2pt": 17,
-      "t_3pt": 20,
+      "name": "Justin Edwards",
+      "t_2pt": 12,
+      "t_3pt": 17,
       "t_def": 15,
       "t_reb": 12
     },
     {
-      "name": "Jock Landale",
-      "t_2pt": 16,
-      "t_3pt": 14,
-      "t_def": 14,
-      "t_reb": 16
-    },
-    {
-      "name": "Jonathan Kuminga",
-      "t_2pt": 16,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 16
-    },
-    {
-      "name": "Zuby Ejiofor",
+      "name": "Trendon Watford",
       "t_2pt": 15,
       "t_3pt": 12,
-      "t_def": 17,
-      "t_reb": 17
-    },
-    {
-      "name": "Aaron Wiggins",
-      "t_2pt": 13,
-      "t_3pt": 16,
-      "t_def": 15,
-      "t_reb": 13
-    },
-    {
-      "name": "Asa Newell",
-      "t_2pt": 14,
-      "t_3pt": 15,
-      "t_def": 14,
-      "t_reb": 13
-    },
-    {
-      "name": "Devin Carter",
-      "t_2pt": 14,
-      "t_3pt": 13,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "Corey Kispert",
-      "t_2pt": 13,
-      "t_3pt": 17,
-      "t_def": 10,
-      "t_reb": 13
-    },
-    {
-      "name": "Luguentz Dort",
-      "t_2pt": 10,
-      "t_3pt": 16,
-      "t_def": 14,
-      "t_reb": 13
-    },
-    {
-      "name": "Kingston Flemings",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 13
-    },
-    {
-      "name": "Ryan Nembhard",
-      "t_2pt": 13,
-      "t_3pt": 15,
-      "t_def": 10,
-      "t_reb": 13
-    }
-  ],
-  "BOS": [
-    {
-      "name": "Jayson Tatum",
-      "t_2pt": 23,
-      "t_3pt": 27,
-      "t_def": 20,
-      "t_reb": 23
-    },
-    {
-      "name": "Derrick White",
-      "t_2pt": 17,
-      "t_3pt": 24,
-      "t_def": 25,
-      "t_reb": 16
-    },
-    {
-      "name": "Payton Pritchard",
-      "t_2pt": 20,
-      "t_3pt": 27,
-      "t_def": 15,
-      "t_reb": 16
-    },
-    {
-      "name": "Neemias Queta",
-      "t_2pt": 21,
-      "t_3pt": 12,
-      "t_def": 22,
-      "t_reb": 22
-    },
-    {
-      "name": "Mitchell Robinson",
-      "t_2pt": 16,
-      "t_3pt": 11,
-      "t_def": 20,
-      "t_reb": 23
-    },
-    {
-      "name": "Paul George",
-      "t_2pt": 14,
-      "t_3pt": 20,
-      "t_def": 17,
+      "t_def": 13,
       "t_reb": 15
     },
     {
-      "name": "Sam Hauser",
-      "t_2pt": 12,
-      "t_3pt": 25,
-      "t_def": 13,
-      "t_reb": 14
-    },
-    {
-      "name": "Luka Garza",
-      "t_2pt": 16,
-      "t_3pt": 16,
-      "t_def": 15,
-      "t_reb": 17
-    },
-    {
-      "name": "Jordan Walsh",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 18,
-      "t_reb": 17
-    },
-    {
-      "name": "Baylor Scheierman",
-      "t_2pt": 12,
-      "t_3pt": 19,
-      "t_def": 13,
-      "t_reb": 16
-    },
-    {
-      "name": "Hugo González",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 15,
-      "t_reb": 16
-    },
-    {
-      "name": "Ron Harper Jr.",
-      "t_2pt": 12,
-      "t_3pt": 15,
-      "t_def": 12,
-      "t_reb": 14
-    },
-    {
-      "name": "Chris Cenac Jr.",
+      "name": "Cameron Payne",
       "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 12,
-      "t_reb": 14
-    },
-    {
-      "name": "Amari Williams",
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 12,
+      "t_3pt": 14,
+      "t_def": 14,
       "t_reb": 13
     },
     {
-      "name": "Mike Conley",
-      "t_2pt": 9,
-      "t_3pt": 14,
+      "name": "Jabari Walker",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 15
+    },
+    {
+      "name": "Dalen Terry",
+      "t_2pt": 11,
+      "t_3pt": 13,
+      "t_def": 15,
+      "t_reb": 13
+    },
+    {
+      "name": "Labaron Philon Jr.",
+      "t_2pt": 13,
+      "t_3pt": 15,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "Adem Bona",
+      "t_2pt": 12,
+      "t_3pt": 9,
+      "t_def": 17,
+      "t_reb": 13
+    },
+    {
+      "name": "Ariel Hukporti",
+      "t_2pt": 11,
+      "t_3pt": 11,
       "t_def": 13,
-      "t_reb": 11
+      "t_reb": 16
     }
   ],
   "BRK": [
@@ -264,6 +157,13 @@
       "t_reb": 12
     },
     {
+      "name": "Joshua Jefferson",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
       "name": "Malachi Smith",
       "t_2pt": 13,
       "t_3pt": 15,
@@ -278,18 +178,25 @@
       "t_reb": 13
     },
     {
-      "name": "Joshua Jefferson",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
       "name": "Moritz Wagner",
       "t_2pt": 13,
       "t_3pt": 13,
       "t_def": 11,
       "t_reb": 15
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 10,
+      "t_reb": 12,
+      "name": "Isaiah Evans"
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 9,
+      "t_reb": 12,
+      "name": "Tyler Bilodeau"
     },
     {
       "name": "Terance Mann",
@@ -303,341 +210,6 @@
       "t_2pt": 11,
       "t_3pt": 11,
       "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Nolan Traoré",
-      "t_2pt": 10,
-      "t_3pt": 11,
-      "t_def": 12,
-      "t_reb": 10
-    },
-    {
-      "name": "Drake Powell",
-      "t_2pt": 9,
-      "t_3pt": 11,
-      "t_def": 11,
-      "t_reb": 11
-    }
-  ],
-  "CHI": [
-    {
-      "name": "Josh Giddey",
-      "t_2pt": 21,
-      "t_3pt": 22,
-      "t_def": 20,
-      "t_reb": 23
-    },
-    {
-      "name": "Norman Powell",
-      "t_2pt": 20,
-      "t_3pt": 23,
-      "t_def": 16,
-      "t_reb": 14
-    },
-    {
-      "name": "Tre Jones",
-      "t_2pt": 23,
-      "t_3pt": 15,
-      "t_def": 18,
-      "t_reb": 16
-    },
-    {
-      "name": "Nic Claxton",
-      "t_2pt": 20,
-      "t_3pt": 12,
-      "t_def": 19,
-      "t_reb": 20
-    },
-    {
-      "name": "Matas Buzelis",
-      "t_2pt": 15,
-      "t_3pt": 19,
-      "t_def": 20,
-      "t_reb": 14
-    },
-    {
-      "name": "Jalen Smith",
-      "t_2pt": 13,
-      "t_3pt": 16,
-      "t_def": 15,
-      "t_reb": 17
-    },
-    {
-      "name": "Caleb Wilson",
-      "t_2pt": 17,
-      "t_3pt": 12,
-      "t_def": 15,
-      "t_reb": 17
-    },
-    {
-      "name": "Jaden Ivey",
-      "t_2pt": 13,
-      "t_3pt": 17,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "Leonard Miller",
-      "t_2pt": 17,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 15
-    },
-    {
-      "name": "Zach Collins",
-      "t_2pt": 14,
-      "t_3pt": 14,
-      "t_def": 10,
-      "t_reb": 16
-    },
-    {
-      "name": "Dailyn Swain",
-      "t_2pt": 14,
-      "t_3pt": 12,
-      "t_def": 13,
-      "t_reb": 14
-    },
-    {
-      "name": "Guerschon Yabusele",
-      "t_2pt": 10,
-      "t_3pt": 14,
-      "t_def": 11,
-      "t_reb": 14
-    },
-    {
-      "name": "Lachlan Olbrich",
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 11,
-      "t_reb": 16
-    },
-    {
-      "name": "Isaac Okoro",
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 12,
-      "t_reb": 11
-    },
-    {
-      "name": "Patrick Williams",
-      "t_2pt": 9,
-      "t_3pt": 12,
-      "t_def": 12,
-      "t_reb": 11
-    }
-  ],
-  "CHO": [
-    {
-      "name": "Kon Knueppel",
-      "t_2pt": 19,
-      "t_3pt": 33,
-      "t_def": 16,
-      "t_reb": 19
-    },
-    {
-      "name": "Brandon Miller",
-      "t_2pt": 18,
-      "t_3pt": 26,
-      "t_def": 19,
-      "t_reb": 16
-    },
-    {
-      "name": "Moussa Diabaté",
-      "t_2pt": 18,
-      "t_3pt": 12,
-      "t_def": 20,
-      "t_reb": 23
-    },
-    {
-      "name": "Naz Reid",
-      "t_2pt": 16,
-      "t_3pt": 19,
-      "t_def": 19,
-      "t_reb": 17
-    },
-    {
-      "name": "Grayson Allen",
-      "t_2pt": 14,
-      "t_3pt": 25,
-      "t_def": 18,
-      "t_reb": 14
-    },
-    {
-      "name": "Ryan Kalkbrenner",
-      "t_2pt": 19,
-      "t_3pt": 11,
-      "t_def": 20,
-      "t_reb": 18
-    },
-    {
-      "name": "Royce O'Neale",
-      "t_2pt": 10,
-      "t_3pt": 23,
-      "t_def": 17,
-      "t_reb": 15
-    },
-    {
-      "name": "Coby White",
-      "t_2pt": 17,
-      "t_3pt": 20,
-      "t_def": 11,
-      "t_reb": 14
-    },
-    {
-      "name": "Grant Williams",
-      "t_2pt": 12,
-      "t_3pt": 17,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Tidjane Salaün",
-      "t_2pt": 13,
-      "t_3pt": 17,
-      "t_def": 11,
-      "t_reb": 17
-    },
-    {
-      "name": "Hannes Steinbach",
-      "t_2pt": 15,
-      "t_3pt": 12,
-      "t_def": 14,
-      "t_reb": 17
-    },
-    {
-      "name": "Liam McNeeley",
-      "t_2pt": 13,
-      "t_3pt": 17,
-      "t_def": 9,
-      "t_reb": 16
-    },
-    {
-      "name": "Christian Anderson Jr.",
-      "t_2pt": 13,
-      "t_3pt": 16,
-      "t_def": 12,
-      "t_reb": 12
-    },
-    {
-      "name": "Sion James",
-      "t_2pt": 11,
-      "t_3pt": 15,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "PJ Hall",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 11,
-      "t_reb": 16
-    }
-  ],
-  "CLE": [
-    {
-      "name": "Donovan Mitchell",
-      "t_2pt": 28,
-      "t_3pt": 29,
-      "t_def": 22,
-      "t_reb": 17
-    },
-    {
-      "name": "James Harden",
-      "t_2pt": 20,
-      "t_3pt": 29,
-      "t_def": 20,
-      "t_reb": 18
-    },
-    {
-      "name": "Evan Mobley",
-      "t_2pt": 24,
-      "t_3pt": 15,
-      "t_def": 24,
-      "t_reb": 23
-    },
-    {
-      "name": "Jarrett Allen",
-      "t_2pt": 24,
-      "t_3pt": 12,
-      "t_def": 20,
-      "t_reb": 21
-    },
-    {
-      "name": "Jaylon Tyson",
-      "t_2pt": 16,
-      "t_3pt": 21,
-      "t_def": 16,
-      "t_reb": 16
-    },
-    {
-      "name": "Craig Porter Jr.",
-      "t_2pt": 14,
-      "t_3pt": 14,
-      "t_def": 20,
-      "t_reb": 16
-    },
-    {
-      "name": "Sam Merrill",
-      "t_2pt": 11,
-      "t_3pt": 25,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "Dean Wade",
-      "t_2pt": 11,
-      "t_3pt": 16,
-      "t_def": 15,
-      "t_reb": 15
-    },
-    {
-      "name": "Keon Ellis",
-      "t_2pt": 11,
-      "t_3pt": 15,
-      "t_def": 19,
-      "t_reb": 12
-    },
-    {
-      "name": "Thomas Bryant",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Max Strus",
-      "t_2pt": 12,
-      "t_3pt": 19,
-      "t_def": 8,
-      "t_reb": 16
-    },
-    {
-      "name": "Lonzo Ball",
-      "t_2pt": 11,
-      "t_3pt": 14,
-      "t_def": 16,
-      "t_reb": 14
-    },
-    {
-      "name": "Tyrese Proctor",
-      "t_2pt": 12,
-      "t_3pt": 17,
-      "t_def": 11,
-      "t_reb": 14
-    },
-    {
-      "name": "Nae'Qwan Tomlin",
-      "t_2pt": 14,
-      "t_3pt": 11,
-      "t_def": 15,
-      "t_reb": 13
-    },
-    {
-      "name": "Dennis Schröder",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 13,
       "t_reb": 12
     }
   ],
@@ -827,6 +399,13 @@
       "t_reb": 12
     },
     {
+      "t_2pt": 12,
+      "t_3pt": 12,
+      "t_def": 11,
+      "t_reb": 13,
+      "name": "Bryce Hopkins"
+    },
+    {
       "name": "Tyus Jones",
       "t_2pt": 10,
       "t_3pt": 13,
@@ -846,120 +425,434 @@
       "t_3pt": 11,
       "t_def": 10,
       "t_reb": 11
-    },
-    {
-      "name": "Hunter Tyson",
-      "t_3pt": 10,
-      "t_reb": 10,
-      "t_2pt": 9,
-      "t_def": 9
     }
   ],
-  "DET": [
+  "HOU": [
     {
-      "name": "Cade Cunningham",
-      "t_2pt": 29,
-      "t_3pt": 25,
-      "t_def": 28,
+      "name": "Alperen Şengün",
+      "t_2pt": 30,
+      "t_3pt": 15,
+      "t_def": 25,
+      "t_reb": 25
+    },
+    {
+      "name": "Kevin Durant",
+      "t_2pt": 27,
+      "t_3pt": 24,
+      "t_def": 20,
+      "t_reb": 16
+    },
+    {
+      "name": "Amen Thompson",
+      "t_2pt": 27,
+      "t_3pt": 14,
+      "t_def": 24,
       "t_reb": 21
     },
     {
-      "name": "Jalen Duren",
-      "t_2pt": 32,
-      "t_3pt": 13,
-      "t_def": 21,
-      "t_reb": 30
-    },
-    {
-      "name": "Ausar Thompson",
-      "t_2pt": 20,
-      "t_3pt": 12,
-      "t_def": 29,
-      "t_reb": 19
-    },
-    {
-      "name": "Paul Reed",
-      "t_2pt": 18,
-      "t_3pt": 11,
-      "t_def": 22,
-      "t_reb": 18
-    },
-    {
-      "name": "Isaiah Joe",
-      "t_2pt": 13,
-      "t_3pt": 27,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Duncan Robinson",
-      "t_2pt": 12,
-      "t_3pt": 26,
-      "t_def": 13,
-      "t_reb": 13
-    },
-    {
-      "name": "John Collins",
-      "t_2pt": 17,
-      "t_3pt": 14,
-      "t_def": 16,
-      "t_reb": 15
-    },
-    {
-      "name": "Kevin Huerter",
+      "name": "Reed Sheppard",
       "t_2pt": 15,
-      "t_3pt": 16,
-      "t_def": 16,
+      "t_3pt": 27,
+      "t_def": 25,
       "t_reb": 14
     },
     {
-      "name": "Javonte Green",
+      "name": "Tari Eason",
+      "t_2pt": 18,
+      "t_3pt": 15,
+      "t_def": 25,
+      "t_reb": 18
+    },
+    {
+      "name": "Jabari Smith Jr.",
+      "t_2pt": 16,
+      "t_3pt": 21,
+      "t_def": 17,
+      "t_reb": 16
+    },
+    {
+      "name": "Fred VanVleet",
+      "t_2pt": 12,
+      "t_3pt": 19,
+      "t_def": 18,
+      "t_reb": 12
+    },
+    {
+      "name": "Steven Adams",
+      "t_2pt": 12,
+      "t_3pt": 11,
+      "t_def": 13,
+      "t_reb": 19
+    },
+    {
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 16,
+      "t_reb": 14,
+      "name": "Ugonna Onyenso"
+    },
+    {
+      "name": "Clint Capela",
+      "t_2pt": 11,
+      "t_3pt": 9,
+      "t_def": 16,
+      "t_reb": 17
+    },
+    {
+      "name": "Josh Okogie",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 15,
+      "t_reb": 13
+    },
+    {
+      "name": "Bruce Thornton",
+      "t_2pt": 13,
+      "t_3pt": 15,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "JD Davison",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 11,
+      "t_reb": 14
+    },
+    {
+      "name": "Marcus Smart",
+      "t_2pt": 10,
+      "t_3pt": 14,
+      "t_def": 15,
+      "t_reb": 11
+    },
+    {
+      "name": "Isaiah Crawford",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 10,
+      "t_reb": 13
+    }
+  ],
+  "ATL": [
+    {
+      "name": "Jalen Johnson",
+      "t_2pt": 27,
+      "t_3pt": 21,
+      "t_def": 21,
+      "t_reb": 27
+    },
+    {
+      "name": "Dyson Daniels",
+      "t_2pt": 22,
+      "t_3pt": 13,
+      "t_def": 25,
+      "t_reb": 19
+    },
+    {
+      "name": "Nickeil Alexander-Walker",
+      "t_2pt": 18,
+      "t_3pt": 26,
+      "t_def": 19,
+      "t_reb": 14
+    },
+    {
+      "name": "Onyeka Okongwu",
+      "t_2pt": 17,
+      "t_3pt": 19,
+      "t_def": 20,
+      "t_reb": 19
+    },
+    {
+      "name": "CJ McCollum",
+      "t_2pt": 17,
+      "t_3pt": 20,
+      "t_def": 15,
+      "t_reb": 12
+    },
+    {
+      "name": "Zuby Ejiofor",
+      "t_2pt": 15,
+      "t_3pt": 12,
+      "t_def": 17,
+      "t_reb": 17
+    },
+    {
+      "name": "Jock Landale",
+      "t_2pt": 16,
+      "t_3pt": 14,
+      "t_def": 14,
+      "t_reb": 16
+    },
+    {
+      "name": "Jonathan Kuminga",
+      "t_2pt": 16,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 16
+    },
+    {
+      "name": "Aaron Wiggins",
+      "t_2pt": 13,
+      "t_3pt": 16,
+      "t_def": 15,
+      "t_reb": 13
+    },
+    {
+      "name": "Asa Newell",
+      "t_2pt": 14,
+      "t_3pt": 15,
+      "t_def": 14,
+      "t_reb": 13
+    },
+    {
+      "name": "Devin Carter",
+      "t_2pt": 14,
+      "t_3pt": 13,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Corey Kispert",
+      "t_2pt": 13,
+      "t_3pt": 17,
+      "t_def": 10,
+      "t_reb": 13
+    },
+    {
+      "name": "Luguentz Dort",
+      "t_2pt": 10,
+      "t_3pt": 16,
+      "t_def": 14,
+      "t_reb": 13
+    },
+    {
+      "name": "Kingston Flemings",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 13
+    },
+    {
+      "name": "Ryan Nembhard",
+      "t_2pt": 13,
+      "t_3pt": 15,
+      "t_def": 10,
+      "t_reb": 13
+    }
+  ],
+  "UTA": [
+    {
+      "name": "Lauri Markkanen",
+      "t_2pt": 23,
+      "t_3pt": 22,
+      "t_def": 17,
+      "t_reb": 18
+    },
+    {
+      "name": "Keyonte George",
+      "t_2pt": 22,
+      "t_3pt": 25,
+      "t_def": 17,
+      "t_reb": 16
+    },
+    {
+      "name": "Jaren Jackson Jr.",
+      "t_2pt": 22,
+      "t_3pt": 19,
+      "t_def": 22,
+      "t_reb": 15
+    },
+    {
+      "name": "Jusuf Nurkić",
+      "t_2pt": 16,
+      "t_3pt": 12,
+      "t_def": 17,
+      "t_reb": 22
+    },
+    {
+      "name": "Kyle Filipowski",
+      "t_2pt": 16,
+      "t_3pt": 13,
+      "t_def": 16,
+      "t_reb": 19
+    },
+    {
+      "name": "Jaxson Hayes",
+      "t_2pt": 18,
+      "t_3pt": 12,
+      "t_def": 17,
+      "t_reb": 16
+    },
+    {
+      "name": "Darryn Peterson",
+      "t_2pt": 16,
+      "t_3pt": 16,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Isaiah Collier",
+      "t_2pt": 18,
+      "t_3pt": 12,
+      "t_def": 17,
+      "t_reb": 12
+    },
+    {
+      "name": "John Konchar",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 21,
+      "t_reb": 14
+    },
+    {
+      "name": "Vince Williams Jr.",
+      "t_2pt": 12,
+      "t_3pt": 15,
+      "t_def": 15,
+      "t_reb": 15
+    },
+    {
+      "name": "Brice Sensabaugh",
+      "t_2pt": 14,
+      "t_3pt": 19,
+      "t_def": 12,
+      "t_reb": 11
+    },
+    {
+      "name": "Svi Mykhailiuk",
+      "t_2pt": 12,
+      "t_3pt": 19,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Ace Bailey",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 11
+    },
+    {
+      "name": "Kennedy Chandler",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 9,
+      "t_reb": 12
+    },
+    {
+      "name": "Bez Mbeng",
+      "t_2pt": 10,
+      "t_3pt": 9,
+      "t_def": 13,
+      "t_reb": 10
+    }
+  ],
+  "MIL": [
+    {
+      "name": "Kevin Porter Jr.",
+      "t_2pt": 20,
+      "t_3pt": 16,
+      "t_def": 23,
+      "t_reb": 17
+    },
+    {
+      "name": "Kel'el Ware",
+      "t_2pt": 17,
+      "t_3pt": 15,
+      "t_def": 20,
+      "t_reb": 24
+    },
+    {
+      "name": "Ryan Rollins",
+      "t_2pt": 18,
+      "t_3pt": 22,
+      "t_def": 19,
+      "t_reb": 14
+    },
+    {
+      "name": "Tyler Herro",
+      "t_2pt": 20,
+      "t_3pt": 22,
+      "t_def": 14,
+      "t_reb": 17
+    },
+    {
+      "name": "Jaime Jaquez Jr.",
+      "t_2pt": 23,
+      "t_3pt": 15,
+      "t_def": 15,
+      "t_reb": 17
+    },
+    {
+      "name": "Kasparas Jakučionis",
+      "t_2pt": 13,
+      "t_3pt": 19,
+      "t_def": 15,
+      "t_reb": 15
+    },
+    {
+      "name": "Myles Turner",
       "t_2pt": 11,
       "t_3pt": 17,
       "t_def": 19,
       "t_reb": 13
     },
     {
-      "name": "Daniss Jenkins",
-      "t_2pt": 15,
-      "t_3pt": 15,
-      "t_def": 16,
-      "t_reb": 13
-    },
-    {
-      "name": "Ron Holland",
-      "t_2pt": 15,
-      "t_3pt": 11,
-      "t_def": 18,
-      "t_reb": 15
-    },
-    {
-      "name": "Tolu Smith",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 11,
-      "t_reb": 15
-    },
-    {
-      "name": "Ebuka Okorie",
-      "t_2pt": 14,
+      "name": "Caris LeVert",
+      "t_2pt": 12,
       "t_3pt": 14,
+      "t_def": 17,
+      "t_reb": 12
+    },
+    {
+      "name": "Kyle Kuzma",
+      "t_2pt": 15,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 13
+    },
+    {
+      "name": "Pete Nance",
+      "t_2pt": 12,
+      "t_3pt": 15,
       "t_def": 11,
       "t_reb": 13
     },
     {
-      "name": "Taurean Prince",
-      "t_2pt": 9,
-      "t_3pt": 16,
-      "t_def": 9,
-      "t_reb": 11
+      "name": "Nate Ament",
+      "t_2pt": 13,
+      "t_3pt": 12,
+      "t_def": 12,
+      "t_reb": 14
     },
     {
-      "name": "Gary Harris",
-      "t_2pt": 10,
-      "t_3pt": 11,
-      "t_def": 12,
+      "name": "Ousmane Dieng",
+      "t_2pt": 12,
+      "t_3pt": 15,
+      "t_def": 11,
       "t_reb": 12
+    },
+    {
+      "name": "Brayden Burries",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 13
+    },
+    {
+      "name": "Jericho Sims",
+      "t_2pt": 13,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 15
+    },
+    {
+      "name": "A.J. Green",
+      "t_2pt": 8,
+      "t_3pt": 20,
+      "t_def": 9,
+      "t_reb": 9
     }
   ],
   "GSW": [
@@ -1006,16 +899,16 @@
       "t_reb": 15
     },
     {
-      "name": "Gary Payton II",
-      "t_2pt": 17,
-      "t_3pt": 12,
+      "name": "Yaxel Lendeborg",
+      "t_2pt": 14,
+      "t_3pt": 16,
       "t_def": 16,
       "t_reb": 15
     },
     {
-      "name": "Yaxel Lendeborg",
-      "t_2pt": 14,
-      "t_3pt": 16,
+      "name": "Gary Payton II",
+      "t_2pt": 17,
+      "t_3pt": 12,
       "t_def": 16,
       "t_reb": 15
     },
@@ -1055,339 +948,18 @@
       "t_reb": 12
     },
     {
+      "t_2pt": 11,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 13,
+      "name": "Lajae Jones"
+    },
+    {
       "name": "LJ Cryer",
       "t_2pt": 10,
       "t_3pt": 15,
       "t_def": 7,
       "t_reb": 12
-    },
-    {
-      "name": "Nate Williams",
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 8,
-      "t_reb": 11
-    }
-  ],
-  "HOU": [
-    {
-      "name": "Alperen Şengün",
-      "t_2pt": 30,
-      "t_3pt": 15,
-      "t_def": 25,
-      "t_reb": 25
-    },
-    {
-      "name": "Kevin Durant",
-      "t_2pt": 27,
-      "t_3pt": 24,
-      "t_def": 20,
-      "t_reb": 16
-    },
-    {
-      "name": "Amen Thompson",
-      "t_2pt": 27,
-      "t_3pt": 14,
-      "t_def": 24,
-      "t_reb": 21
-    },
-    {
-      "name": "Reed Sheppard",
-      "t_2pt": 15,
-      "t_3pt": 27,
-      "t_def": 25,
-      "t_reb": 14
-    },
-    {
-      "name": "Jabari Smith Jr.",
-      "t_2pt": 16,
-      "t_3pt": 21,
-      "t_def": 17,
-      "t_reb": 16
-    },
-    {
-      "name": "Fred VanVleet",
-      "t_2pt": 12,
-      "t_3pt": 19,
-      "t_def": 18,
-      "t_reb": 12
-    },
-    {
-      "name": "Tari Eason",
-      "t_2pt": 18,
-      "t_3pt": 15,
-      "t_def": 25,
-      "t_reb": 18
-    },
-    {
-      "name": "Steven Adams",
-      "t_2pt": 12,
-      "t_3pt": 11,
-      "t_def": 13,
-      "t_reb": 19
-    },
-    {
-      "name": "Clint Capela",
-      "t_2pt": 11,
-      "t_3pt": 9,
-      "t_def": 16,
-      "t_reb": 17
-    },
-    {
-      "name": "Josh Okogie",
-      "t_2pt": 11,
-      "t_3pt": 14,
-      "t_def": 15,
-      "t_reb": 13
-    },
-    {
-      "name": "Bruce Thornton",
-      "t_2pt": 13,
-      "t_3pt": 15,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "JD Davison",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 11,
-      "t_reb": 14
-    },
-    {
-      "name": "Marcus Smart",
-      "t_2pt": 10,
-      "t_3pt": 14,
-      "t_def": 15,
-      "t_reb": 11
-    },
-    {
-      "name": "Isaiah Crawford",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 10,
-      "t_reb": 13
-    },
-    {
-      "name": "Aaron Holiday",
-      "t_2pt": 10,
-      "t_3pt": 16,
-      "t_def": 10,
-      "t_reb": 11
-    }
-  ],
-  "IND": [
-    {
-      "name": "Tyrese Haliburton",
-      "t_2pt": 21,
-      "t_3pt": 29,
-      "t_def": 25,
-      "t_reb": 17
-    },
-    {
-      "name": "Pascal Siakam",
-      "t_2pt": 23,
-      "t_3pt": 18,
-      "t_def": 17,
-      "t_reb": 17
-    },
-    {
-      "name": "Andrew Nembhard",
-      "t_2pt": 18,
-      "t_3pt": 19,
-      "t_def": 15,
-      "t_reb": 15
-    },
-    {
-      "name": "Ivica Zubac",
-      "t_2pt": 24,
-      "t_3pt": 11,
-      "t_def": 18,
-      "t_reb": 26
-    },
-    {
-      "name": "Jay Huff",
-      "t_2pt": 14,
-      "t_3pt": 15,
-      "t_def": 21,
-      "t_reb": 13
-    },
-    {
-      "name": "T.J. McConnell",
-      "t_2pt": 20,
-      "t_3pt": 12,
-      "t_def": 16,
-      "t_reb": 14
-    },
-    {
-      "name": "Obi Toppin",
-      "t_2pt": 16,
-      "t_3pt": 17,
-      "t_def": 11,
-      "t_reb": 16
-    },
-    {
-      "name": "Jarace Walker",
-      "t_2pt": 12,
-      "t_3pt": 18,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "Kelly Oubre Jr.",
-      "t_2pt": 14,
-      "t_3pt": 15,
-      "t_def": 16,
-      "t_reb": 13
-    },
-    {
-      "name": "Braden Smith",
-      "t_2pt": 13,
-      "t_3pt": 15,
-      "t_def": 14,
-      "t_reb": 13
-    },
-    {
-      "name": "Quenton Jackson",
-      "t_2pt": 14,
-      "t_3pt": 14,
-      "t_def": 13,
-      "t_reb": 13
-    },
-    {
-      "name": "Johnny Furphy",
-      "t_2pt": 11,
-      "t_3pt": 13,
-      "t_def": 11,
-      "t_reb": 15
-    },
-    {
-      "name": "Aaron Nesmith",
-      "t_2pt": 11,
-      "t_3pt": 16,
-      "t_def": 11,
-      "t_reb": 11
-    },
-    {
-      "name": "Kobe Brown",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "Ben Sheppard",
-      "t_2pt": 11,
-      "t_3pt": 14,
-      "t_def": 11,
-      "t_reb": 13
-    }
-  ],
-  "LAC": [
-    {
-      "name": "Brandon Ingram",
-      "t_2pt": 22,
-      "t_3pt": 18,
-      "t_def": 17,
-      "t_reb": 16
-    },
-    {
-      "name": "Darius Garland",
-      "t_2pt": 17,
-      "t_3pt": 22,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "Jordan Miller",
-      "t_2pt": 18,
-      "t_3pt": 14,
-      "t_def": 15,
-      "t_reb": 15
-    },
-    {
-      "name": "Derrick Jones Jr.",
-      "t_2pt": 14,
-      "t_3pt": 14,
-      "t_def": 18,
-      "t_reb": 14
-    },
-    {
-      "name": "Bennedict Mathurin",
-      "t_2pt": 16,
-      "t_3pt": 15,
-      "t_def": 13,
-      "t_reb": 15
-    },
-    {
-      "name": "Keaton Wagler",
-      "t_2pt": 14,
-      "t_3pt": 16,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Isaiah Jackson",
-      "t_2pt": 15,
-      "t_3pt": 10,
-      "t_def": 16,
-      "t_reb": 16
-    },
-    {
-      "name": "Kris Dunn",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 18,
-      "t_reb": 12
-    },
-    {
-      "name": "Brook Lopez",
-      "t_2pt": 10,
-      "t_3pt": 15,
-      "t_def": 17,
-      "t_reb": 11
-    },
-    {
-      "name": "Yanic Konan Niederhäuser",
-      "t_2pt": 13,
-      "t_3pt": 11,
-      "t_def": 15,
-      "t_reb": 14
-    },
-    {
-      "name": "Rui Hachimura",
-      "t_2pt": 13,
-      "t_3pt": 16,
-      "t_def": 12,
-      "t_reb": 12
-    },
-    {
-      "name": "Kobe Sanders",
-      "t_2pt": 11,
-      "t_3pt": 15,
-      "t_def": 13,
-      "t_reb": 12
-    },
-    {
-      "name": "Gradey Dick",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 12
-    },
-    {
-      "name": "Nicolas Batum",
-      "t_2pt": 8,
-      "t_3pt": 15,
-      "t_def": 13,
-      "t_reb": 11
-    },
-    {
-      "name": "Cam Christie",
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 9,
-      "t_reb": 13
     }
   ],
   "LAL": [
@@ -1497,6 +1069,755 @@
       "t_reb": 12
     }
   ],
+  "SAS": [
+    {
+      "name": "Victor Wembanyama",
+      "t_2pt": 30,
+      "t_3pt": 23,
+      "t_def": 39,
+      "t_reb": 33
+    },
+    {
+      "name": "Stephon Castle",
+      "t_2pt": 24,
+      "t_3pt": 19,
+      "t_def": 21,
+      "t_reb": 19
+    },
+    {
+      "name": "De'Aaron Fox",
+      "t_2pt": 24,
+      "t_3pt": 20,
+      "t_def": 19,
+      "t_reb": 16
+    },
+    {
+      "name": "Dylan Harper",
+      "t_2pt": 22,
+      "t_3pt": 17,
+      "t_def": 18,
+      "t_reb": 17
+    },
+    {
+      "name": "Luke Kornet",
+      "t_2pt": 18,
+      "t_3pt": 12,
+      "t_def": 20,
+      "t_reb": 21
+    },
+    {
+      "name": "Julian Champagnie",
+      "t_2pt": 13,
+      "t_3pt": 23,
+      "t_def": 17,
+      "t_reb": 18
+    },
+    {
+      "name": "Devin Vassell",
+      "t_2pt": 16,
+      "t_3pt": 23,
+      "t_def": 17,
+      "t_reb": 15
+    },
+    {
+      "name": "Keldon Johnson",
+      "t_2pt": 20,
+      "t_3pt": 17,
+      "t_def": 13,
+      "t_reb": 17
+    },
+    {
+      "name": "Tobias Harris",
+      "t_2pt": 17,
+      "t_3pt": 16,
+      "t_def": 17,
+      "t_reb": 17
+    },
+    {
+      "name": "Harrison Barnes",
+      "t_2pt": 12,
+      "t_3pt": 20,
+      "t_def": 13,
+      "t_reb": 13
+    },
+    {
+      "name": "Carter Bryant",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 13,
+      "t_reb": 15
+    },
+    {
+      "name": "Tarris Reed Jr.",
+      "t_2pt": 14,
+      "t_3pt": 10,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 14,
+      "t_reb": 14,
+      "name": "Trevon Brazile"
+    },
+    {
+      "t_2pt": 12,
+      "t_3pt": 15,
+      "t_def": 13,
+      "t_reb": 12,
+      "name": "Ja'Kobi Gillespie"
+    },
+    {
+      "name": "Kelly Olynyk",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 11,
+      "t_reb": 13
+    }
+  ],
+  "SAC": [
+    {
+      "name": "Domantas Sabonis",
+      "t_2pt": 23,
+      "t_3pt": 14,
+      "t_def": 14,
+      "t_reb": 28
+    },
+    {
+      "name": "DeMar DeRozan",
+      "t_2pt": 22,
+      "t_3pt": 12,
+      "t_def": 16,
+      "t_reb": 13
+    },
+    {
+      "name": "Russell Westbrook",
+      "t_2pt": 15,
+      "t_3pt": 17,
+      "t_def": 15,
+      "t_reb": 14
+    },
+    {
+      "name": "Zach LaVine",
+      "t_2pt": 16,
+      "t_3pt": 19,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Precious Achiuwa",
+      "t_2pt": 16,
+      "t_3pt": 10,
+      "t_def": 16,
+      "t_reb": 16
+    },
+    {
+      "name": "Maxime Raynaud",
+      "t_2pt": 19,
+      "t_3pt": 10,
+      "t_def": 12,
+      "t_reb": 17
+    },
+    {
+      "name": "Malik Monk",
+      "t_2pt": 13,
+      "t_3pt": 19,
+      "t_def": 13,
+      "t_reb": 12
+    },
+    {
+      "name": "Dylan Cardwell",
+      "t_2pt": 12,
+      "t_3pt": 10,
+      "t_def": 16,
+      "t_reb": 17
+    },
+    {
+      "name": "Keegan Murray",
+      "t_2pt": 13,
+      "t_3pt": 12,
+      "t_def": 15,
+      "t_reb": 13
+    },
+    {
+      "name": "Darius Acuff Jr.",
+      "t_2pt": 14,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "Alex Karaban",
+      "t_2pt": 12,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 13
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 11,
+      "t_reb": 11,
+      "name": "Emanuel Sharp"
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 11,
+      "name": "Meleek Thomas"
+    },
+    {
+      "name": "De'Andre Hunter",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 10,
+      "t_reb": 11
+    },
+    {
+      "name": "Drew Eubanks",
+      "t_2pt": 12,
+      "t_3pt": 10,
+      "t_def": 12,
+      "t_reb": 11
+    }
+  ],
+  "CLE": [
+    {
+      "name": "Donovan Mitchell",
+      "t_2pt": 28,
+      "t_3pt": 29,
+      "t_def": 22,
+      "t_reb": 17
+    },
+    {
+      "name": "James Harden",
+      "t_2pt": 20,
+      "t_3pt": 29,
+      "t_def": 20,
+      "t_reb": 18
+    },
+    {
+      "name": "Evan Mobley",
+      "t_2pt": 24,
+      "t_3pt": 15,
+      "t_def": 24,
+      "t_reb": 23
+    },
+    {
+      "name": "Jarrett Allen",
+      "t_2pt": 24,
+      "t_3pt": 12,
+      "t_def": 20,
+      "t_reb": 21
+    },
+    {
+      "name": "Jaylon Tyson",
+      "t_2pt": 16,
+      "t_3pt": 21,
+      "t_def": 16,
+      "t_reb": 16
+    },
+    {
+      "name": "Craig Porter Jr.",
+      "t_2pt": 14,
+      "t_3pt": 14,
+      "t_def": 20,
+      "t_reb": 16
+    },
+    {
+      "name": "Sam Merrill",
+      "t_2pt": 11,
+      "t_3pt": 25,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "Dean Wade",
+      "t_2pt": 11,
+      "t_3pt": 16,
+      "t_def": 15,
+      "t_reb": 15
+    },
+    {
+      "name": "Keon Ellis",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 19,
+      "t_reb": 12
+    },
+    {
+      "name": "Thomas Bryant",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "name": "Max Strus",
+      "t_2pt": 12,
+      "t_3pt": 19,
+      "t_def": 8,
+      "t_reb": 16
+    },
+    {
+      "name": "Lonzo Ball",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Tyrese Proctor",
+      "t_2pt": 12,
+      "t_3pt": 17,
+      "t_def": 11,
+      "t_reb": 14
+    },
+    {
+      "name": "Nae'Qwan Tomlin",
+      "t_2pt": 14,
+      "t_3pt": 11,
+      "t_def": 15,
+      "t_reb": 13
+    },
+    {
+      "name": "Dennis Schröder",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 12
+    }
+  ],
+  "WAS": [
+    {
+      "name": "Anthony Davis",
+      "t_2pt": 25,
+      "t_3pt": 12,
+      "t_def": 25,
+      "t_reb": 25
+    },
+    {
+      "name": "Alex Sarr",
+      "t_2pt": 20,
+      "t_3pt": 13,
+      "t_def": 23,
+      "t_reb": 18
+    },
+    {
+      "name": "Trae Young",
+      "t_2pt": 20,
+      "t_3pt": 23,
+      "t_def": 17,
+      "t_reb": 14
+    },
+    {
+      "name": "AJ Dybantsa",
+      "t_2pt": 24,
+      "t_3pt": 15,
+      "t_def": 16,
+      "t_reb": 17
+    },
+    {
+      "name": "Kyshawn George",
+      "t_2pt": 14,
+      "t_3pt": 19,
+      "t_def": 17,
+      "t_reb": 14
+    },
+    {
+      "name": "Deandre Ayton",
+      "t_2pt": 20,
+      "t_3pt": 10,
+      "t_def": 16,
+      "t_reb": 18
+    },
+    {
+      "name": "Justin Champagnie",
+      "t_2pt": 15,
+      "t_3pt": 13,
+      "t_def": 16,
+      "t_reb": 17
+    },
+    {
+      "name": "Tristan Vukcevic",
+      "t_2pt": 14,
+      "t_3pt": 15,
+      "t_def": 17,
+      "t_reb": 14
+    },
+    {
+      "name": "Bilal Coulibaly",
+      "t_2pt": 14,
+      "t_3pt": 13,
+      "t_def": 20,
+      "t_reb": 13
+    },
+    {
+      "name": "Will Riley",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 12
+    },
+    {
+      "name": "Tre Johnson",
+      "t_2pt": 12,
+      "t_3pt": 16,
+      "t_def": 11,
+      "t_reb": 11
+    },
+    {
+      "name": "Jamir Watkins",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 14,
+      "t_reb": 12
+    },
+    {
+      "name": "Sharife Cooper",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 10,
+      "t_reb": 13
+    },
+    {
+      "name": "Felix Okpara",
+      "t_2pt": 12,
+      "t_3pt": 11,
+      "t_def": 12,
+      "t_reb": 14
+    },
+    {
+      "name": "Julian Reese",
+      "t_2pt": 12,
+      "t_3pt": 10,
+      "t_def": 11,
+      "t_reb": 15
+    }
+  ],
+  "LAC": [
+    {
+      "name": "Brandon Ingram",
+      "t_2pt": 22,
+      "t_3pt": 18,
+      "t_def": 17,
+      "t_reb": 16
+    },
+    {
+      "name": "Darius Garland",
+      "t_2pt": 17,
+      "t_3pt": 22,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Jordan Miller",
+      "t_2pt": 18,
+      "t_3pt": 14,
+      "t_def": 15,
+      "t_reb": 15
+    },
+    {
+      "name": "Derrick Jones Jr.",
+      "t_2pt": 14,
+      "t_3pt": 14,
+      "t_def": 18,
+      "t_reb": 14
+    },
+    {
+      "name": "Bennedict Mathurin",
+      "t_2pt": 16,
+      "t_3pt": 15,
+      "t_def": 13,
+      "t_reb": 15
+    },
+    {
+      "name": "Keaton Wagler",
+      "t_2pt": 14,
+      "t_3pt": 16,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "name": "Isaiah Jackson",
+      "t_2pt": 15,
+      "t_3pt": 10,
+      "t_def": 16,
+      "t_reb": 16
+    },
+    {
+      "name": "Kris Dunn",
+      "t_2pt": 12,
+      "t_3pt": 14,
+      "t_def": 18,
+      "t_reb": 12
+    },
+    {
+      "t_2pt": 14,
+      "t_3pt": 12,
+      "t_def": 14,
+      "t_reb": 16,
+      "name": "Baba Miller"
+    },
+    {
+      "name": "Brook Lopez",
+      "t_2pt": 10,
+      "t_3pt": 15,
+      "t_def": 17,
+      "t_reb": 11
+    },
+    {
+      "name": "Yanic Konan Niederhäuser",
+      "t_2pt": 13,
+      "t_3pt": 11,
+      "t_def": 15,
+      "t_reb": 14
+    },
+    {
+      "name": "Rui Hachimura",
+      "t_2pt": 13,
+      "t_3pt": 16,
+      "t_def": 12,
+      "t_reb": 12
+    },
+    {
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 12,
+      "t_reb": 14,
+      "name": "Henri Veesaar"
+    },
+    {
+      "name": "Kobe Sanders",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 13,
+      "t_reb": 12
+    },
+    {
+      "name": "Gradey Dick",
+      "t_2pt": 12,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 12
+    }
+  ],
+  "DET": [
+    {
+      "name": "Cade Cunningham",
+      "t_2pt": 29,
+      "t_3pt": 25,
+      "t_def": 28,
+      "t_reb": 21
+    },
+    {
+      "name": "Jalen Duren",
+      "t_2pt": 32,
+      "t_3pt": 13,
+      "t_def": 21,
+      "t_reb": 30
+    },
+    {
+      "name": "Ausar Thompson",
+      "t_2pt": 20,
+      "t_3pt": 12,
+      "t_def": 29,
+      "t_reb": 19
+    },
+    {
+      "name": "Paul Reed",
+      "t_2pt": 18,
+      "t_3pt": 11,
+      "t_def": 22,
+      "t_reb": 18
+    },
+    {
+      "name": "Isaiah Joe",
+      "t_2pt": 13,
+      "t_3pt": 27,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "name": "Duncan Robinson",
+      "t_2pt": 12,
+      "t_3pt": 26,
+      "t_def": 13,
+      "t_reb": 13
+    },
+    {
+      "name": "John Collins",
+      "t_2pt": 17,
+      "t_3pt": 14,
+      "t_def": 16,
+      "t_reb": 15
+    },
+    {
+      "name": "Kevin Huerter",
+      "t_2pt": 15,
+      "t_3pt": 16,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Javonte Green",
+      "t_2pt": 11,
+      "t_3pt": 17,
+      "t_def": 19,
+      "t_reb": 13
+    },
+    {
+      "name": "Daniss Jenkins",
+      "t_2pt": 15,
+      "t_3pt": 15,
+      "t_def": 16,
+      "t_reb": 13
+    },
+    {
+      "name": "Ron Holland",
+      "t_2pt": 15,
+      "t_3pt": 11,
+      "t_def": 18,
+      "t_reb": 15
+    },
+    {
+      "name": "Tolu Smith",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 11,
+      "t_reb": 15
+    },
+    {
+      "name": "Ebuka Okorie",
+      "t_2pt": 14,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "Taurean Prince",
+      "t_2pt": 9,
+      "t_3pt": 16,
+      "t_def": 9,
+      "t_reb": 11
+    },
+    {
+      "name": "Gary Harris",
+      "t_2pt": 10,
+      "t_3pt": 11,
+      "t_def": 12,
+      "t_reb": 12
+    }
+  ],
+  "IND": [
+    {
+      "name": "Tyrese Haliburton",
+      "t_2pt": 21,
+      "t_3pt": 29,
+      "t_def": 25,
+      "t_reb": 17
+    },
+    {
+      "name": "Ivica Zubac",
+      "t_2pt": 24,
+      "t_3pt": 11,
+      "t_def": 18,
+      "t_reb": 26
+    },
+    {
+      "name": "Pascal Siakam",
+      "t_2pt": 23,
+      "t_3pt": 18,
+      "t_def": 17,
+      "t_reb": 17
+    },
+    {
+      "name": "Andrew Nembhard",
+      "t_2pt": 18,
+      "t_3pt": 19,
+      "t_def": 15,
+      "t_reb": 15
+    },
+    {
+      "name": "Jay Huff",
+      "t_2pt": 14,
+      "t_3pt": 15,
+      "t_def": 21,
+      "t_reb": 13
+    },
+    {
+      "name": "T.J. McConnell",
+      "t_2pt": 20,
+      "t_3pt": 12,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Obi Toppin",
+      "t_2pt": 16,
+      "t_3pt": 17,
+      "t_def": 11,
+      "t_reb": 16
+    },
+    {
+      "name": "Jarace Walker",
+      "t_2pt": 12,
+      "t_3pt": 18,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Kelly Oubre Jr.",
+      "t_2pt": 14,
+      "t_3pt": 15,
+      "t_def": 16,
+      "t_reb": 13
+    },
+    {
+      "name": "Braden Smith",
+      "t_2pt": 13,
+      "t_3pt": 15,
+      "t_def": 14,
+      "t_reb": 13
+    },
+    {
+      "name": "Quenton Jackson",
+      "t_2pt": 14,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 13
+    },
+    {
+      "name": "Johnny Furphy",
+      "t_2pt": 11,
+      "t_3pt": 13,
+      "t_def": 11,
+      "t_reb": 15
+    },
+    {
+      "name": "Aaron Nesmith",
+      "t_2pt": 11,
+      "t_3pt": 16,
+      "t_def": 11,
+      "t_reb": 11
+    },
+    {
+      "name": "Kobe Brown",
+      "t_2pt": 12,
+      "t_3pt": 13,
+      "t_def": 11,
+      "t_reb": 13
+    },
+    {
+      "name": "Ben Sheppard",
+      "t_2pt": 11,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 13
+    }
+  ],
   "MEM": [
     {
       "name": "Cam Spencer",
@@ -1576,6 +1897,13 @@
       "t_reb": 14
     },
     {
+      "t_2pt": 13,
+      "t_3pt": 16,
+      "t_def": 13,
+      "t_reb": 13,
+      "name": "Richie Saunders"
+    },
+    {
       "name": "D'Angelo Russell",
       "t_2pt": 14,
       "t_3pt": 15,
@@ -1595,227 +1923,6 @@
       "t_3pt": 13,
       "t_def": 13,
       "t_reb": 12
-    },
-    {
-      "name": "Karim LÃ³pez",
-      "t_2pt": 12,
-      "t_3pt": 12,
-      "t_def": 12,
-      "t_reb": 13
-    }
-  ],
-  "MIA": [
-    {
-      "name": "Giannis Antetokounmpo",
-      "t_2pt": 42,
-      "t_3pt": 13,
-      "t_def": 24,
-      "t_reb": 32
-    },
-    {
-      "name": "Bam Adebayo",
-      "t_2pt": 20,
-      "t_3pt": 19,
-      "t_def": 19,
-      "t_reb": 23
-    },
-    {
-      "name": "Andrew Wiggins",
-      "t_2pt": 17,
-      "t_3pt": 20,
-      "t_def": 21,
-      "t_reb": 14
-    },
-    {
-      "name": "Bobby Portis",
-      "t_2pt": 15,
-      "t_3pt": 20,
-      "t_def": 11,
-      "t_reb": 17
-    },
-    {
-      "name": "Dru Smith",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 22,
-      "t_reb": 14
-    },
-    {
-      "name": "Davion Mitchell",
-      "t_2pt": 15,
-      "t_3pt": 17,
-      "t_def": 16,
-      "t_reb": 14
-    },
-    {
-      "name": "Pelle Larsson",
-      "t_2pt": 17,
-      "t_3pt": 15,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Simone Fontecchio",
-      "t_2pt": 11,
-      "t_3pt": 21,
-      "t_def": 12,
-      "t_reb": 14
-    },
-    {
-      "name": "Tim Hardaway Jr.",
-      "t_2pt": 11,
-      "t_3pt": 23,
-      "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Maliq Brown",
-      "t_2pt": 12,
-      "t_3pt": 11,
-      "t_def": 17,
-      "t_reb": 14
-    },
-    {
-      "name": "Myron Gardner",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 13,
-      "t_reb": 15
-    },
-    {
-      "name": "Keshad Johnson",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 13,
-      "t_reb": 13
-    },
-    {
-      "name": "Nikola Jović",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 13,
-      "t_reb": 13
-    },
-    {
-      "name": "Ryan Conwell",
-      "t_2pt": 11,
-      "t_3pt": 15,
-      "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Jahmir Young",
-      "t_2pt": 8,
-      "t_3pt": 9,
-      "t_def": 6,
-      "t_reb": 9
-    }
-  ],
-  "MIL": [
-    {
-      "name": "Kevin Porter Jr.",
-      "t_2pt": 20,
-      "t_3pt": 16,
-      "t_def": 23,
-      "t_reb": 17
-    },
-    {
-      "name": "Kel'el Ware",
-      "t_2pt": 17,
-      "t_3pt": 15,
-      "t_def": 20,
-      "t_reb": 24
-    },
-    {
-      "name": "Ryan Rollins",
-      "t_2pt": 18,
-      "t_3pt": 22,
-      "t_def": 19,
-      "t_reb": 14
-    },
-    {
-      "name": "Tyler Herro",
-      "t_2pt": 20,
-      "t_3pt": 22,
-      "t_def": 14,
-      "t_reb": 17
-    },
-    {
-      "name": "Jaime Jaquez Jr.",
-      "t_2pt": 23,
-      "t_3pt": 15,
-      "t_def": 15,
-      "t_reb": 17
-    },
-    {
-      "name": "Kasparas Jakučionis",
-      "t_2pt": 13,
-      "t_3pt": 19,
-      "t_def": 15,
-      "t_reb": 15
-    },
-    {
-      "name": "Myles Turner",
-      "t_2pt": 11,
-      "t_3pt": 17,
-      "t_def": 19,
-      "t_reb": 13
-    },
-    {
-      "name": "Caris LeVert",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 17,
-      "t_reb": 12
-    },
-    {
-      "name": "Kyle Kuzma",
-      "t_2pt": 15,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 13
-    },
-    {
-      "name": "Pete Nance",
-      "t_2pt": 12,
-      "t_3pt": 15,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "Ousmane Dieng",
-      "t_2pt": 12,
-      "t_3pt": 15,
-      "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Brayden Burries",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 13
-    },
-    {
-      "name": "Nate Ament",
-      "t_2pt": 13,
-      "t_3pt": 12,
-      "t_def": 12,
-      "t_reb": 14
-    },
-    {
-      "name": "Jericho Sims",
-      "t_2pt": 13,
-      "t_3pt": 10,
-      "t_def": 10,
-      "t_reb": 15
-    },
-    {
-      "name": "A.J. Green",
-      "t_2pt": 8,
-      "t_3pt": 20,
-      "t_def": 9,
-      "t_reb": 9
     }
   ],
   "MIN": [
@@ -1918,118 +2025,225 @@
       "t_reb": 12
     },
     {
-      "name": "Joe Ingles",
-      "t_2pt": 10,
-      "t_3pt": 11,
+      "t_2pt": 12,
+      "t_3pt": 10,
       "t_def": 10,
-      "t_reb": 12
+      "t_reb": 14,
+      "name": "Trey Kaufman-Renn"
     }
   ],
-  "NOP": [
+  "MIA": [
     {
-      "name": "Zion Williamson",
-      "t_2pt": 31,
-      "t_3pt": 14,
-      "t_def": 21,
-      "t_reb": 19
+      "name": "Giannis Antetokounmpo",
+      "t_2pt": 42,
+      "t_3pt": 13,
+      "t_def": 24,
+      "t_reb": 32
     },
     {
-      "name": "Trey Murphy III",
+      "name": "Bam Adebayo",
       "t_2pt": 20,
-      "t_3pt": 26,
-      "t_def": 20,
-      "t_reb": 17
+      "t_3pt": 19,
+      "t_def": 19,
+      "t_reb": 23
     },
     {
-      "name": "Saddiq Bey",
-      "t_2pt": 18,
-      "t_3pt": 21,
-      "t_def": 15,
-      "t_reb": 17
-    },
-    {
-      "name": "Derik Queen",
+      "name": "Andrew Wiggins",
       "t_2pt": 17,
-      "t_3pt": 10,
-      "t_def": 20,
-      "t_reb": 19
+      "t_3pt": 20,
+      "t_def": 21,
+      "t_reb": 14
     },
     {
-      "name": "Dejounte Murray",
+      "name": "Bobby Portis",
+      "t_2pt": 15,
+      "t_3pt": 20,
+      "t_def": 11,
+      "t_reb": 17
+    },
+    {
+      "name": "Dru Smith",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 22,
+      "t_reb": 14
+    },
+    {
+      "name": "Davion Mitchell",
+      "t_2pt": 15,
+      "t_3pt": 17,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Pelle Larsson",
       "t_2pt": 17,
       "t_3pt": 15,
-      "t_def": 15,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "name": "Simone Fontecchio",
+      "t_2pt": 11,
+      "t_3pt": 21,
+      "t_def": 12,
+      "t_reb": 14
+    },
+    {
+      "name": "Tim Hardaway Jr.",
+      "t_2pt": 11,
+      "t_3pt": 23,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "name": "Maliq Brown",
+      "t_2pt": 12,
+      "t_3pt": 11,
+      "t_def": 17,
+      "t_reb": 14
+    },
+    {
+      "name": "Myron Gardner",
+      "t_2pt": 12,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 15
+    },
+    {
+      "name": "Keshad Johnson",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 13,
+      "t_reb": 13
+    },
+    {
+      "name": "Nikola Jović",
+      "t_2pt": 12,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 13
+    },
+    {
+      "name": "Ryan Conwell",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 11,
+      "t_reb": 12
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 10,
+      "t_reb": 12,
+      "name": "Otega Oweh"
+    }
+  ],
+  "CHI": [
+    {
+      "name": "Josh Giddey",
+      "t_2pt": 21,
+      "t_3pt": 22,
+      "t_def": 20,
+      "t_reb": 23
+    },
+    {
+      "name": "Norman Powell",
+      "t_2pt": 20,
+      "t_3pt": 23,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Tre Jones",
+      "t_2pt": 23,
+      "t_3pt": 15,
+      "t_def": 18,
       "t_reb": 16
     },
     {
-      "name": "Yves Missi",
-      "t_2pt": 13,
-      "t_3pt": 10,
+      "name": "Nic Claxton",
+      "t_2pt": 20,
+      "t_3pt": 12,
       "t_def": 19,
-      "t_reb": 17
+      "t_reb": 20
     },
     {
-      "name": "Jeremiah Fears",
-      "t_2pt": 16,
-      "t_3pt": 14,
-      "t_def": 16,
-      "t_reb": 13
+      "name": "Matas Buzelis",
+      "t_2pt": 15,
+      "t_3pt": 19,
+      "t_def": 20,
+      "t_reb": 14
     },
     {
-      "name": "Karlo Matković",
-      "t_2pt": 14,
-      "t_3pt": 13,
-      "t_def": 16,
-      "t_reb": 15
-    },
-    {
-      "name": "Bryce McGowens",
+      "name": "Jalen Smith",
       "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 13
-    },
-    {
-      "name": "Kevon Looney",
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 11,
+      "t_3pt": 16,
+      "t_def": 15,
       "t_reb": 17
     },
     {
-      "name": "Jordan Poole",
-      "t_2pt": 11,
-      "t_3pt": 17,
-      "t_def": 11,
-      "t_reb": 11
-    },
-    {
-      "name": "Herbert Jones",
-      "t_2pt": 10,
+      "name": "Caleb Wilson",
+      "t_2pt": 17,
       "t_3pt": 12,
       "t_def": 15,
-      "t_reb": 11
+      "t_reb": 17
     },
     {
-      "name": "DeAndre Jordan",
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 10,
+      "name": "Jaden Ivey",
+      "t_2pt": 13,
+      "t_3pt": 17,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Leonard Miller",
+      "t_2pt": 17,
+      "t_3pt": 13,
+      "t_def": 12,
       "t_reb": 15
     },
     {
-      "name": "Micah Peavy",
-      "t_2pt": 10,
-      "t_3pt": 10,
+      "name": "Zach Collins",
+      "t_2pt": 14,
+      "t_3pt": 14,
       "t_def": 10,
-      "t_reb": 10
+      "t_reb": 16
     },
     {
-      "name": "Jordan Hawkins",
-      "t_2pt": 8,
+      "name": "Dailyn Swain",
+      "t_2pt": 14,
+      "t_3pt": 12,
+      "t_def": 13,
+      "t_reb": 14
+    },
+    {
+      "name": "Guerschon Yabusele",
+      "t_2pt": 10,
+      "t_3pt": 14,
+      "t_def": 11,
+      "t_reb": 14
+    },
+    {
+      "name": "Lachlan Olbrich",
+      "t_2pt": 11,
       "t_3pt": 11,
-      "t_def": 8,
-      "t_reb": 10
+      "t_def": 11,
+      "t_reb": 16
+    },
+    {
+      "t_2pt": 12,
+      "t_3pt": 12,
+      "t_def": 11,
+      "t_reb": 13,
+      "name": "Vsevolod Ishchenko"
+    },
+    {
+      "name": "Isaac Okoro",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 12,
+      "t_reb": 11
     }
   ],
   "NYK": [
@@ -2132,11 +2346,11 @@
       "t_reb": 13
     },
     {
-      "name": "Jordan Clarkson",
-      "t_2pt": 12,
+      "t_2pt": 13,
       "t_3pt": 12,
-      "t_def": 9,
-      "t_reb": 11
+      "t_def": 10,
+      "t_reb": 13,
+      "name": "Nick Martinelli"
     }
   ],
   "OKC": [
@@ -2155,6 +2369,13 @@
       "t_reb": 24
     },
     {
+      "name": "Jalen Williams",
+      "t_2pt": 25,
+      "t_3pt": 21,
+      "t_def": 24,
+      "t_reb": 17
+    },
+    {
       "name": "Isaiah Hartenstein",
       "t_2pt": 19,
       "t_3pt": 13,
@@ -2167,13 +2388,6 @@
       "t_3pt": 17,
       "t_def": 20,
       "t_reb": 16
-    },
-    {
-      "name": "Jalen Williams",
-      "t_2pt": 25,
-      "t_3pt": 21,
-      "t_def": 24,
-      "t_reb": 17
     },
     {
       "name": "Jaylin Williams",
@@ -2218,18 +2432,18 @@
       "t_reb": 12
     },
     {
-      "name": "Kenrich Williams",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 15
-    },
-    {
       "name": "Aday Mara",
       "t_2pt": 14,
       "t_3pt": 10,
       "t_def": 15,
       "t_reb": 16
+    },
+    {
+      "name": "Kenrich Williams",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 15
     },
     {
       "name": "Bennett Stirtz",
@@ -2246,225 +2460,218 @@
       "t_reb": 14
     }
   ],
-  "ORL": [
+  "BOS": [
     {
-      "name": "Paolo Banchero",
-      "t_2pt": 25,
-      "t_3pt": 17,
-      "t_def": 18,
+      "name": "Jayson Tatum",
+      "t_2pt": 23,
+      "t_3pt": 27,
+      "t_def": 20,
       "t_reb": 23
     },
     {
-      "name": "Desmond Bane",
-      "t_2pt": 22,
-      "t_3pt": 21,
-      "t_def": 19,
-      "t_reb": 15
-    },
-    {
-      "name": "Jalen Suggs",
+      "name": "Derrick White",
       "t_2pt": 17,
-      "t_3pt": 21,
-      "t_def": 24,
-      "t_reb": 15
+      "t_3pt": 24,
+      "t_def": 25,
+      "t_reb": 16
     },
     {
-      "name": "Franz Wagner",
-      "t_2pt": 27,
-      "t_3pt": 20,
-      "t_def": 20,
-      "t_reb": 18
-    },
-    {
-      "name": "Nikola Vučević",
-      "t_2pt": 19,
-      "t_3pt": 17,
+      "name": "Payton Pritchard",
+      "t_2pt": 20,
+      "t_3pt": 27,
       "t_def": 15,
-      "t_reb": 20
+      "t_reb": 16
     },
     {
-      "name": "Anthony Black",
-      "t_2pt": 17,
-      "t_3pt": 17,
-      "t_def": 21,
-      "t_reb": 14
-    },
-    {
-      "name": "Goga Bitadze",
-      "t_2pt": 17,
-      "t_3pt": 11,
-      "t_def": 19,
-      "t_reb": 18
-    },
-    {
-      "name": "Wendell Carter Jr.",
-      "t_2pt": 16,
-      "t_3pt": 14,
-      "t_def": 16,
-      "t_reb": 18
-    },
-    {
-      "name": "Tristan Da Silva",
-      "t_2pt": 14,
-      "t_3pt": 17,
-      "t_def": 16,
-      "t_reb": 14
-    },
-    {
-      "name": "Izaiyah Nelson",
-      "t_2pt": 14,
+      "name": "Neemias Queta",
+      "t_2pt": 21,
       "t_3pt": 12,
-      "t_def": 16,
-      "t_reb": 16
+      "t_def": 22,
+      "t_reb": 22
     },
     {
-      "name": "Noah Penda",
-      "t_2pt": 11,
-      "t_3pt": 13,
-      "t_def": 15,
-      "t_reb": 16
+      "name": "Mitchell Robinson",
+      "t_2pt": 16,
+      "t_3pt": 11,
+      "t_def": 20,
+      "t_reb": 23
     },
     {
-      "name": "Jase Richardson",
+      "name": "Paul George",
       "t_2pt": 14,
-      "t_3pt": 15,
-      "t_def": 11,
+      "t_3pt": 20,
+      "t_def": 17,
+      "t_reb": 15
+    },
+    {
+      "name": "Sam Hauser",
+      "t_2pt": 12,
+      "t_3pt": 25,
+      "t_def": 13,
       "t_reb": 14
     },
     {
-      "name": "Jett Howard",
-      "t_2pt": 12,
-      "t_3pt": 18,
-      "t_def": 10,
-      "t_reb": 13
-    },
-    {
-      "name": "Jevon Carter",
-      "t_2pt": 10,
-      "t_3pt": 17,
-      "t_def": 13,
-      "t_reb": 11
-    },
-    {
-      "name": "Jamal Cain",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 10,
-      "t_reb": 13
-    }
-  ],
-  "PHI": [
-    {
-      "name": "Tyrese Maxey",
-      "t_2pt": 28,
-      "t_3pt": 28,
-      "t_def": 28,
+      "name": "Luka Garza",
+      "t_2pt": 16,
+      "t_3pt": 16,
+      "t_def": 15,
       "t_reb": 17
     },
     {
-      "name": "Jaylen Brown",
-      "t_2pt": 30,
-      "t_3pt": 21,
-      "t_def": 18,
-      "t_reb": 20
-    },
-    {
-      "name": "Joel Embiid",
-      "t_2pt": 26,
-      "t_3pt": 18,
-      "t_def": 19,
-      "t_reb": 21
-    },
-    {
-      "name": "VJ Edgecombe",
-      "t_2pt": 18,
-      "t_3pt": 20,
-      "t_def": 20,
-      "t_reb": 15
-    },
-    {
-      "name": "Anfernee Simons",
-      "t_2pt": 14,
-      "t_3pt": 23,
-      "t_def": 12,
-      "t_reb": 14
-    },
-    {
-      "name": "Dominick Barlow",
-      "t_2pt": 15,
-      "t_3pt": 11,
-      "t_def": 19,
-      "t_reb": 15
-    },
-    {
-      "name": "Justin Edwards",
-      "t_2pt": 12,
-      "t_3pt": 17,
-      "t_def": 15,
-      "t_reb": 12
-    },
-    {
-      "name": "Trendon Watford",
-      "t_2pt": 15,
-      "t_3pt": 12,
-      "t_def": 13,
-      "t_reb": 15
-    },
-    {
-      "name": "Cameron Payne",
-      "t_2pt": 11,
-      "t_3pt": 14,
-      "t_def": 14,
-      "t_reb": 13
-    },
-    {
-      "name": "Jabari Walker",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 15
-    },
-    {
-      "name": "Dalen Terry",
-      "t_2pt": 11,
-      "t_3pt": 13,
-      "t_def": 15,
-      "t_reb": 13
-    },
-    {
-      "name": "Labaron Philon Jr.",
+      "name": "Jordan Walsh",
       "t_2pt": 13,
-      "t_3pt": 15,
-      "t_def": 11,
-      "t_reb": 13
+      "t_3pt": 14,
+      "t_def": 18,
+      "t_reb": 17
     },
     {
-      "name": "Adem Bona",
+      "name": "Baylor Scheierman",
       "t_2pt": 12,
-      "t_3pt": 9,
-      "t_def": 17,
-      "t_reb": 13
-    },
-    {
-      "name": "Ariel Hukporti",
-      "t_2pt": 11,
-      "t_3pt": 11,
+      "t_3pt": 19,
       "t_def": 13,
       "t_reb": 16
     },
     {
-      "name": "Tyrese Martin",
-      "t_2pt": 11,
+      "name": "Hugo González",
+      "t_2pt": 12,
       "t_3pt": 14,
+      "t_def": 15,
+      "t_reb": 16
+    },
+    {
+      "name": "Ron Harper Jr.",
+      "t_2pt": 12,
+      "t_3pt": 15,
+      "t_def": 12,
+      "t_reb": 14
+    },
+    {
+      "t_2pt": 13,
+      "t_3pt": 11,
+      "t_def": 14,
+      "t_reb": 15,
+      "name": "Dillon Mitchell"
+    },
+    {
+      "name": "Chris Cenac Jr.",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 12,
+      "t_reb": 14
+    },
+    {
+      "name": "Amari Williams",
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 12,
+      "t_reb": 13
+    }
+  ],
+  "CHO": [
+    {
+      "name": "Kon Knueppel",
+      "t_2pt": 19,
+      "t_3pt": 33,
+      "t_def": 16,
+      "t_reb": 19
+    },
+    {
+      "name": "Brandon Miller",
+      "t_2pt": 18,
+      "t_3pt": 26,
+      "t_def": 19,
+      "t_reb": 16
+    },
+    {
+      "name": "Moussa Diabaté",
+      "t_2pt": 18,
+      "t_3pt": 12,
+      "t_def": 20,
+      "t_reb": 23
+    },
+    {
+      "name": "Naz Reid",
+      "t_2pt": 16,
+      "t_3pt": 19,
+      "t_def": 19,
+      "t_reb": 17
+    },
+    {
+      "name": "Grayson Allen",
+      "t_2pt": 14,
+      "t_3pt": 25,
+      "t_def": 18,
+      "t_reb": 14
+    },
+    {
+      "name": "Ryan Kalkbrenner",
+      "t_2pt": 19,
+      "t_3pt": 11,
+      "t_def": 20,
+      "t_reb": 18
+    },
+    {
+      "name": "Royce O'Neale",
+      "t_2pt": 10,
+      "t_3pt": 23,
+      "t_def": 17,
+      "t_reb": 15
+    },
+    {
+      "name": "Coby White",
+      "t_2pt": 17,
+      "t_3pt": 20,
       "t_def": 11,
+      "t_reb": 14
+    },
+    {
+      "name": "Grant Williams",
+      "t_2pt": 12,
+      "t_3pt": 17,
+      "t_def": 14,
+      "t_reb": 15
+    },
+    {
+      "name": "Tidjane Salaün",
+      "t_2pt": 13,
+      "t_3pt": 17,
+      "t_def": 11,
+      "t_reb": 17
+    },
+    {
+      "name": "Hannes Steinbach",
+      "t_2pt": 15,
+      "t_3pt": 12,
+      "t_def": 14,
+      "t_reb": 17
+    },
+    {
+      "name": "Liam McNeeley",
+      "t_2pt": 13,
+      "t_3pt": 17,
+      "t_def": 9,
+      "t_reb": 16
+    },
+    {
+      "name": "Sion James",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 14,
+      "t_reb": 14
+    },
+    {
+      "name": "Christian Anderson Jr.",
+      "t_2pt": 13,
+      "t_3pt": 16,
+      "t_def": 12,
       "t_reb": 12
     },
     {
-      "name": "LeBron James",
-      "t_2pt": 26,
-      "t_3pt": 17,
-      "t_def": 20,
-      "t_reb": 18
+      "name": "PJ Hall",
+      "t_2pt": 13,
+      "t_3pt": 13,
+      "t_def": 11,
+      "t_reb": 16
     }
   ],
   "PHO": [
@@ -2574,6 +2781,113 @@
       "t_reb": 13
     }
   ],
+  "NOP": [
+    {
+      "name": "Zion Williamson",
+      "t_2pt": 31,
+      "t_3pt": 14,
+      "t_def": 21,
+      "t_reb": 19
+    },
+    {
+      "name": "Trey Murphy III",
+      "t_2pt": 20,
+      "t_3pt": 26,
+      "t_def": 20,
+      "t_reb": 17
+    },
+    {
+      "name": "Saddiq Bey",
+      "t_2pt": 18,
+      "t_3pt": 21,
+      "t_def": 15,
+      "t_reb": 17
+    },
+    {
+      "name": "Derik Queen",
+      "t_2pt": 17,
+      "t_3pt": 10,
+      "t_def": 20,
+      "t_reb": 19
+    },
+    {
+      "name": "Dejounte Murray",
+      "t_2pt": 17,
+      "t_3pt": 15,
+      "t_def": 15,
+      "t_reb": 16
+    },
+    {
+      "name": "Yves Missi",
+      "t_2pt": 13,
+      "t_3pt": 10,
+      "t_def": 19,
+      "t_reb": 17
+    },
+    {
+      "name": "Jeremiah Fears",
+      "t_2pt": 16,
+      "t_3pt": 14,
+      "t_def": 16,
+      "t_reb": 13
+    },
+    {
+      "name": "Karlo Matković",
+      "t_2pt": 14,
+      "t_3pt": 13,
+      "t_def": 16,
+      "t_reb": 15
+    },
+    {
+      "name": "Bryce McGowens",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 13
+    },
+    {
+      "name": "Kevon Looney",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 11,
+      "t_reb": 17
+    },
+    {
+      "name": "Jordan Poole",
+      "t_2pt": 11,
+      "t_3pt": 17,
+      "t_def": 11,
+      "t_reb": 11
+    },
+    {
+      "name": "Herbert Jones",
+      "t_2pt": 10,
+      "t_3pt": 12,
+      "t_def": 15,
+      "t_reb": 11
+    },
+    {
+      "name": "DeAndre Jordan",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 10,
+      "t_reb": 15
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 13,
+      "t_def": 9,
+      "t_reb": 11,
+      "name": "Jaron Pierre Jr."
+    },
+    {
+      "name": "Micah Peavy",
+      "t_2pt": 10,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 10
+    }
+  ],
   "POR": [
     {
       "name": "Deni Avdija",
@@ -2681,220 +2995,6 @@
       "t_reb": 7
     }
   ],
-  "SAC": [
-    {
-      "name": "Domantas Sabonis",
-      "t_2pt": 23,
-      "t_3pt": 14,
-      "t_def": 14,
-      "t_reb": 28
-    },
-    {
-      "name": "DeMar DeRozan",
-      "t_2pt": 22,
-      "t_3pt": 12,
-      "t_def": 16,
-      "t_reb": 13
-    },
-    {
-      "name": "Russell Westbrook",
-      "t_2pt": 15,
-      "t_3pt": 17,
-      "t_def": 15,
-      "t_reb": 14
-    },
-    {
-      "name": "Zach LaVine",
-      "t_2pt": 16,
-      "t_3pt": 19,
-      "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Precious Achiuwa",
-      "t_2pt": 16,
-      "t_3pt": 10,
-      "t_def": 16,
-      "t_reb": 16
-    },
-    {
-      "name": "Maxime Raynaud",
-      "t_2pt": 19,
-      "t_3pt": 10,
-      "t_def": 12,
-      "t_reb": 17
-    },
-    {
-      "name": "Malik Monk",
-      "t_2pt": 13,
-      "t_3pt": 19,
-      "t_def": 13,
-      "t_reb": 12
-    },
-    {
-      "name": "Dylan Cardwell",
-      "t_2pt": 12,
-      "t_3pt": 10,
-      "t_def": 16,
-      "t_reb": 17
-    },
-    {
-      "name": "Keegan Murray",
-      "t_2pt": 13,
-      "t_3pt": 12,
-      "t_def": 15,
-      "t_reb": 13
-    },
-    {
-      "name": "Darius Acuff Jr.",
-      "t_2pt": 14,
-      "t_3pt": 14,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "Alex Karaban",
-      "t_2pt": 12,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 13
-    },
-    {
-      "name": "De'Andre Hunter",
-      "t_2pt": 12,
-      "t_3pt": 13,
-      "t_def": 10,
-      "t_reb": 11
-    },
-    {
-      "name": "Drew Eubanks",
-      "t_2pt": 12,
-      "t_3pt": 10,
-      "t_def": 12,
-      "t_reb": 11
-    },
-    {
-      "name": "Daeqwon Plowden",
-      "t_2pt": 10,
-      "t_3pt": 13,
-      "t_def": 10,
-      "t_reb": 11
-    },
-    {
-      "name": "Nique Clifford",
-      "t_2pt": 10,
-      "t_3pt": 11,
-      "t_def": 11,
-      "t_reb": 10
-    }
-  ],
-  "SAS": [
-    {
-      "name": "Victor Wembanyama",
-      "t_2pt": 30,
-      "t_3pt": 23,
-      "t_def": 39,
-      "t_reb": 33
-    },
-    {
-      "name": "Stephon Castle",
-      "t_2pt": 24,
-      "t_3pt": 19,
-      "t_def": 21,
-      "t_reb": 19
-    },
-    {
-      "name": "De'Aaron Fox",
-      "t_2pt": 24,
-      "t_3pt": 20,
-      "t_def": 19,
-      "t_reb": 16
-    },
-    {
-      "name": "Dylan Harper",
-      "t_2pt": 22,
-      "t_3pt": 17,
-      "t_def": 18,
-      "t_reb": 17
-    },
-    {
-      "name": "Luke Kornet",
-      "t_2pt": 18,
-      "t_3pt": 12,
-      "t_def": 20,
-      "t_reb": 21
-    },
-    {
-      "name": "Julian Champagnie",
-      "t_2pt": 13,
-      "t_3pt": 23,
-      "t_def": 17,
-      "t_reb": 18
-    },
-    {
-      "name": "Devin Vassell",
-      "t_2pt": 16,
-      "t_3pt": 23,
-      "t_def": 17,
-      "t_reb": 15
-    },
-    {
-      "name": "Keldon Johnson",
-      "t_2pt": 20,
-      "t_3pt": 17,
-      "t_def": 13,
-      "t_reb": 17
-    },
-    {
-      "name": "Tobias Harris",
-      "t_2pt": 17,
-      "t_3pt": 16,
-      "t_def": 17,
-      "t_reb": 17
-    },
-    {
-      "name": "Harrison Barnes",
-      "t_2pt": 12,
-      "t_3pt": 20,
-      "t_def": 13,
-      "t_reb": 13
-    },
-    {
-      "name": "Carter Bryant",
-      "t_2pt": 11,
-      "t_3pt": 15,
-      "t_def": 13,
-      "t_reb": 15
-    },
-    {
-      "name": "Tarris Reed Jr.",
-      "t_2pt": 14,
-      "t_3pt": 10,
-      "t_def": 14,
-      "t_reb": 15
-    },
-    {
-      "name": "Kelly Olynyk",
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 11,
-      "t_reb": 13
-    },
-    {
-      "name": "Jordan McLaughlin",
-      "t_2pt": 10,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 12
-    },
-    {
-      "name": "Mason Plumlee",
-      "t_2pt": 10,
-      "t_3pt": 11,
-      "t_def": 10,
-      "t_reb": 14
-    }
-  ],
   "TOR": [
     {
       "name": "Kawhi Leonard",
@@ -2995,225 +3095,118 @@
       "t_reb": 14
     },
     {
-      "name": "Alijah Martin",
-      "t_2pt": 10,
-      "t_3pt": 11,
-      "t_def": 10,
-      "t_reb": 11
+      "t_2pt": 12,
+      "t_3pt": 12,
+      "t_def": 11,
+      "t_reb": 13,
+      "name": "Jaden Bradley"
     }
   ],
-  "UTA": [
+  "ORL": [
     {
-      "name": "Lauri Markkanen",
-      "t_2pt": 23,
-      "t_3pt": 22,
-      "t_def": 17,
+      "name": "Franz Wagner",
+      "t_2pt": 27,
+      "t_3pt": 20,
+      "t_def": 20,
       "t_reb": 18
     },
     {
-      "name": "Keyonte George",
-      "t_2pt": 22,
-      "t_3pt": 25,
-      "t_def": 17,
-      "t_reb": 16
+      "name": "Paolo Banchero",
+      "t_2pt": 25,
+      "t_3pt": 17,
+      "t_def": 18,
+      "t_reb": 23
     },
     {
-      "name": "Jusuf Nurkić",
-      "t_2pt": 16,
-      "t_3pt": 12,
-      "t_def": 17,
-      "t_reb": 22
-    },
-    {
-      "name": "Jaren Jackson Jr.",
+      "name": "Desmond Bane",
       "t_2pt": 22,
-      "t_3pt": 19,
-      "t_def": 22,
+      "t_3pt": 21,
+      "t_def": 19,
       "t_reb": 15
     },
     {
-      "name": "Kyle Filipowski",
-      "t_2pt": 16,
-      "t_3pt": 13,
-      "t_def": 16,
-      "t_reb": 19
+      "name": "Jalen Suggs",
+      "t_2pt": 17,
+      "t_3pt": 21,
+      "t_def": 24,
+      "t_reb": 15
     },
     {
-      "name": "Jaxson Hayes",
-      "t_2pt": 18,
-      "t_3pt": 12,
-      "t_def": 17,
-      "t_reb": 16
+      "name": "Nikola Vučević",
+      "t_2pt": 19,
+      "t_3pt": 17,
+      "t_def": 15,
+      "t_reb": 20
     },
     {
-      "name": "Darryn Peterson",
-      "t_2pt": 16,
-      "t_3pt": 16,
-      "t_def": 14,
-      "t_reb": 14
-    },
-    {
-      "name": "Isaiah Collier",
-      "t_2pt": 18,
-      "t_3pt": 12,
-      "t_def": 17,
-      "t_reb": 12
-    },
-    {
-      "name": "John Konchar",
-      "t_2pt": 11,
-      "t_3pt": 11,
+      "name": "Anthony Black",
+      "t_2pt": 17,
+      "t_3pt": 17,
       "t_def": 21,
       "t_reb": 14
     },
     {
-      "name": "Vince Williams Jr.",
-      "t_2pt": 12,
-      "t_3pt": 15,
-      "t_def": 15,
-      "t_reb": 15
+      "name": "Goga Bitadze",
+      "t_2pt": 17,
+      "t_3pt": 11,
+      "t_def": 19,
+      "t_reb": 18
     },
     {
-      "name": "Brice Sensabaugh",
-      "t_2pt": 14,
-      "t_3pt": 19,
-      "t_def": 12,
-      "t_reb": 11
-    },
-    {
-      "name": "Svi Mykhailiuk",
-      "t_2pt": 12,
-      "t_3pt": 19,
-      "t_def": 11,
-      "t_reb": 12
-    },
-    {
-      "name": "Ace Bailey",
-      "t_2pt": 13,
+      "name": "Wendell Carter Jr.",
+      "t_2pt": 16,
       "t_3pt": 14,
-      "t_def": 13,
-      "t_reb": 11
+      "t_def": 16,
+      "t_reb": 18
     },
     {
-      "name": "Kennedy Chandler",
+      "name": "Tristan Da Silva",
+      "t_2pt": 14,
+      "t_3pt": 17,
+      "t_def": 16,
+      "t_reb": 14
+    },
+    {
+      "name": "Izaiyah Nelson",
+      "t_2pt": 14,
+      "t_3pt": 12,
+      "t_def": 16,
+      "t_reb": 16
+    },
+    {
+      "name": "Noah Penda",
       "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 9,
-      "t_reb": 12
-    },
-    {
-      "name": "Bez Mbeng",
-      "t_2pt": 10,
-      "t_3pt": 9,
-      "t_def": 13,
-      "t_reb": 10
-    }
-  ],
-  "WAS": [
-    {
-      "name": "Anthony Davis",
-      "t_2pt": 25,
-      "t_3pt": 12,
-      "t_def": 25,
-      "t_reb": 25
-    },
-    {
-      "name": "Alex Sarr",
-      "t_2pt": 20,
       "t_3pt": 13,
-      "t_def": 23,
-      "t_reb": 18
+      "t_def": 15,
+      "t_reb": 16
     },
     {
-      "name": "Trae Young",
-      "t_2pt": 20,
-      "t_3pt": 23,
-      "t_def": 17,
-      "t_reb": 14
-    },
-    {
-      "name": "AJ Dybantsa",
-      "t_2pt": 24,
-      "t_3pt": 15,
-      "t_def": 16,
-      "t_reb": 17
-    },
-    {
-      "name": "Kyshawn George",
-      "t_2pt": 14,
-      "t_3pt": 19,
-      "t_def": 17,
-      "t_reb": 14
-    },
-    {
-      "name": "Deandre Ayton",
-      "t_2pt": 20,
-      "t_3pt": 10,
-      "t_def": 16,
-      "t_reb": 18
-    },
-    {
-      "name": "Justin Champagnie",
-      "t_2pt": 15,
-      "t_3pt": 13,
-      "t_def": 16,
-      "t_reb": 17
-    },
-    {
-      "name": "Tristan Vukcevic",
+      "name": "Jase Richardson",
       "t_2pt": 14,
       "t_3pt": 15,
-      "t_def": 17,
-      "t_reb": 14
-    },
-    {
-      "name": "Bilal Coulibaly",
-      "t_2pt": 14,
-      "t_3pt": 13,
-      "t_def": 20,
-      "t_reb": 13
-    },
-    {
-      "name": "Will Riley",
-      "t_2pt": 13,
-      "t_3pt": 13,
-      "t_def": 12,
-      "t_reb": 12
-    },
-    {
-      "name": "Tre Johnson",
-      "t_2pt": 12,
-      "t_3pt": 16,
       "t_def": 11,
-      "t_reb": 11
+      "t_reb": 14
     },
     {
-      "name": "Jamir Watkins",
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 14,
-      "t_reb": 12
-    },
-    {
-      "name": "Sharife Cooper",
-      "t_2pt": 13,
-      "t_3pt": 13,
+      "name": "Jett Howard",
+      "t_2pt": 12,
+      "t_3pt": 18,
       "t_def": 10,
       "t_reb": 13
     },
     {
-      "name": "Felix Okpara",
-      "t_2pt": 12,
-      "t_3pt": 11,
-      "t_def": 12,
-      "t_reb": 14
+      "name": "Jevon Carter",
+      "t_2pt": 10,
+      "t_3pt": 17,
+      "t_def": 13,
+      "t_reb": 11
     },
     {
-      "name": "Julian Reese",
-      "t_2pt": 12,
-      "t_3pt": 10,
-      "t_def": 11,
-      "t_reb": 15
+      "name": "Jamal Cain",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 10,
+      "t_reb": 13
     }
   ]
 }
