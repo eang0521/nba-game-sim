@@ -37,10 +37,27 @@ BASE          = 'https://www.basketball-reference.com'
 CAL_FILE      = 'calibration_data.csv'
 DRAFT_CACHE   = 'draft_links_cache.json'
 COLLEGE_CACHE = 'college_stats_cache.json'
+ADV_CACHE     = 'college_adv_cache.json'
 OUT_CSV       = f'rookie_predictions_{DRAFT_YEAR}.csv'
 OUT_JSON      = f'rookie_predictions_{DRAFT_YEAR}.json'
 AGES_CACHE    = 'player_ages_cache.json'
 SEASON_START  = '2026-10-01'   # age computed as of this date
+
+CBB_BASE  = 'https://www.sports-reference.com/cbb/players'
+# CBB Reference advanced stat columns → our feature names
+ADV_COL_SRC = {
+    'c_TSp':  'TS%',
+    'c_USGp': 'USG%',
+    'c_STLp': 'STL%',
+    'c_BLKp': 'BLK%',
+    'c_ASTp': 'AST%',
+    'c_TOVp': 'TOV%',
+    'c_ORBp': 'ORB%',
+    'c_DRBp': 'DRB%',
+    'c_BPM':  'BPM',
+    'c_OBPM': 'OBPM',
+    'c_DBPM': 'DBPM',
+}
 
 STAT_MAP = {
     'G': 'c_G', 'MP': 'c_MP',
@@ -105,6 +122,20 @@ def safe_float(val):
 # ── 1. Load calibration data and fit OLS models ───────────────────────────────
 print(f'Loading calibration data from {CAL_FILE}...')
 cal = pd.read_csv(CAL_FILE, encoding='utf-8-sig')
+
+# ── Derived features (computed from existing per-game stats) ──────────────────
+# Shooting efficiency (much better predictors than raw FG%)
+cal['c_TSp']   = cal['c_PTS'] / (2 * (cal['c_FGA'] + 0.44 * cal['c_FTA']))
+cal['c_eFGp']  = (cal['c_FG'] + 0.5 * cal['c_3P']) / cal['c_FGA']
+cal['c_3PAr']  = cal['c_3PA'] / cal['c_FGA']
+cal['c_FTr']   = cal['c_FTA'] / cal['c_FGA']
+# Per-40-minute rate stats (pace-neutral, translate better than per-game)
+cal['c_STL40'] = cal['c_STL'] / cal['c_MP'] * 40
+cal['c_BLK40'] = cal['c_BLK'] / cal['c_MP'] * 40
+cal['c_AST40'] = cal['c_AST'] / cal['c_MP'] * 40
+cal['c_ORB40'] = cal['c_ORB'] / cal['c_MP'] * 40
+cal['c_TRB40'] = cal['c_TRB'] / cal['c_MP'] * 40
+cal['c_PTS40'] = cal['c_PTS'] / cal['c_MP'] * 40
 
 features   = [c for c in cal.columns if c.startswith('c_')]
 components = ['2PS', '3PS', 'DEF', 'REB']
@@ -182,73 +213,144 @@ draft_players = draft_cache[key]  # {name: /players/...}
 
 # ── 3. Fetch college stats for each draftee ───────────────────────────────────
 college_cache = load_json(COLLEGE_CACHE)
+adv_cache     = load_json(ADV_CACHE)
 new_scrapes = 0
+
+def _cbb_urls(full_name: str) -> list[str]:
+    """Generate CBB Reference URL variants to try for a player name.
+    CBB Reference keeps 'jr'/'sr' in URLs, so we try that variant first."""
+    s = unicodedata.normalize('NFD', full_name).encode('ascii', 'ignore').decode().lower()
+    has_jr = bool(re.search(r'\bjr\.?\b', s))
+    has_sr = bool(re.search(r'\bsr\.?\b', s))
+    base = re.sub(r'\b(jr\.?|sr\.?|ii|iii|iv)\b', '', s)
+    base = re.sub(r"[^a-z\s]", '', base)
+    base = re.sub(r'\s+', '-', base.strip()).strip('-')
+    urls = []
+    for n in range(1, 3):
+        if has_jr:
+            urls.append(f'{CBB_BASE}/{base}-jr-{n}.html')
+        if has_sr:
+            urls.append(f'{CBB_BASE}/{base}-sr-{n}.html')
+        urls.append(f'{CBB_BASE}/{base}-{n}.html')
+    return urls
+
+
+def _parse_cbb_adv(html: str) -> dict:
+    """Find players_advanced table in CBB Reference page, return last season stats."""
+    soup = BeautifulSoup(html, 'html.parser')
+    table = None
+    for comment in soup.find_all(string=lambda x: isinstance(x, Comment)):
+        cs = BeautifulSoup(comment, 'html.parser')
+        table = cs.find('table', id='players_advanced')
+        if table:
+            break
+    if table is None:
+        return {}
+    try:
+        df = pd.read_html(StringIO(str(table)))[0]
+    except Exception:
+        return {}
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [str(l1) if 'Unnamed' in str(l0) else f'{l0}_{l1}' for l0, l1 in df.columns]
+    else:
+        df.columns = [str(c) for c in df.columns]
+    df['Season'] = df['Season'].astype(str)
+    df = df[df['Season'].str.match(r'^\d{4}-\d{2}$', na=False)]
+    if df.empty:
+        return {}
+    last = df.iloc[-1]
+    result = {}
+    for dest, src in ADV_COL_SRC.items():
+        val = safe_float(last.get(src))
+        if val is not None:
+            result[dest] = val
+    return result
+
+
+def _fetch_cbb_adv(name: str) -> dict:
+    """Try CBB Reference URL variants (with/without Jr., n=1,2) for a player name."""
+    for url in _cbb_urls(name):
+        cbb_html = fetch_html(url)
+        if cbb_html is None:
+            continue
+        result = _parse_cbb_adv(cbb_html)
+        if result:
+            return result
+    return {}
 
 print(f'\nFetching college stats for {DRAFT_YEAR} draftees...')
 for name, url_path in draft_players.items():
-    if name in college_cache:
+    need_per_game = name not in college_cache
+    need_adv      = name not in adv_cache
+    if not need_per_game and not need_adv:
         continue
 
     url = BASE + url_path
     print(f'  Fetching {name} → {url}')
     html = fetch_html(url)
     if not html:
-        college_cache[name] = None
+        if need_per_game: college_cache[name] = None
+        if need_adv:      adv_cache[name] = {}
         continue
 
-    table = find_table(html, 'all_college_stats')
-    if table is None:
-        college_cache[name] = None
-        print(f'    → no college stats (international/HS)')
-        continue
+    # Per-game stats
+    if need_per_game:
+        table = find_table(html, 'all_college_stats')
+        if table is None:
+            college_cache[name] = None
+            print(f'    → no college stats (international/HS)')
+        else:
+            try:
+                df = pd.read_html(StringIO(str(table)))[0]
+            except Exception as e:
+                print(f'    → parse error: {e}')
+                college_cache[name] = None
+                df = None
 
-    try:
-        df = pd.read_html(StringIO(str(table)))[0]
-    except Exception as e:
-        print(f'    → parse error: {e}')
-        college_cache[name] = None
-        continue
+            if df is not None:
+                if isinstance(df.columns, pd.MultiIndex):
+                    flat = []
+                    for l0, l1 in df.columns:
+                        flat.append(str(l1) if 'Unnamed' in str(l0) else f'{l0}_{l1}')
+                    df.columns = flat
+                else:
+                    df.columns = [str(c) for c in df.columns]
 
-    if isinstance(df.columns, pd.MultiIndex):
-        flat = []
-        for l0, l1 in df.columns:
-            flat.append(str(l1) if 'Unnamed' in str(l0) else f'{l0}_{l1}')
-        df.columns = flat
-    else:
-        df.columns = [str(c) for c in df.columns]
+                df['Season'] = df['Season'].astype(str)
+                df = df[df['Season'].str.match(r'^\d{4}-\d{2}$', na=False)]
 
-    df['Season'] = df['Season'].astype(str)
-    df = df[df['Season'].str.match(r'^\d{4}-\d{2}$', na=False)]
+                if df.empty:
+                    college_cache[name] = None
+                    print(f'    → no valid season rows')
+                else:
+                    last = df.iloc[-1]
+                    g    = safe_float(last.get('G'))
+                    row  = {'G': g}
+                    for col in ['FG', 'FGA', '3P', '3PA', 'FT', 'FTA',
+                                'ORB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS']:
+                        val = safe_float(last.get(f'Totals_{col}'))
+                        row[col] = (val / g) if (val is not None and g and g > 0) else None
+                    for short, key_col in [('FG%', 'Shooting_FG%'), ('3P%', 'Shooting_3P%'), ('FT%', 'Shooting_FT%')]:
+                        row[short] = safe_float(last.get(key_col))
+                    row['MP']  = safe_float(last.get('Per Game_MP'))
+                    row['Age'] = safe_float(last.get('Age'))
+                    college_cache[name] = row
+                    new_scrapes += 1
+                    print(f'    → per-game stats captured')
 
-    if df.empty:
-        college_cache[name] = None
-        print(f'    → no valid season rows')
-        continue
+    # Advanced stats from CBB Reference (separate fetch; 4s delay inside _fetch_cbb_adv)
+    if need_adv:
+        adv_cache[name] = _fetch_cbb_adv(name)
+        if adv_cache[name]:
+            print(f'    → CBB adv stats captured ({list(adv_cache[name].keys())})')
 
-    last = df.iloc[-1]
-    g    = safe_float(last.get('G'))
-    row  = {'G': g}
-
-    for col in ['FG', 'FGA', '3P', '3PA', 'FT', 'FTA',
-                'ORB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS']:
-        val = safe_float(last.get(f'Totals_{col}'))
-        row[col] = (val / g) if (val is not None and g and g > 0) else None
-
-    for short, key_col in [('FG%', 'Shooting_FG%'), ('3P%', 'Shooting_3P%'), ('FT%', 'Shooting_FT%')]:
-        row[short] = safe_float(last.get(key_col))
-
-    row['MP']  = safe_float(last.get('Per Game_MP'))
-    row['Age'] = safe_float(last.get('Age'))
-
-    college_cache[name] = row
-    new_scrapes += 1
-    print(f'    → stats captured ({new_scrapes} new this run)')
-
-    if new_scrapes % 20 == 0:
+    if new_scrapes % 20 == 0 and new_scrapes > 0:
         save_json(COLLEGE_CACHE, college_cache)
+        save_json(ADV_CACHE, adv_cache)
         print(f'    [checkpoint saved]')
 
 save_json(COLLEGE_CACHE, college_cache)
+save_json(ADV_CACHE, adv_cache)
 print(f'College cache saved ({new_scrapes} new entries)')
 
 # Load ages cache (populated by scrape_ages.py)
@@ -331,6 +433,37 @@ for name, url_path in draft_players.items():
                            and feat.get('c_2PA', 0) and feat['c_2PA'] > 0)
                        else np.nan)
     feat['c_inv_pick'] = 1.0 / float(pick)
+
+    # ── Derived features (mirror what's added to cal at training time) ──────────
+    pts  = feat.get('c_PTS', np.nan)
+    mp   = safe_float(cstats.get('MP')) or np.nan
+    stl  = feat.get('c_STL', np.nan)
+    blk  = feat.get('c_BLK', np.nan)
+    ast  = feat.get('c_AST', np.nan)
+    orb  = feat.get('c_ORB', np.nan)
+    trb  = feat.get('c_TRB', np.nan)
+    fta_ = feat.get('c_FTA', np.nan)
+    tp_  = feat.get('c_3P', np.nan)
+
+    def _d(a, b, scale=1.0):
+        return a / b * scale if (not np.isnan(a) and not np.isnan(b) and b != 0) else np.nan
+
+    feat['c_TSp']   = _d(pts, 2 * (fga + 0.44 * fta_)) if not np.isnan(fga) and not np.isnan(fta_) else np.nan
+    feat['c_eFGp']  = _d(fg + 0.5 * tp_, fga) if not np.isnan(tp_) else np.nan
+    feat['c_3PAr']  = _d(feat.get('c_3PA', np.nan), fga)
+    feat['c_FTr']   = _d(fta_, fga)
+    feat['c_STL40'] = _d(stl, mp, 40)
+    feat['c_BLK40'] = _d(blk, mp, 40)
+    feat['c_AST40'] = _d(ast, mp, 40)
+    feat['c_ORB40'] = _d(orb, mp, 40)
+    feat['c_TRB40'] = _d(trb, mp, 40)
+    feat['c_PTS40'] = _d(pts, mp, 40)
+
+    # Advanced rate stats from adv_cache (populated by enrich_college_adv.py
+    # for calibration players, and by step 3 above for new draftees)
+    adv_entry = adv_cache.get(name, {})
+    for dest_col in ADV_COL_SRC:
+        feat[dest_col] = float(adv_entry[dest_col]) if dest_col in adv_entry else np.nan
 
     # Fill any remaining NaN with training-set column means
     x_vec = np.array([feat.get(f, np.nan) for f in features])
