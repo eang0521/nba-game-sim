@@ -1175,49 +1175,118 @@ function initPlayoffs() {
     seeds[conf]=s;
     s.forEach((abbr,i)=>{ seedNums[conf][abbr]=i+1; });
   }
-  playoffState={round:0,seedNums,seeds,r1:{East:[],West:[]},r2:{East:[],West:[]},cf:{East:null,West:null},finals:null};
+  playoffState={round:0,seedNums,seeds,r1:{East:[],West:[]},r2:{East:[],West:[]},cf:{East:null,West:null},finals:null,activeSeries:[]};
   renderPlayoffBracket();
   const btn=document.getElementById('playoffsBtn');
   btn.textContent='Simulate First Round'; btn.style.display=''; btn.disabled=false;
+}
+
+// ── Step-by-step series helpers ────────────────────────────────────────
+
+function createSeriesState(t1, t2, roundNum, conf, confIdx) {
+  const rec1=teamRecords[t1]||{w:0,g:1}, rec2=teamRecords[t2]||{w:0,g:1};
+  return {
+    t1, t2, roundNum, conf, confIdx,
+    t1SeriesHome: (rec1.w/Math.max(1,rec1.g)) >= (rec2.w/Math.max(1,rec2.g)),
+    w1:0, w2:0, games:[], seriesPts:{},
+    done:false, winner:null, loser:null, wins:0, losses:0, leaders:{},
+  };
+}
+
+function simOneSeriesGame(state) {
+  const {pattern, winsNeeded}=getSeriesConfig(state.roundNum);
+  const gn=state.games.length;
+  const seriesHomeIsHome=pattern[gn]??true;
+  const t1Home=state.t1SeriesHome?seriesHomeIsHome:!seriesHomeIsHome;
+  const home=t1Home?state.t1:state.t2, away=t1Home?state.t2:state.t1;
+  const r=simGame(home,away,currentTeamsData,false);
+  const t1Won=(t1Home&&r.homeScore>r.awayScore)||(!t1Home&&r.awayScore>r.homeScore);
+  if(t1Won) state.w1++; else state.w2++;
+  let homeLeader=null, awayLeader=null;
+  for (const [name,ps] of Object.entries(r.gamePlayers)) {
+    const entry={name,pts:ps.pts};
+    if(ps.team===home){if(!homeLeader||ps.pts>homeLeader.pts) homeLeader=entry;}
+    else              {if(!awayLeader||ps.pts>awayLeader.pts) awayLeader=entry;}
+    if(!state.seriesPts[name]) state.seriesPts[name]={team:ps.team,pts:0,reb:0,ast:0,stl:0,blk:0,gp:0};
+    const sp=state.seriesPts[name];
+    sp.pts+=ps.pts; sp.reb+=ps.reb||0; sp.ast+=ps.ast||0; sp.stl+=ps.stl||0; sp.blk+=ps.blk||0; sp.gp++;
+  }
+  state.games.push({home,away,hs:r.homeScore,as:r.awayScore,t1Won,homeLeader,awayLeader});
+  if(state.w1>=winsNeeded||state.w2>=winsNeeded) {
+    state.done=true;
+    state.winner=state.w1>=winsNeeded?state.t1:state.t2;
+    state.loser =state.w1>=winsNeeded?state.t2:state.t1;
+    state.wins  =Math.max(state.w1,state.w2);
+    state.losses=Math.min(state.w1,state.w2);
+    const seriesLeader=(abbr)=>{
+      let best=null;
+      for(const [name,s] of Object.entries(state.seriesPts)){
+        if(s.team!==abbr||s.gp===0) continue;
+        const ppg=s.pts/s.gp;
+        if(!best||ppg>best.ppg) best={name,ppg};
+      }
+      return best;
+    };
+    state.leaders={[state.t1]:seriesLeader(state.t1),[state.t2]:seriesLeader(state.t2)};
+  }
+}
+
+function setupActiveRound() {
+  const ps=playoffState;
+  const series=[];
+  if(ps.round===0) {
+    for(const conf of ['East','West']) {
+      const s=ps.seeds[conf];
+      series.push(createSeriesState(s[0],s[7],0,conf,0));
+      series.push(createSeriesState(s[1],s[6],0,conf,1));
+      series.push(createSeriesState(s[2],s[5],0,conf,2));
+      series.push(createSeriesState(s[3],s[4],0,conf,3));
+    }
+  } else if(ps.round===1) {
+    for(const conf of ['East','West']) {
+      const r=ps.r1[conf];
+      series.push(createSeriesState(r[0].winner,r[3].winner,1,conf,0));
+      series.push(createSeriesState(r[1].winner,r[2].winner,1,conf,1));
+    }
+  } else if(ps.round===2) {
+    for(const conf of ['East','West']) {
+      const r=ps.r2[conf];
+      series.push(createSeriesState(r[0].winner,r[1].winner,2,conf,0));
+    }
+  } else if(ps.round===3) {
+    series.push(createSeriesState(ps.cf.East.winner,ps.cf.West.winner,3,'Finals',0));
+  }
+  ps.activeSeries=series;
+}
+
+function harvestRound() {
+  const ps=playoffState;
+  for(const s of ps.activeSeries) {
+    const result={winner:s.winner,loser:s.loser,wins:s.wins,losses:s.losses,games:s.games,seriesStats:s.seriesPts,leaders:s.leaders};
+    if(ps.round===0)      ps.r1[s.conf][s.confIdx]=result;
+    else if(ps.round===1) ps.r2[s.conf][s.confIdx]=result;
+    else if(ps.round===2) ps.cf[s.conf]=result;
+    else if(ps.round===3) ps.finals=result;
+  }
 }
 
 function advancePlayoffs() {
   const btn=document.getElementById('playoffsBtn');
   btn.disabled=true;
   const ps=playoffState;
-  if (ps.round>=4) { initPlayoffs(); return; }
+  if(ps.round>=4){ initPlayoffs(); return; }
   setTimeout(()=>{
-    if (ps.round===0) {
-      for (const conf of ['East','West']) {
-        const s=ps.seeds[conf];
-        ps.r1[conf]=[
-          simSeries(s[0],s[7],currentTeamsData,0),
-          simSeries(s[1],s[6],currentTeamsData,0),
-          simSeries(s[2],s[5],currentTeamsData,0),
-          simSeries(s[3],s[4],currentTeamsData,0),
-        ];
-      }
-      ps.round=1; btn.textContent='Simulate Conference Semifinals';
-    } else if (ps.round===1) {
-      for (const conf of ['East','West']) {
-        const r=ps.r1[conf];
-        ps.r2[conf]=[
-          simSeries(r[0].winner,r[3].winner,currentTeamsData,1),
-          simSeries(r[1].winner,r[2].winner,currentTeamsData,1),
-        ];
-      }
-      ps.round=2; btn.textContent='Simulate Conference Finals';
-    } else if (ps.round===2) {
-      for (const conf of ['East','West']) {
-        const r=ps.r2[conf];
-        ps.cf[conf]=simSeries(r[0].winner,r[1].winner,currentTeamsData,2);
-      }
-      ps.round=3; btn.textContent='Simulate NBA Finals';
-    } else if (ps.round===3) {
-      ps.finals=simSeries(ps.cf.East.winner,ps.cf.West.winner,currentTeamsData,3);
-      ps.round=4; btn.textContent='Re-Simulate Playoffs';
+    if(ps.activeSeries.length===0) setupActiveRound();
+    for(const s of ps.activeSeries) { if(!s.done) simOneSeriesGame(s); }
+    if(ps.activeSeries.every(s=>s.done)) {
+      harvestRound();
+      ps.round++;
+      ps.activeSeries=[];
     }
     renderPlayoffBracket();
+    const roundLabels=['Simulate First Round','Simulate Conference Semifinals','Simulate Conference Finals','Simulate NBA Finals'];
+    const inProgress=ps.activeSeries.length>0&&!ps.activeSeries.every(s=>s.done);
+    btn.textContent=ps.round>=4?'Re-Simulate Playoffs':inProgress?'Next Games':roundLabels[ps.round];
     btn.disabled=false;
   }, 20);
 }
@@ -1233,18 +1302,17 @@ function renderPlayoffBracket() {
     return n!=null?`<span class="seed-num">#${n}</span> `:'';
   };
 
+  const gameLogRows=(games)=>games.map((g,i)=>{
+    let leaders='';
+    if(g.homeLeader||g.awayLeader){
+      const hl=g.homeLeader?`${esc(shortName(g.homeLeader.name))} ${g.homeLeader.pts}`:'';
+      const al=g.awayLeader?`${esc(shortName(g.awayLeader.name))} ${g.awayLeader.pts}`:'';
+      leaders=`<span class="game-leaders">${[hl,al].filter(Boolean).join(' · ')}</span>`;
+    }
+    return `<div class="game-row">G${i+1}: ${esc(g.home)} <strong>${g.hs}</strong>–<strong>${g.as}</strong> ${esc(g.away)}${leaders}</div>`;
+  }).join('');
+
   const seriesCard=(s,isFinals=false)=>{
-    // Option B: per-game scoring leaders in the game log
-    const gameRows=s.games.map((g,i)=>{
-      let leaders='';
-      if (g.homeLeader||g.awayLeader) {
-        const hl=g.homeLeader?`${esc(shortName(g.homeLeader.name))} ${g.homeLeader.pts}`:'';
-        const al=g.awayLeader?`${esc(shortName(g.awayLeader.name))} ${g.awayLeader.pts}`:'';
-        leaders=`<span class="game-leaders">${[hl,al].filter(Boolean).join(' · ')}</span>`;
-      }
-      return `<div class="game-row">G${i+1}: ${esc(g.home)} <strong>${g.hs}</strong>–<strong>${g.as}</strong> ${esc(g.away)}${leaders}</div>`;
-    }).join('');
-    // Option A: series leading scorers
     const wL=s.leaders?.[s.winner], lL=s.leaders?.[s.loser];
     const leadersHtml=(wL||lL)?`<div class="series-leaders">${
       wL?`<span class="sl-w">${esc(shortName(wL.name))} ${wL.ppg.toFixed(1)}</span>`:''}${
@@ -1262,16 +1330,39 @@ function renderPlayoffBracket() {
       ${leadersHtml}
       <details class="series-games">
         <summary>Game log (${s.wins+s.losses} games) ▾</summary>
-        <div class="game-list">${gameRows}</div>
+        <div class="game-list">${gameLogRows(s.games)}</div>
       </details>
     </div>`;
   };
+
+  const inProgressCard=(state)=>{
+    const t1Leads=state.w1>state.w2, t2Leads=state.w2>state.w1;
+    return `<div class="series-card" style="border-color:#3b5bdb">
+      <div class="series-summary">
+        <span class="${t1Leads?'winner':''}">${logoTag(state.t1)}${sl(state.t1)}${esc(state.t1)}</span>
+        <span class="series-record">${state.w1}–${state.w2}</span>
+        <span class="vs-word">vs</span>
+        <span class="${t2Leads?'winner':''}">${logoTag(state.t2)}${sl(state.t2)}${esc(state.t2)}</span>
+      </div>
+      ${state.games.length>0?`<details class="series-games">
+        <summary>Game log (${state.games.length} game${state.games.length!==1?'s':''}) ▾</summary>
+        <div class="game-list">${gameLogRows(state.games)}</div>
+      </details>`:''}
+    </div>`;
+  };
+
+  const asResult=(s)=>({winner:s.winner,loser:s.loser,wins:s.wins,losses:s.losses,games:s.games,seriesStats:s.seriesPts,leaders:s.leaders});
 
   const pendingCard=(a1,a2)=>`<div class="series-card pending">
     ${logoTag(a1)}${sl(a1)}${esc(a1)} <span class="vs-word">vs</span> ${logoTag(a2)}${sl(a2)}${esc(a2)}
   </div>`;
 
   const tbdCard=(msg)=>`<div class="series-card pending" style="font-style:italic;font-size:.73rem">${msg}</div>`;
+
+  const getActive=(roundNum,conf)=>ps.activeSeries.filter(s=>s.roundNum===roundNum&&s.conf===conf);
+
+  const showActive=(roundNum,conf,isFinals=false)=>
+    getActive(roundNum,conf).map(s=>s.done?seriesCard(asResult(s),isFinals):inProgressCard(s)).join('');
 
   let html='';
   html+='<div class="bracket-grid">';
@@ -1280,19 +1371,22 @@ function renderPlayoffBracket() {
     html+=`<div class="bracket-conf"><div class="bracket-conf-label">${esc(conf)}ern Conference</div>`;
 
     html+=`<div class="bracket-round"><div class="round-label">First Round</div>`;
-    if (ps.round>=1) { for (const sr of ps.r1[conf]) html+=seriesCard(sr); }
+    if(ps.round>0) { for(const sr of ps.r1[conf]) html+=seriesCard(sr); }
+    else if(ps.activeSeries.length>0) { html+=showActive(0,conf); }
     else { html+=pendingCard(s[0],s[7])+pendingCard(s[1],s[6])+pendingCard(s[2],s[5])+pendingCard(s[3],s[4]); }
     html+='</div>';
 
     html+=`<div class="bracket-round"><div class="round-label">Conference Semifinals</div>`;
-    if (ps.round>=2) { for (const sr of ps.r2[conf]) html+=seriesCard(sr); }
-    else if (ps.round>=1) { html+=pendingCard(ps.r1[conf][0].winner,ps.r1[conf][3].winner)+pendingCard(ps.r1[conf][1].winner,ps.r1[conf][2].winner); }
+    if(ps.round>1) { for(const sr of ps.r2[conf]) html+=seriesCard(sr); }
+    else if(ps.round===1&&ps.activeSeries.length>0) { html+=showActive(1,conf); }
+    else if(ps.round>=1) { html+=pendingCard(ps.r1[conf][0].winner,ps.r1[conf][3].winner)+pendingCard(ps.r1[conf][1].winner,ps.r1[conf][2].winner); }
     else { html+=tbdCard('After First Round'); }
     html+='</div>';
 
     html+=`<div class="bracket-round"><div class="round-label">Conference Finals</div>`;
-    if (ps.round>=3&&ps.cf[conf]) { html+=seriesCard(ps.cf[conf]); }
-    else if (ps.round>=2) { html+=pendingCard(ps.r2[conf][0].winner,ps.r2[conf][1].winner); }
+    if(ps.round>2&&ps.cf[conf]) { html+=seriesCard(ps.cf[conf]); }
+    else if(ps.round===2&&ps.activeSeries.length>0) { html+=showActive(2,conf); }
+    else if(ps.round>=2) { html+=pendingCard(ps.r2[conf][0].winner,ps.r2[conf][1].winner); }
     else { html+=tbdCard('After Semifinals'); }
     html+='</div>';
 
@@ -1301,8 +1395,9 @@ function renderPlayoffBracket() {
   html+='</div>';
 
   html+=`<div class="finals-section"><div class="finals-label">NBA Finals</div>`;
-  if (ps.round>=4&&ps.finals) { html+=seriesCard(ps.finals,true); }
-  else if (ps.round>=3&&ps.cf.East&&ps.cf.West) { html+=pendingCard(ps.cf.East.winner,ps.cf.West.winner); }
+  if(ps.round>=4&&ps.finals) { html+=seriesCard(ps.finals,true); }
+  else if(ps.round===3&&ps.activeSeries.length>0) { html+=showActive(3,'Finals',true); }
+  else if(ps.round>=3&&ps.cf.East&&ps.cf.West) { html+=pendingCard(ps.cf.East.winner,ps.cf.West.winner); }
   else { html+=tbdCard('After Conference Finals'); }
   html+='</div>';
 
