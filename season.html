@@ -179,6 +179,7 @@
     <a href="teams.html" class="nav-link">Teams</a>
     <a href="how-it-works.html" class="nav-link">How This Works</a>
     <a href="rulebook.html" class="nav-link">Rulebook</a>
+    <a href="settings.html" class="nav-link">Settings</a>
   </nav>
 </header>
 
@@ -298,6 +299,35 @@ let playInSeeds     = { East:{}, West:{} };
 let currentYear     = 2026;
 let currentTeamsData = {};
 let playInDone      = false;
+let activeSimSettings = null;
+
+// ── Settings ──────────────────────────────────────────────────────────
+const SIM_DEFAULTS = {
+  ratingUncertainty: false, uncertaintyStdev: 3,
+  playoffMode: 'step', homeCourtAdvantage: true,
+  showLeaders: true, showAwards: true,
+};
+function loadSettings() {
+  try { return { ...SIM_DEFAULTS, ...JSON.parse(localStorage.getItem('nbaSimSettings') || '{}') }; }
+  catch { return { ...SIM_DEFAULTS }; }
+}
+function randNormal(std) {
+  const u1=Math.random(), u2=Math.random();
+  return std * Math.sqrt(-2*Math.log(u1)) * Math.cos(2*Math.PI*u2);
+}
+function perturbRosters(original, std) {
+  const out={};
+  for (const [team,players] of Object.entries(original)) {
+    out[team]=players.map(p=>({
+      name:  p.name,
+      t_2pt: Math.max(0, p.t_2pt+Math.round(randNormal(std))),
+      t_3pt: Math.max(0, p.t_3pt+Math.round(randNormal(std))),
+      t_def: Math.max(0, p.t_def+Math.round(randNormal(std))),
+      t_reb: Math.max(0, p.t_reb+Math.round(randNormal(std))),
+    }));
+  }
+  return out;
+}
 
 function seasonLabel(y) { return `${y-1}-${String(y).slice(2)}`; }
 
@@ -666,7 +696,7 @@ function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
   if (!homeRaw || !awayRaw) return null;
   const homeTeam = new Team(homeAbbr, homeRaw);
   const awayTeam = new Team(awayAbbr, awayRaw);
-  applyHomeBonus(homeTeam);
+  if (!activeSimSettings || activeSimSettings.homeCourtAdvantage) applyHomeBonus(homeTeam);
   const game = new Game(homeTeam, awayTeam, true);
   game.run();
   if (recordStats) {
@@ -948,8 +978,13 @@ function renderAwards() {
 function runSeason() {
   const year = document.getElementById('year').value;
   currentYear = parseInt(year);
-  currentTeamsData = allData[year];
-  if (!currentTeamsData) return;
+  const baseTeamsData = allData[year];
+  if (!baseTeamsData) return;
+
+  activeSimSettings = loadSettings();
+  currentTeamsData = activeSimSettings.ratingUncertainty
+    ? perturbRosters(baseTeamsData, activeSimSettings.uncertaintyStdev)
+    : baseTeamsData;
 
   teamRecords={}; playerSeasonStats={}; confStandings={East:[],West:[]};
   playInSeeds={East:{},West:{}}; playInDone=false; playoffState=null;
@@ -963,10 +998,18 @@ function runSeason() {
     for (const g of schedule) simGame(g.home,g.away,currentTeamsData);
     buildStandings();
     renderStandings();
-    renderLeaders('ppg');
-    renderLeaderTabs();
-    renderTeamStatsSel();
-    renderAwards();
+    if (activeSimSettings.showLeaders) {
+      renderLeaders('ppg'); renderLeaderTabs(); renderTeamStatsSel();
+      document.getElementById('leadersSection').style.display='';
+    } else {
+      document.getElementById('leadersSection').style.display='none';
+    }
+    if (activeSimSettings.showAwards) {
+      renderAwards();
+      document.getElementById('awardsSection').style.display='';
+    } else {
+      document.getElementById('awardsSection').style.display='none';
+    }
     setupPostSeason();
     document.getElementById('results').style.display='';
     btn.disabled=false; btn.textContent='Re-Simulate';
@@ -1275,9 +1318,15 @@ function advancePlayoffs() {
   btn.disabled=true;
   const ps=playoffState;
   if(ps.round>=4){ initPlayoffs(); return; }
+  const mode=activeSimSettings ? activeSimSettings.playoffMode : 'step';
   setTimeout(()=>{
     if(ps.activeSeries.length===0) setupActiveRound();
-    for(const s of ps.activeSeries) { if(!s.done) simOneSeriesGame(s); }
+    if(mode==='round') {
+      while(!ps.activeSeries.every(s=>s.done))
+        for(const s of ps.activeSeries) { if(!s.done) simOneSeriesGame(s); }
+    } else {
+      for(const s of ps.activeSeries) { if(!s.done) simOneSeriesGame(s); }
+    }
     if(ps.activeSeries.every(s=>s.done)) {
       harvestRound();
       ps.round++;

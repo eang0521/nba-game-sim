@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — NBA Game Simulator</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .container { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    section { margin-bottom: 2rem; }
+
+    .setting-card {
+      background: #141929; border: 1px solid #1e2d5a;
+      border-radius: 10px; overflow: hidden; margin-bottom: .75rem;
+    }
+
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1.5rem; padding: .9rem 1.25rem;
+    }
+    .setting-row + .setting-row { border-top: 1px solid #1a2235; }
+    .sub-setting { background: #0c101a; }
+
+    .setting-text { flex: 1; min-width: 0; }
+    .setting-label { font-size: .88rem; font-weight: 700; color: #e2e8f0; margin-bottom: .2rem; }
+    .setting-desc  { font-size: .72rem; color: #64748b; line-height: 1.45; }
+
+    /* Toggle */
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #2d3f6e; border-radius: 24px; transition: background .2s;
+    }
+    .toggle-track::before {
+      content: ''; position: absolute;
+      height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background: #64748b; border-radius: 50%; transition: transform .2s, background .2s;
+    }
+    .toggle input:checked + .toggle-track { background: #3b5bdb; }
+    .toggle input:checked + .toggle-track::before { transform: translateX(20px); background: #fff; }
+
+    /* Stdev slider */
+    .stdev-control { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
+    .stdev-control input[type=range] { width: 100px; accent-color: #3b5bdb; cursor: pointer; }
+    .stdev-badge {
+      background: #1e2d5a; color: #748ffc; font-size: .78rem; font-weight: 800;
+      border-radius: 5px; padding: .2rem .55rem; min-width: 28px; text-align: center;
+    }
+
+    /* Radio group */
+    .radio-group { display: flex; flex-direction: column; gap: .35rem; padding: .75rem 1rem 1rem; }
+    .radio-option {
+      display: flex; align-items: flex-start; gap: .75rem;
+      cursor: pointer; padding: .55rem .75rem; border-radius: 7px; transition: background .15s;
+    }
+    .radio-option:hover { background: #1a2235; }
+    .radio-option input[type=radio] { margin-top: .22rem; accent-color: #3b5bdb; flex-shrink: 0; }
+    .option-label { font-size: .85rem; font-weight: 700; color: #e2e8f0; }
+    .option-desc  { font-size: .72rem; color: #64748b; margin-top: .1rem; line-height: 1.4; }
+
+    /* Section separator inside card */
+    .card-divider { height: 1px; background: #1a2235; margin: 0 1.25rem; }
+
+    .reset-row { display: flex; justify-content: flex-end; margin-top: 1.75rem; }
+    .btn-reset {
+      background: #141929; color: #748ffc; border: 1px solid #2d3f6e;
+      border-radius: 6px; padding: .45rem 1rem; font-size: .82rem; font-weight: 700;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-reset:hover { background: #1e2d5a; }
+
+    .saved-toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: #1e3a5f; border: 1px solid #3b5bdb; border-radius: 8px;
+      padding: .55rem 1.1rem; color: #c8d3f5; font-size: .8rem; font-weight: 700;
+      opacity: 0; transition: opacity .2s; pointer-events: none;
+    }
+    .saved-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>NBA Game Simulator</h1>
+    <span class="badge">2026–27 Season</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="simulator.html" class="nav-link">Instant Results</a>
+    <a href="live.html" class="nav-link">Live Sim</a>
+    <a href="season.html" class="nav-link">Season</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="how-it-works.html" class="nav-link">How This Works</a>
+    <a href="rulebook.html" class="nav-link">Rulebook</a>
+    <a href="settings.html" class="nav-link active">Settings</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Settings</div>
+      <div class="page-subtitle">Customize your simulation experience — changes apply immediately</div>
+    </div>
+  </div>
+
+  <!-- ── Season Simulation ───────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Season Simulation</div>
+
+    <div class="setting-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-label">Rating Uncertainty</div>
+          <div class="setting-desc">Before each season sim, apply independent N(0, σ) noise to every player's 2PS, 3PS, DEF, and REB ratings (rounded to the nearest integer). Models real-world variance in player performance.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="ratingUncertainty">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="setting-row sub-setting" id="stdevRow" style="display:none">
+        <div class="setting-text">
+          <div class="setting-label">Noise Std Dev (σ)</div>
+          <div class="setting-desc">Points of rating variance per stat per player. σ = 3 means ~95% of changes stay within ±6 rating points.</div>
+        </div>
+        <div class="stdev-control">
+          <input type="range" id="uncertaintyStdev" min="1" max="10" step="1" value="3">
+          <span class="stdev-badge" id="stdevVal">3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-label">Home Court Advantage</div>
+          <div class="setting-desc">The home team receives +1 to all four ratings (2PS, 3PS, DEF, REB) for the duration of each game.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="homeCourtAdvantage" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Playoffs ────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Playoffs</div>
+    <div class="setting-card">
+      <div class="setting-row" style="padding-bottom:.75rem">
+        <div class="setting-text">
+          <div class="setting-label">Series Simulation Mode</div>
+          <div class="setting-desc">Controls how playoff series advance on the Season page.</div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="playoffMode" value="step">
+          <div>
+            <div class="option-label">Game by Game</div>
+            <div class="option-desc">Each button press simulates one game per active series. Watch the bracket fill in game by game across all simultaneous series.</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="playoffMode" value="round">
+          <div>
+            <div class="option-label">Round by Round</div>
+            <div class="option-desc">Each button press completes an entire round instantly. Faster for reviewing full bracket results.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Display ─────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Display</div>
+    <div class="setting-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-label">Show Statistical Leaders</div>
+          <div class="setting-desc">Display PPG, RPG, APG, and other per-game leader tables after simulating a season.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="showLeaders" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-label">Show Season Awards</div>
+          <div class="setting-desc">Display MVP, DPOY, ROY, and All-NBA / All-Defensive / All-Rookie teams after simulating a season.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="showAwards" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <div class="reset-row">
+    <button class="btn-reset" onclick="resetDefaults()">Reset to Defaults</button>
+  </div>
+</div>
+
+<div class="saved-toast" id="toast">Settings saved</div>
+
+<script>
+'use strict';
+
+const DEFAULT_SETTINGS = {
+  ratingUncertainty: false,
+  uncertaintyStdev: 3,
+  playoffMode: 'step',
+  homeCourtAdvantage: true,
+  showLeaders: true,
+  showAwards: true,
+};
+
+function loadSettings() {
+  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem('nbaSimSettings') || '{}') }; }
+  catch { return { ...DEFAULT_SETTINGS }; }
+}
+
+function saveSettings() {
+  const s = {
+    ratingUncertainty:  document.getElementById('ratingUncertainty').checked,
+    uncertaintyStdev:   parseInt(document.getElementById('uncertaintyStdev').value),
+    playoffMode:        document.querySelector('input[name="playoffMode"]:checked')?.value || 'step',
+    homeCourtAdvantage: document.getElementById('homeCourtAdvantage').checked,
+    showLeaders:        document.getElementById('showLeaders').checked,
+    showAwards:         document.getElementById('showAwards').checked,
+  };
+  localStorage.setItem('nbaSimSettings', JSON.stringify(s));
+  showToast();
+}
+
+let _toastTimer = null;
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+function resetDefaults() {
+  localStorage.removeItem('nbaSimSettings');
+  applyToUI(DEFAULT_SETTINGS);
+  showToast();
+}
+
+function applyToUI(s) {
+  document.getElementById('ratingUncertainty').checked = s.ratingUncertainty;
+  document.getElementById('uncertaintyStdev').value    = s.uncertaintyStdev;
+  document.getElementById('stdevVal').textContent      = s.uncertaintyStdev;
+  document.getElementById('stdevRow').style.display    = s.ratingUncertainty ? '' : 'none';
+  const modeEl = document.querySelector(`input[name="playoffMode"][value="${s.playoffMode}"]`);
+  if (modeEl) modeEl.checked = true;
+  document.getElementById('homeCourtAdvantage').checked = s.homeCourtAdvantage;
+  document.getElementById('showLeaders').checked        = s.showLeaders;
+  document.getElementById('showAwards').checked         = s.showAwards;
+}
+
+applyToUI(loadSettings());
+
+// Listeners — auto-save on any change
+document.getElementById('ratingUncertainty').addEventListener('change', function() {
+  document.getElementById('stdevRow').style.display = this.checked ? '' : 'none';
+  saveSettings();
+});
+document.getElementById('uncertaintyStdev').addEventListener('input', function() {
+  document.getElementById('stdevVal').textContent = this.value;
+  saveSettings();
+});
+['homeCourtAdvantage','showLeaders','showAwards'].forEach(id =>
+  document.getElementById(id).addEventListener('change', saveSettings));
+document.querySelectorAll('input[name="playoffMode"]').forEach(el =>
+  el.addEventListener('change', saveSettings));
+</script>
+</body>
+</html>
