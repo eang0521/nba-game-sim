@@ -68,9 +68,10 @@
     .leader-qualifier { font-size:.66rem; color:#475569; margin-top:.4rem; }
 
     /* ── Team player stats ─────── */
-    .team-stats-ctrl { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; }
+    .team-stats-ctrl { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; flex-wrap:wrap; }
     .team-stats-sub-label { font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#c5d0fc; white-space:nowrap; }
-    #teamStatsSel { font-size:.82rem; }
+    #teamStatsSel, #teamStatsView { font-size:.82rem; }
+    .ts-delta { font-size:.68rem; font-weight:700; color:#475569; }
     .ts-wrap { overflow-x:auto; }
     .ts-table { border-collapse:collapse; font-size:.75rem; table-layout:fixed; min-width:540px; }
     .ts-table col.tc-name { width:130px; }
@@ -1516,20 +1517,20 @@ function renderTeamRatings(abbr) {
 
   const showDelta = !!(activeSimSettings && activeSimSettings.ratingUncertainty);
 
-  const players = [...perturbed].sort((a,b) =>
-    (b.t_2pt+b.t_3pt+b.t_def+b.t_reb) - (a.t_2pt+a.t_3pt+a.t_def+a.t_reb));
+  // Sort by MPG descending (same order as stats table)
+  const players = [...perturbed].sort((a, b) => {
+    const sa = playerSeasonStats[a.name], sb = playerSeasonStats[b.name];
+    return (sb ? sb.sec / Math.max(1, sb.gp) : 0) - (sa ? sa.sec / Math.max(1, sa.gp) : 0);
+  });
 
   if (!players.length) {
     el.innerHTML = '<p style="color:#64748b;font-size:.82rem;margin-top:.5rem">No ratings available.</p>';
     return;
   }
 
-  const dc = (cur, base) => {
-    if (!showDelta) return `${cur}`;
-    const d = cur - base;
-    if (d === 0) return `${cur}`;
-    const cls = d > 0 ? 'pos-diff' : 'neg-diff';
-    return `${cur} <span class="${cls}" style="font-size:.67rem;font-weight:700">${d>0?'+':''}${d}</span>`;
+  const dTd = (d) => {
+    if (d === 0) return `<td class="ts-delta"></td>`;
+    return `<td class="ts-delta ${d > 0 ? 'pos-diff' : 'neg-diff'}">${d > 0 ? '+' : ''}${d}</td>`;
   };
 
   let rows = '';
@@ -1537,28 +1538,58 @@ function renderTeamRatings(abbr) {
     const b = baseMap[p.name] || p;
     const ovr = p.t_2pt+p.t_3pt+p.t_def+p.t_reb;
     const bOvr = b.t_2pt+b.t_3pt+b.t_def+b.t_reb;
-    rows += `<tr>
-      <td title="${esc(p.name)}">${esc(p.name)}</td>
-      <td>${dc(p.t_2pt, b.t_2pt)}</td>
-      <td>${dc(p.t_3pt, b.t_3pt)}</td>
-      <td>${dc(p.t_def, b.t_def)}</td>
-      <td>${dc(p.t_reb, b.t_reb)}</td>
-      <td><strong>${dc(ovr, bOvr)}</strong></td>
-    </tr>`;
+    if (showDelta) {
+      rows += `<tr>
+        <td title="${esc(p.name)}">${esc(p.name)}</td>
+        <td>${p.t_2pt}</td>${dTd(p.t_2pt-b.t_2pt)}
+        <td>${p.t_3pt}</td>${dTd(p.t_3pt-b.t_3pt)}
+        <td>${p.t_def}</td>${dTd(p.t_def-b.t_def)}
+        <td>${p.t_reb}</td>${dTd(p.t_reb-b.t_reb)}
+        <td><strong>${ovr}</strong></td>${dTd(ovr-bOvr)}
+      </tr>`;
+    } else {
+      rows += `<tr>
+        <td title="${esc(p.name)}">${esc(p.name)}</td>
+        <td>${p.t_2pt}</td><td>${p.t_3pt}</td><td>${p.t_def}</td><td>${p.t_reb}</td>
+        <td><strong>${ovr}</strong></td>
+      </tr>`;
+    }
   }
 
-  el.innerHTML = `<table class="ts-table">
-    <colgroup>
-      <col class="tc-name">
-      <col style="width:56px"><col style="width:56px">
-      <col style="width:56px"><col style="width:56px">
-      <col style="width:56px">
-    </colgroup>
-    <thead><tr>
-      <th>Player</th><th>2PS</th><th>3PS</th><th>DEF</th><th>REB</th><th>OVR</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>${showDelta ? '<div class="leader-qualifier">Δ from base ratings · uncertainty σ=' + esc(activeSimSettings.uncertaintyStdev) + '</div>' : ''}`;
+  if (showDelta) {
+    el.innerHTML = `<table class="ts-table">
+      <colgroup>
+        <col class="tc-name">
+        <col style="width:38px"><col style="width:28px">
+        <col style="width:38px"><col style="width:28px">
+        <col style="width:38px"><col style="width:28px">
+        <col style="width:38px"><col style="width:28px">
+        <col style="width:42px"><col style="width:28px">
+      </colgroup>
+      <thead><tr>
+        <th>Player</th>
+        <th>2PS</th><th class="ts-delta">Δ</th>
+        <th>3PS</th><th class="ts-delta">Δ</th>
+        <th>DEF</th><th class="ts-delta">Δ</th>
+        <th>REB</th><th class="ts-delta">Δ</th>
+        <th>OVR</th><th class="ts-delta">Δ</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="leader-qualifier">Δ from base ratings · uncertainty σ=${esc(String(activeSimSettings.uncertaintyStdev))}</div>`;
+  } else {
+    el.innerHTML = `<table class="ts-table">
+      <colgroup>
+        <col class="tc-name">
+        <col style="width:44px"><col style="width:44px">
+        <col style="width:44px"><col style="width:44px"><col style="width:44px">
+      </colgroup>
+      <thead><tr>
+        <th>Player</th><th>2PS</th><th>3PS</th><th>DEF</th><th>REB</th><th>OVR</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
 }
 
 function renderTeamStats(abbr) {
