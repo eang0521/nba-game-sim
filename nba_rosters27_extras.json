@@ -40,13 +40,6 @@
   ],
   "DAL": [
     {
-      "name": "Caleb Martin",
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 14,
-      "t_reb": 12
-    },
-    {
       "t_2pt": 11,
       "t_3pt": 12,
       "t_def": 11,
@@ -187,6 +180,13 @@
   ],
   "LAL": [
     {
+      "name": "Nick Smith Jr.",
+      "t_2pt": 10,
+      "t_3pt": 15,
+      "t_def": 8,
+      "t_reb": 12
+    },
+    {
       "name": "Jaden Hardy",
       "t_2pt": 10,
       "t_3pt": 17,
@@ -240,13 +240,6 @@
   ],
   "SAC": [
     {
-      "name": "Daeqwon Plowden",
-      "t_2pt": 10,
-      "t_3pt": 13,
-      "t_def": 10,
-      "t_reb": 11
-    },
-    {
       "name": "Nique Clifford",
       "t_2pt": 10,
       "t_3pt": 11,
@@ -289,6 +282,13 @@
       "t_3pt": 11,
       "t_def": 10,
       "t_reb": 11
+    },
+    {
+      "name": "Tre Mann",
+      "t_2pt": 9,
+      "t_3pt": 11,
+      "t_def": 9,
+      "t_reb": 10
     },
     {
       "name": "Leaky Black",
@@ -387,6 +387,13 @@
   ],
   "MIA": [
     {
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 10,
+      "t_reb": 12,
+      "name": "Otega Oweh"
+    },
+    {
       "name": "Jahmir Young",
       "t_2pt": 8,
       "t_3pt": 9,
@@ -458,18 +465,18 @@
   ],
   "CHO": [
     {
+      "name": "Dennis Schröder",
+      "t_2pt": 13,
+      "t_3pt": 14,
+      "t_def": 13,
+      "t_reb": 12
+    },
+    {
       "name": "Pat Connaughton",
       "t_2pt": 11,
       "t_3pt": 13,
       "t_def": 9,
       "t_reb": 13
-    },
-    {
-      "name": "Tre Mann",
-      "t_2pt": 9,
-      "t_3pt": 11,
-      "t_def": 9,
-      "t_reb": 10
     },
     {
       "name": "Dorian Finney-Smith",

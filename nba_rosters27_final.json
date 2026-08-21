@@ -299,13 +299,6 @@
       "t_reb": 16
     },
     {
-      "name": "Klay Thompson",
-      "t_2pt": 10,
-      "t_3pt": 22,
-      "t_def": 10,
-      "t_reb": 10
-    },
-    {
       "name": "Marcus Sasser",
       "t_2pt": 11,
       "t_3pt": 16,
@@ -318,6 +311,13 @@
       "t_3pt": 12,
       "t_def": 12,
       "t_reb": 13
+    },
+    {
+      "name": "Caleb Martin",
+      "t_2pt": 11,
+      "t_3pt": 11,
+      "t_def": 14,
+      "t_reb": 12
     }
   ],
   "DEN": [
@@ -343,11 +343,11 @@
       "t_reb": 17
     },
     {
-      "name": "Peyton Watson",
-      "t_2pt": 15,
-      "t_3pt": 16,
-      "t_def": 18,
-      "t_reb": 14
+      "name": "DeMar DeRozan",
+      "t_2pt": 22,
+      "t_3pt": 12,
+      "t_def": 16,
+      "t_reb": 13
     },
     {
       "name": "Cameron Johnson",
@@ -1027,6 +1027,13 @@
       "t_reb": 12
     },
     {
+      "name": "Max Strus",
+      "t_2pt": 12,
+      "t_3pt": 19,
+      "t_def": 8,
+      "t_reb": 16
+    },
+    {
       "name": "Jarred Vanderbilt",
       "t_2pt": 12,
       "t_3pt": 11,
@@ -1060,13 +1067,6 @@
       "t_3pt": 13,
       "t_def": 12,
       "t_reb": 11
-    },
-    {
-      "name": "Nick Smith Jr.",
-      "t_2pt": 10,
-      "t_3pt": 15,
-      "t_def": 8,
-      "t_reb": 12
     }
   ],
   "SAS": [
@@ -1185,13 +1185,6 @@
       "t_reb": 28
     },
     {
-      "name": "DeMar DeRozan",
-      "t_2pt": 22,
-      "t_3pt": 12,
-      "t_def": 16,
-      "t_reb": 13
-    },
-    {
       "name": "Russell Westbrook",
       "t_2pt": 15,
       "t_3pt": 17,
@@ -1281,6 +1274,13 @@
       "t_3pt": 10,
       "t_def": 12,
       "t_reb": 11
+    },
+    {
+      "name": "Daeqwon Plowden",
+      "t_2pt": 10,
+      "t_3pt": 13,
+      "t_def": 10,
+      "t_reb": 11
     }
   ],
   "CLE": [
@@ -1327,6 +1327,13 @@
       "t_reb": 16
     },
     {
+      "name": "Peyton Watson",
+      "t_2pt": 15,
+      "t_3pt": 16,
+      "t_def": 18,
+      "t_reb": 14
+    },
+    {
       "name": "Sam Merrill",
       "t_2pt": 11,
       "t_3pt": 25,
@@ -1355,13 +1362,6 @@
       "t_reb": 15
     },
     {
-      "name": "Max Strus",
-      "t_2pt": 12,
-      "t_3pt": 19,
-      "t_def": 8,
-      "t_reb": 16
-    },
-    {
       "name": "Lonzo Ball",
       "t_2pt": 11,
       "t_3pt": 14,
@@ -1383,11 +1383,11 @@
       "t_reb": 13
     },
     {
-      "name": "Dennis Schröder",
-      "t_2pt": 13,
-      "t_3pt": 14,
-      "t_def": 13,
-      "t_reb": 12
+      "name": "Mario Hezonja",
+      "t_2pt": 7,
+      "t_3pt": 7,
+      "t_def": 8,
+      "t_reb": 8
     }
   ],
   "WAS": [
@@ -2125,18 +2125,18 @@
       "t_reb": 13
     },
     {
+      "name": "Klay Thompson",
+      "t_2pt": 10,
+      "t_3pt": 22,
+      "t_def": 10,
+      "t_reb": 10
+    },
+    {
       "name": "Ryan Conwell",
       "t_2pt": 11,
       "t_3pt": 15,
       "t_def": 11,
       "t_reb": 12
-    },
-    {
-      "t_2pt": 11,
-      "t_3pt": 11,
-      "t_def": 10,
-      "t_reb": 12,
-      "name": "Otega Oweh"
     }
   ],
   "CHI": [
