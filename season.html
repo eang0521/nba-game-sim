@@ -233,6 +233,12 @@
       <div id="awardsContent"></div>
     </section>
 
+    <!-- Injury Report -->
+    <section id="injuriesSection" style="display:none">
+      <div class="section-title">Injury Report</div>
+      <div id="injuriesContent"></div>
+    </section>
+
     <!-- Play-In Tournament -->
     <section id="playinSection" style="display:none">
       <div class="section-title">Play-In Tournament</div>
@@ -305,11 +311,13 @@ let currentYear     = 2026;
 let currentTeamsData = {};
 let playInDone      = false;
 let activeSimSettings = null;
+let playerInjuries   = {};   // name -> {team, gamesRemaining, severe}
+let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severe}]
 
 // ── Settings ──────────────────────────────────────────────────────────
 const SIM_DEFAULTS = {
   ratingUncertainty: false, uncertaintyStdev: 3,
-  playoffMode: 'step', homeCourtAdvantage: true,
+  playoffMode: 'step', homeCourtAdvantage: true, injuriesEnabled: false,
   showLeaders: true, showAwards: true,
 };
 function loadSettings() {
@@ -381,7 +389,7 @@ class Player {
     this.ft_made=0; this.ft_attempted=0;
     this.rebounds=0; this.assists=0; this.steals=0; this.blocks=0;
     this.fouls=0; this.plus_minus=0;
-    this.on_court=false; this.fouled_out=false;
+    this.on_court=false; this.fouled_out=false; this.injured=false;
     this.positions_played={1:0,2:0,3:0,4:0,5:0}; this.current_position=null; this.team_ref=null;
   }
 }
@@ -400,13 +408,14 @@ class Team {
 
 // ── Game ─────────────────────────────────────────────────────────────
 class Game {
-  constructor(t1,t2,silent=false) {
-    this.t1=t1; this.t2=t2; this.silent=silent;
+  constructor(t1,t2,silent=false,phase='Regular Season') {
+    this.t1=t1; this.t2=t2; this.silent=silent; this.phase=phase;
     this.quarter=0; this.clock=0;
     this.possession=null; this.jumpball_winner=null;
     this.subs_waiting=false;
     this.t1_q_scores=[]; this.t2_q_scores=[];
     this.t1_last=0; this.t2_last=0; this.logs={};
+    this.pendingInjuries=[]; this.injuryEvents=[];
   }
   fmt() { const m=Math.floor(this.clock/60),s=this.clock%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
   log(msg) {
@@ -427,7 +436,7 @@ class Game {
     for(const team of [this.t1,this.t2]) {
       team.court=[]; team.players.forEach(p=>p.on_court=false);
       for(let s=0;s<5;s++) {
-        const bench=[...team.players].filter(p=>!p.on_court&&!p.fouled_out).sort((a,b)=>b.ovr-a.ovr);
+        const bench=[...team.players].filter(p=>!p.on_court&&!p.fouled_out&&!p.injured).sort((a,b)=>b.ovr-a.ovr);
         if(!bench.length) break;
         const r=rollD(20);
         const idx=r<=6?0:r<=11?Math.min(1,bench.length-1):r<=15?Math.min(2,bench.length-1):r<=18?Math.min(3,bench.length-1):Math.min(4,bench.length-1);
@@ -442,14 +451,14 @@ class Game {
       let n=forcedTeam.length&&!this.subs_waiting?1:Math.min(5,this.thresh(rollD(20),5)+1);
       n=Math.max(n,forcedTeam.length);
       const courtPool=[...team.court].sort((a,b)=>a.ovr-b.ovr);
-      const initBench=team.players.filter(p=>!p.on_court&&!p.fouled_out);
+      const initBench=team.players.filter(p=>!p.on_court&&!p.fouled_out&&!p.injured);
       const maxSubs=Math.min(n,courtPool.length,initBench.length);
       const outList=[],inList=[];
       for(let i=0;i<maxSubs;i++) {
         let outP;
         if(i<forcedTeam.length) { outP=forcedTeam[i]; }
         else { const v=courtPool.filter(p=>!outList.includes(p)&&p!==ftShooter); if(!v.length) break; outP=v[this.thresh(rollD(20),v.length)]; }
-        const validIn=[...team.players].filter(p=>!p.on_court&&!p.fouled_out&&!inList.includes(p)).sort((a,b)=>b.ovr-a.ovr).slice(0,5);
+        const validIn=[...team.players].filter(p=>!p.on_court&&!p.fouled_out&&!p.injured&&!inList.includes(p)).sort((a,b)=>b.ovr-a.ovr).slice(0,5);
         if(!validIn.length) break;
         outList.push(outP); inList.push(validIn[Math.min(this.thresh(rollD(20),5),validIn.length-1)]);
       }
@@ -474,6 +483,40 @@ class Game {
     if(player.fouls>=6){player.fouled_out=true;f.push(player);this.log(`${player.name} fouled out!`);}
     else if(player.fouls>=this.quarter+2){f.push(player);this.log(`${player.name} in foul trouble (${player.fouls}f).`);}
     return f;
+  }
+  rollInjuries() {
+    if (!activeSimSettings || !activeSimSettings.injuriesEnabled) return;
+    while (rollD(20)<=5) {
+      this.pendingInjuries.push({
+        quarter: rollD(4),                       // regulation quarters only
+        clock:   Math.floor(Math.random()*720),  // 0-719 seconds remaining
+        team:    rollD(2)===1?'t1':'t2',
+        applied: false,
+      });
+    }
+  }
+  checkInjuries() {
+    if (!this.pendingInjuries.length) return;
+    for (const inj of this.pendingInjuries) {
+      if (inj.applied || inj.quarter!==this.quarter || this.clock>inj.clock) continue;
+      inj.applied = true;
+      this.applyInjury(inj);
+    }
+  }
+  applyInjury(inj) {
+    const team=inj.team==='t1'?this.t1:this.t2, opp=inj.team==='t1'?this.t2:this.t1;
+    if (!team.court.length) return;
+    const player=team.court[Math.floor(Math.random()*team.court.length)];
+    player.injured=true;
+    const severe=rollD(100)<=2;
+    const raw=severe ? (50+randNormal(20)) : (10+randNormal(10));
+    const games=Math.max(0,Math.round(raw));
+    playerInjuries[player.name]={team:team.abbr,gamesRemaining:games,severe};
+    const evt={player:player.name,team:team.abbr,opp:opp.abbr,phase:this.phase,
+               quarter:this.quarter,clock:this.fmt(),games,severe};
+    this.injuryEvents.push(evt); seasonInjuryLog.push(evt);
+    this.log(`${player.name} is injured${severe?' (SEVERE)':''} — out an estimated ${games} game${games===1?'':'s'}`);
+    this.subs(null,[player]);
   }
   fts(shooter,n) {
     if(!n) return true; let madeLast=false;
@@ -502,7 +545,9 @@ class Game {
     }
   }
   poss(dice=4) {
-    if(this.clock<=0) return; if(!this.tick(dice)) return;
+    if(this.clock<=0) return;
+    const going=this.tick(dice); this.checkInjuries();
+    if(!going) return;
     const off=this.possession,def=off===this.t1?this.t2:this.t1;
     off.court.forEach(p=>p.team_ref=off); def.court.forEach(p=>p.team_ref=def);
     let ev=rollD(6);
@@ -515,11 +560,11 @@ class Game {
     if(ev===2) {
       const foulType=rollD(10),foulPos=Math.floor((rollD(10)-1)/2);
       if(foulType===1){
-        const fouler=offPv[foulPos],forced=this.foulOn(fouler); this.log(`${fouler.name} offensive foul`);
+        const fouler=offPv[Math.min(foulPos,offPv.length-1)],forced=this.foulOn(fouler); this.log(`${fouler.name} offensive foul`);
         if(this.bonus(off)){const shooter=def.court[Math.floor(Math.random()*def.court.length)];this.subs(shooter,forced);if(!this.fts(shooter,2)) this.rebCycle(def,off,shooter);else this.possession=off;}
         else{this.subs(null,forced);this.possession=def;}
       } else {
-        const fouler=defPv[foulPos],forced=this.foulOn(fouler);
+        const fouler=defPv[Math.min(foulPos,defPv.length-1)],forced=this.foulOn(fouler);
         def.defensive_fouls_qtr++;if(this.clock<=120) def.foul_in_last_2_mins=true;
         if(foulType<=6){
           this.log(`${fouler.name} defensive foul`);
@@ -527,11 +572,11 @@ class Game {
           else{this.subs(null,forced);this.poss(2);}
         } else {
           this.log(`${fouler.name} shooting foul`);
-          const offOff=off.byOff(),shooter=offOff[this.thresh(rollD(20),5)];
+          const offOff=off.byOff(),shooter=offOff[Math.min(this.thresh(rollD(20),5),offOff.length-1)];
           const s2=Math.max(1,shooter.t_2pt),s3=Math.max(1,shooter.t_3pt);
           const ratio=Math.round((s2*3)/((s2*3)+(s3*2))*100);
           let is2=rollD(100)<=ratio; if(!is2&&rollD(6)<=4) is2=true;
-          const pts=is2?2:3,defender=defPv[shooter.current_position-1];
+          const pts=is2?2:3,defender=defPv[Math.min(shooter.current_position-1,defPv.length-1)];
           const diff=(is2?shooter.t_2pt:shooter.t_3pt)-defender.t_def;
           const target=Math.round(diff*(is2?2/3:0.5))+(is2?54:36);
           const m1=rollD(100)<=target,m2=rollD(100)<=target;
@@ -548,10 +593,10 @@ class Game {
         }
       } return;
     }
-    const offOff=off.byOff(),shooter=offOff[this.thresh(rollD(20),5)];
+    const offOff=off.byOff(),shooter=offOff[Math.min(this.thresh(rollD(20),5),offOff.length-1)];
     const s2=Math.max(1,shooter.t_2pt),s3=Math.max(1,shooter.t_3pt);
     const ratio=Math.round((s2*3)/((s2*3)+(s3*2))*100),is2=rollD(100)<=ratio,pts=is2?2:3;
-    const defender=defPv[shooter.current_position-1];
+    const defender=defPv[Math.min(shooter.current_position-1,defPv.length-1)];
     const diff=(is2?shooter.t_2pt:shooter.t_3pt)-defender.t_def;
     const target=Math.round(diff*(is2?2/3:0.5))+(is2?54:36);
     shooter.fg_attempted++; if(!is2) shooter.tpt_attempted++;
@@ -573,7 +618,8 @@ class Game {
     this.t1.foul_in_last_2_mins=false;this.t2.foul_in_last_2_mins=false;
     this.startLineups(); this.t1.byPv(); this.t2.byPv();
     if(this.quarter===1||mins===5){
-      const c1=this.t1.byPv()[4],c2=this.t2.byPv()[4];
+      const t1pv=this.t1.byPv(),t2pv=this.t2.byPv();
+      const c1=t1pv[t1pv.length-1],c2=t2pv[t2pv.length-1];
       const r1=Math.max(1,c1.t_reb),r2=Math.max(1,c2.t_reb);
       if(rollD(r1+r2)<=r1){this.possession=this.t1;if(this.quarter===1)this.jumpball_winner=this.t1;}
       else{this.possession=this.t2;if(this.quarter===1)this.jumpball_winner=this.t2;}
@@ -586,6 +632,7 @@ class Game {
     this.t1_last=this.t1.score; this.t2_last=this.t2.score;
   }
   run() {
+    this.rollInjuries();
     for(let q=1;q<=4;q++){this.quarter=q;this.playQuarter(12);}
     let ot=1; while(this.t1.score===this.t2.score){this.quarter=4+ot;this.playQuarter(5);ot++;}
   }
@@ -696,13 +743,29 @@ function generateSchedule(teamsData) {
 }
 
 // ── Simulation helpers ────────────────────────────────────────────────
+function isAvailable(p) {
+  const inj = playerInjuries[p.name];
+  return !inj || inj.gamesRemaining<=0;
+}
+function decrementInjuries(roster) {
+  for (const p of roster) {
+    const inj = playerInjuries[p.name];
+    if (!inj) continue;
+    inj.gamesRemaining--;
+    if (inj.gamesRemaining<=0) delete playerInjuries[p.name];
+  }
+}
 function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
   const homeRaw = teamsData[homeAbbr], awayRaw = teamsData[awayAbbr];
   if (!homeRaw || !awayRaw) return null;
-  const homeTeam = new Team(homeAbbr, homeRaw);
-  const awayTeam = new Team(awayAbbr, awayRaw);
+  const injuriesOn = activeSimSettings && activeSimSettings.injuriesEnabled;
+  const homeAvail = injuriesOn ? homeRaw.filter(isAvailable) : homeRaw;
+  const awayAvail = injuriesOn ? awayRaw.filter(isAvailable) : awayRaw;
+  if (injuriesOn) { decrementInjuries(homeRaw); decrementInjuries(awayRaw); }
+  const homeTeam = new Team(homeAbbr, homeAvail);
+  const awayTeam = new Team(awayAbbr, awayAvail);
   if (!activeSimSettings || activeSimSettings.homeCourtAdvantage) applyHomeBonus(homeTeam);
-  const game = new Game(homeTeam, awayTeam, true);
+  const game = new Game(homeTeam, awayTeam, true, recordStats?'Regular Season':'Postseason');
   game.run();
   if (recordStats) {
     accumPlayerStats(homeTeam, homeAbbr);
@@ -921,6 +984,31 @@ function allTeamHTML(entries, label, statFn, startRank = 1) {
   </div>`;
 }
 
+function renderInjuries() {
+  const el = document.getElementById('injuriesContent');
+  if (!seasonInjuryLog.length) {
+    el.innerHTML = `<div style="color:#748ffc;padding:1rem 0">No injuries occurred this season.</div>`;
+    return;
+  }
+  const rows = [...seasonInjuryLog].reverse().map(e => `
+    <tr>
+      <td>${esc(e.player)}</td>
+      <td>${esc(e.team)}</td>
+      <td>vs ${esc(e.opp)}</td>
+      <td>${esc(e.phase)}</td>
+      <td>Q${e.quarter} ${esc(e.clock)}</td>
+      <td>${e.games}</td>
+      <td>${e.severe ? 'Severe' : ''}</td>
+    </tr>`).join('');
+  el.innerHTML = `
+    <table class="leader-table">
+      <thead><tr>
+        <th>Player</th><th>Team</th><th>Opponent</th><th>Phase</th><th>Time</th><th>Games Missed</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
 function renderAwards() {
   const entries = Object.entries(playerSeasonStats);
   // ROY/All-Rookie require at least one prior season of data to confirm who is
@@ -993,6 +1081,7 @@ function runSeason() {
 
   teamRecords={}; playerSeasonStats={}; confStandings={East:[],West:[]};
   playInSeeds={East:{},West:{}}; playInDone=false; playoffState=null;
+  playerInjuries={}; seasonInjuryLog=[];
 
   const btn=document.getElementById('simBtn');
   btn.disabled=true; btn.textContent='Simulating…';
@@ -1014,6 +1103,12 @@ function runSeason() {
       document.getElementById('awardsSection').style.display='';
     } else {
       document.getElementById('awardsSection').style.display='none';
+    }
+    if (activeSimSettings.injuriesEnabled) {
+      renderInjuries();
+      document.getElementById('injuriesSection').style.display='';
+    } else {
+      document.getElementById('injuriesSection').style.display='none';
     }
     setupPostSeason();
     document.getElementById('results').style.display='';
@@ -1179,6 +1274,7 @@ function runPlayIn() {
   renderPlayInResults(results);
   document.getElementById('playinBtn').style.display='none';
   document.getElementById('playoffsSection').style.display='';
+  if (activeSimSettings && activeSimSettings.injuriesEnabled) renderInjuries();
   initPlayoffs();
 }
 
@@ -1338,6 +1434,7 @@ function advancePlayoffs() {
       ps.activeSeries=[];
     }
     renderPlayoffBracket();
+    if (activeSimSettings && activeSimSettings.injuriesEnabled) renderInjuries();
     const roundLabels=['Simulate First Round','Simulate Conference Semifinals','Simulate Conference Finals','Simulate NBA Finals'];
     const inProgress=ps.activeSeries.length>0&&!ps.activeSeries.every(s=>s.done);
     btn.textContent=ps.round>=4?'Re-Simulate Playoffs':inProgress?'Next Games':roundLabels[ps.round];

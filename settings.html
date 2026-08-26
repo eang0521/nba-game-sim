@@ -151,6 +151,19 @@
         </label>
       </div>
     </div>
+
+    <div class="setting-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-label">Injuries</div>
+          <div class="setting-desc">Each game carries a chance of an in-game injury (1-in-4 per roll, re-rolled for multiples). Injured players sit out a random number of future games — regular season and playoffs alike — before returning.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="injuriesEnabled">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
   </section>
 
   <!-- ── Playoffs ────────────────────────────────────────────────── -->
@@ -225,6 +238,7 @@ const DEFAULT_SETTINGS = {
   uncertaintyStdev: 3,
   playoffMode: 'step',
   homeCourtAdvantage: true,
+  injuriesEnabled: false,
   showLeaders: true,
   showAwards: true,
 };
@@ -240,6 +254,7 @@ function saveSettings() {
     uncertaintyStdev:   parseInt(document.getElementById('uncertaintyStdev').value),
     playoffMode:        document.querySelector('input[name="playoffMode"]:checked')?.value || 'step',
     homeCourtAdvantage: document.getElementById('homeCourtAdvantage').checked,
+    injuriesEnabled:    document.getElementById('injuriesEnabled').checked,
     showLeaders:        document.getElementById('showLeaders').checked,
     showAwards:         document.getElementById('showAwards').checked,
   };
@@ -269,6 +284,7 @@ function applyToUI(s) {
   const modeEl = document.querySelector(`input[name="playoffMode"][value="${s.playoffMode}"]`);
   if (modeEl) modeEl.checked = true;
   document.getElementById('homeCourtAdvantage').checked = s.homeCourtAdvantage;
+  document.getElementById('injuriesEnabled').checked    = s.injuriesEnabled;
   document.getElementById('showLeaders').checked        = s.showLeaders;
   document.getElementById('showAwards').checked         = s.showAwards;
 }
@@ -284,7 +300,7 @@ document.getElementById('uncertaintyStdev').addEventListener('input', function()
   document.getElementById('stdevVal').textContent = this.value;
   saveSettings();
 });
-['homeCourtAdvantage','showLeaders','showAwards'].forEach(id =>
+['homeCourtAdvantage','injuriesEnabled','showLeaders','showAwards'].forEach(id =>
   document.getElementById(id).addEventListener('change', saveSettings));
 document.querySelectorAll('input[name="playoffMode"]').forEach(el =>
   el.addEventListener('change', saveSettings));
