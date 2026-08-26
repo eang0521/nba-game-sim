@@ -125086,13 +125086,6 @@
         "t_reb": 14
       },
       {
-        "name": "Bennedict Mathurin",
-        "t_2pt": 16,
-        "t_3pt": 15,
-        "t_def": 13,
-        "t_reb": 15
-      },
-      {
         "name": "Keaton Wagler",
         "t_2pt": 14,
         "t_3pt": 16,
@@ -125161,6 +125154,13 @@
         "t_3pt": 14,
         "t_def": 12,
         "t_reb": 12
+      },
+      {
+        "name": "Nicolas Batum",
+        "t_2pt": 8,
+        "t_3pt": 15,
+        "t_def": 13,
+        "t_reb": 11
       }
     ],
     "DET": [
@@ -126391,6 +126391,13 @@
         "t_reb": 13
       },
       {
+        "name": "Bennedict Mathurin",
+        "t_2pt": 16,
+        "t_3pt": 15,
+        "t_def": 13,
+        "t_reb": 15
+      },
+      {
         "name": "Karlo Matković",
         "t_2pt": 14,
         "t_3pt": 13,
@@ -126438,13 +126445,6 @@
         "t_def": 9,
         "t_reb": 11,
         "name": "Jaron Pierre Jr."
-      },
-      {
-        "name": "Micah Peavy",
-        "t_2pt": 10,
-        "t_3pt": 10,
-        "t_def": 10,
-        "t_reb": 10
       }
     ],
     "POR": [

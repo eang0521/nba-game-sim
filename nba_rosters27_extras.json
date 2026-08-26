@@ -307,13 +307,6 @@
   ],
   "LAC": [
     {
-      "name": "Nicolas Batum",
-      "t_2pt": 8,
-      "t_3pt": 15,
-      "t_def": 13,
-      "t_reb": 11
-    },
-    {
       "name": "Cam Christie",
       "t_2pt": 11,
       "t_3pt": 12,
@@ -510,6 +503,13 @@
     }
   ],
   "NOP": [
+    {
+      "name": "Micah Peavy",
+      "t_2pt": 10,
+      "t_3pt": 10,
+      "t_def": 10,
+      "t_reb": 10
+    },
     {
       "name": "Jordan Hawkins",
       "t_2pt": 8,
