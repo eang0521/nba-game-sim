@@ -40,13 +40,6 @@
   ],
   "DAL": [
     {
-      "t_2pt": 11,
-      "t_3pt": 12,
-      "t_def": 11,
-      "t_reb": 14,
-      "name": "Tobi Lawal"
-    },
-    {
       "name": "Dwight Powell",
       "t_2pt": 11,
       "t_3pt": 10,
@@ -170,6 +163,20 @@
     }
   ],
   "GSW": [
+    {
+      "name": "LJ Cryer",
+      "t_2pt": 10,
+      "t_3pt": 15,
+      "t_def": 7,
+      "t_reb": 12
+    },
+    {
+      "name": "Georges Niang",
+      "t_2pt": 10,
+      "t_3pt": 16,
+      "t_def": 8,
+      "t_reb": 10
+    },
     {
       "name": "Nate Williams",
       "t_2pt": 11,

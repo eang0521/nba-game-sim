@@ -236,13 +236,6 @@
       "t_reb": 18
     },
     {
-      "name": "Brandon Williams",
-      "t_2pt": 20,
-      "t_3pt": 14,
-      "t_def": 17,
-      "t_reb": 15
-    },
-    {
       "name": "Naji Marshall",
       "t_2pt": 21,
       "t_3pt": 14,
@@ -318,6 +311,13 @@
       "t_3pt": 11,
       "t_def": 14,
       "t_reb": 12
+    },
+    {
+      "t_2pt": 11,
+      "t_3pt": 12,
+      "t_def": 11,
+      "t_reb": 14,
+      "name": "Tobi Lawal"
     }
   ],
   "DEN": [
@@ -885,6 +885,13 @@
       "t_reb": 16
     },
     {
+      "name": "Brandon Williams",
+      "t_2pt": 20,
+      "t_3pt": 14,
+      "t_def": 17,
+      "t_reb": 15
+    },
+    {
       "name": "Moses Moody",
       "t_2pt": 12,
       "t_3pt": 22,
@@ -953,13 +960,6 @@
       "t_def": 12,
       "t_reb": 13,
       "name": "Lajae Jones"
-    },
-    {
-      "name": "LJ Cryer",
-      "t_2pt": 10,
-      "t_3pt": 15,
-      "t_def": 7,
-      "t_reb": 12
     }
   ],
   "LAL": [
