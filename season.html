@@ -142,6 +142,10 @@
     .series-games summary { font-size:.68rem; color:#748ffc; cursor:pointer; user-select:none; list-style:none; }
     .series-games summary::-webkit-details-marker { display:none; }
     .series-games[open] summary { color:#4c6ef5; }
+    .injury-details summary { font-size:.8rem; color:#748ffc; cursor:pointer; user-select:none; list-style:none; padding:.3rem 0; }
+    .injury-details summary::-webkit-details-marker { display:none; }
+    .injury-details[open] summary { color:#4c6ef5; }
+    .injury-details table { margin-top:.5rem; }
     .game-list { margin-top:.3rem; padding:.35rem .5rem; background:#0c101a; border-radius:5px; }
     .game-row { padding:.18rem 0; font-size:.72rem; color:#94a3b8; border-bottom:1px solid #172035; }
     .game-row:last-child { border-bottom:none; }
@@ -486,7 +490,7 @@ class Game {
   }
   rollInjuries() {
     if (!activeSimSettings || !activeSimSettings.injuriesEnabled) return;
-    while (rollD(20)<=5) {
+    while (rollD(20)<=4) {
       this.pendingInjuries.push({
         quarter: rollD(4),                       // regulation quarters only
         clock:   Math.floor(Math.random()*720),  // 0-719 seconds remaining
@@ -706,13 +710,16 @@ function generateSchedule(teamsData) {
       for (const t2 of confGroups[confKeys[c+1]])
         addSeries(t1, t2, 2);
 
-  // Ensure every team reaches exactly 82 games.
+  // Ensure every team reaches exactly 82 games — never more, never less.
   // Sort short teams by deficit (fewest games first) so the most-deficit team always
   // pairs with another high-deficit team rather than a near-82 team. This prevents
   // a lone team being stranded when all other teams happen to finish first (which
   // can occur with odd team counts and uneven division sizes, e.g. 1987 ATL having
-  // no division opponents). Fallback: if only 1 team remains short, force it to
-  // play any team — partner goes to 83 games, which is acceptable for a simulator.
+  // no division opponents). If only 1 team remains short (its deficit is guaranteed
+  // even, since the total deficit across all teams always is), fix it with a swap:
+  // drop one existing game between two other teams and replace it with two new
+  // games pairing the short team against each of them — this hands the short team
+  // 2 games while leaving those other teams' totals unchanged, so nobody exceeds 82.
   {
     const H={}, A={};
     teams.forEach(t=>{ H[t]=0; A[t]=0; });
@@ -723,17 +730,21 @@ function generateSchedule(teamsData) {
       const short=teams.filter(t=>H[t]+A[t]<82)
         .sort((a,b)=>(H[a]+A[a])-(H[b]+A[b])||Math.random()-0.5);
       if (!short.length) break;
-      let t1, t2;
       if (short.length >= 2) {
-        t1=short[0]; t2=short[1];
+        const t1=short[0], t2=short[1];
+        const home=H[t1]<=H[t2]?t1:t2, away=home===t1?t2:t1;
+        games.push({home,away});
+        H[home]++; A[away]++;
       } else {
-        // Isolated: pair with whatever team has fewest games overall
-        t1=short[0];
-        t2=[...teams].filter(t=>t!==t1).sort((a,b)=>(H[a]+A[a])-(H[b]+A[b]))[0];
+        const t1=short[0];
+        const idx=games.findIndex(g=>g.home!==t1&&g.away!==t1);
+        if (idx===-1) break; // no swappable game exists — leave as-is
+        const [g]=games.splice(idx,1);
+        const other1=g.home, other2=g.away;
+        H[other1]--; A[other2]--;
+        games.push({home:t1,away:other1}); H[t1]++; A[other1]++;
+        games.push({home:other2,away:t1}); H[other2]++; A[t1]++;
       }
-      const home=H[t1]<=H[t2]?t1:t2, away=home===t1?t2:t1;
-      games.push({home,away});
-      H[home]++; A[away]++;
     }
   }
 
@@ -1001,12 +1012,15 @@ function renderInjuries() {
       <td>${e.severe ? 'Severe' : ''}</td>
     </tr>`).join('');
   el.innerHTML = `
-    <table class="leader-table">
-      <thead><tr>
-        <th>Player</th><th>Team</th><th>Opponent</th><th>Phase</th><th>Time</th><th>Games Missed</th><th></th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+    <details class="injury-details">
+      <summary>${seasonInjuryLog.length} injur${seasonInjuryLog.length===1?'y':'ies'} this season ▾</summary>
+      <table class="leader-table">
+        <thead><tr>
+          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase</th><th>Time</th><th>Games Missed</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </details>`;
 }
 
 function renderAwards() {
