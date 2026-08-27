@@ -316,7 +316,9 @@ let currentTeamsData = {};
 let playInDone      = false;
 let activeSimSettings = null;
 let playerInjuries   = {};   // name -> {team, gamesRemaining, severe}
-let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severe}]
+let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severe, gameNum}]
+let teamRegGameNum   = {};   // team -> regular-season games played so far
+let teamPostGameNum  = {};   // team -> postseason (play-in + playoffs) games played so far
 
 // ── Settings ──────────────────────────────────────────────────────────
 const SIM_DEFAULTS = {
@@ -516,8 +518,9 @@ class Game {
     const raw=severe ? (50+randNormal(20)) : (10+randNormal(10));
     const games=Math.max(0,Math.round(raw));
     playerInjuries[player.name]={team:team.abbr,gamesRemaining:games,severe};
+    const gameNum=inj.team==='t1'?this.homeGameNum:this.awayGameNum;
     const evt={player:player.name,team:team.abbr,opp:opp.abbr,phase:this.phase,
-               quarter:this.quarter,clock:this.fmt(),games,severe};
+               quarter:this.quarter,clock:this.fmt(),games,severe,gameNum};
     this.injuryEvents.push(evt); seasonInjuryLog.push(evt);
     this.log(`${player.name} is injured${severe?' (SEVERE)':''} — out an estimated ${games} game${games===1?'':'s'}`);
     this.subs(null,[player]);
@@ -748,9 +751,28 @@ function generateSchedule(teamsData) {
     }
   }
 
-  // Shuffle full game list
-  for (let i=games.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [games[i],games[j]]=[games[j],games[i]]; }
-  return games;
+  // Order the full game list so every team advances through its schedule at
+  // roughly the same pace — at each step, play whichever remaining game most
+  // benefits the team(s) furthest behind, so nobody reaches game 41 (or any
+  // other point) drastically ahead of or behind the rest of the league.
+  return pacedGameOrder(games, teams);
+}
+
+function pacedGameOrder(games, teams) {
+  const played={}; teams.forEach(t=>played[t]=0);
+  const pool=[...games], ordered=[];
+  while (pool.length) {
+    let bestIdx=0, bestKey=Infinity;
+    for (let i=0;i<pool.length;i++) {
+      const g=pool[i];
+      const key=Math.max(played[g.home],played[g.away])*10000+(played[g.home]+played[g.away])+Math.random();
+      if (key<bestKey) { bestKey=key; bestIdx=i; }
+    }
+    const g=pool.splice(bestIdx,1)[0];
+    ordered.push(g);
+    played[g.home]++; played[g.away]++;
+  }
+  return ordered;
 }
 
 // ── Simulation helpers ────────────────────────────────────────────────
@@ -776,7 +798,11 @@ function simGame(homeAbbr, awayAbbr, teamsData, recordStats=true) {
   const homeTeam = new Team(homeAbbr, homeAvail);
   const awayTeam = new Team(awayAbbr, awayAvail);
   if (!activeSimSettings || activeSimSettings.homeCourtAdvantage) applyHomeBonus(homeTeam);
+  const gameNumCounter = recordStats ? teamRegGameNum : teamPostGameNum;
+  gameNumCounter[homeAbbr]=(gameNumCounter[homeAbbr]||0)+1;
+  gameNumCounter[awayAbbr]=(gameNumCounter[awayAbbr]||0)+1;
   const game = new Game(homeTeam, awayTeam, true, recordStats?'Regular Season':'Postseason');
+  game.homeGameNum=gameNumCounter[homeAbbr]; game.awayGameNum=gameNumCounter[awayAbbr];
   game.run();
   if (recordStats) {
     accumPlayerStats(homeTeam, homeAbbr);
@@ -1006,7 +1032,7 @@ function renderInjuries() {
       <td>${esc(e.player)}</td>
       <td>${esc(e.team)}</td>
       <td>vs ${esc(e.opp)}</td>
-      <td>${esc(e.phase)}</td>
+      <td>${esc(e.phase)} (G${e.gameNum})</td>
       <td>Q${e.quarter} ${esc(e.clock)}</td>
       <td>${e.games}</td>
       <td>${e.severe ? 'Severe' : ''}</td>
@@ -1016,7 +1042,7 @@ function renderInjuries() {
       <summary>${seasonInjuryLog.length} injur${seasonInjuryLog.length===1?'y':'ies'} this season ▾</summary>
       <table class="leader-table">
         <thead><tr>
-          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase</th><th>Time</th><th>Games Missed</th><th></th>
+          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th><th></th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -1095,7 +1121,7 @@ function runSeason() {
 
   teamRecords={}; playerSeasonStats={}; confStandings={East:[],West:[]};
   playInSeeds={East:{},West:{}}; playInDone=false; playoffState=null;
-  playerInjuries={}; seasonInjuryLog=[];
+  playerInjuries={}; seasonInjuryLog=[]; teamRegGameNum={}; teamPostGameNum={};
 
   const btn=document.getElementById('simBtn');
   btn.disabled=true; btn.textContent='Simulating…';
