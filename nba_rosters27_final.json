@@ -585,13 +585,6 @@
       "t_reb": 16
     },
     {
-      "name": "Jonathan Kuminga",
-      "t_2pt": 16,
-      "t_3pt": 14,
-      "t_def": 12,
-      "t_reb": 16
-    },
-    {
       "name": "Aaron Wiggins",
       "t_2pt": 13,
       "t_3pt": 16,
@@ -639,6 +632,13 @@
       "t_3pt": 15,
       "t_def": 10,
       "t_reb": 13
+    },
+    {
+      "name": "Buddy Hield",
+      "t_2pt": 11,
+      "t_3pt": 15,
+      "t_def": 12,
+      "t_reb": 12
     }
   ],
   "UTA": [
@@ -1976,6 +1976,13 @@
       "t_reb": 14
     },
     {
+      "name": "Jonathan Kuminga",
+      "t_2pt": 16,
+      "t_3pt": 14,
+      "t_def": 12,
+      "t_reb": 16
+    },
+    {
       "name": "Joan Beringer",
       "t_2pt": 15,
       "t_3pt": 12,
@@ -2023,13 +2030,6 @@
       "t_3pt": 13,
       "t_def": 12,
       "t_reb": 12
-    },
-    {
-      "t_2pt": 12,
-      "t_3pt": 10,
-      "t_def": 10,
-      "t_reb": 14,
-      "name": "Trey Kaufman-Renn"
     }
   ],
   "MIA": [
