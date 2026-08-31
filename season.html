@@ -1033,6 +1033,7 @@ function renderInjuries() {
     el.innerHTML = `<div style="color:#748ffc;padding:1rem 0">No injuries occurred this season.</div>`;
     return;
   }
+  const wasOpen = el.querySelector('details')?.open || false;
   const teams = [...new Set(seasonInjuryLog.map(e => e.team))].sort((a, b) => a.localeCompare(b));
   if (injuryTeamFilter && !teams.includes(injuryTeamFilter)) injuryTeamFilter = '';
   const teamFilterHtml = `
@@ -1060,7 +1061,7 @@ function renderInjuries() {
         <tbody>${rows}</tbody>
       </table>` : `<div style="color:#748ffc;padding:.5rem 0">No injuries for this team.</div>`;
   el.innerHTML = `
-    <details class="injury-details">
+    <details class="injury-details"${wasOpen ? ' open' : ''}>
       <summary>${seasonInjuryLog.length} injur${seasonInjuryLog.length===1?'y':'ies'} this season ▾</summary>
       ${teamFilterHtml}
       ${tableHtml}
