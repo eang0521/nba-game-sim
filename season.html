@@ -315,8 +315,8 @@ let currentYear     = 2026;
 let currentTeamsData = {};
 let playInDone      = false;
 let activeSimSettings = null;
-let playerInjuries   = {};   // name -> {team, gamesRemaining, severe}
-let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severe, gameNum}]
+let playerInjuries   = {};   // name -> {team, gamesRemaining, severity}
+let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severity, gameNum}]
 let injuryTeamFilter = '';
 let teamRegGameNum   = {};   // team -> regular-season games played so far
 let teamPostGameNum  = {};   // team -> postseason (play-in + playoffs) games played so far
@@ -493,7 +493,7 @@ class Game {
   }
   rollInjuries() {
     if (!activeSimSettings || !activeSimSettings.injuriesEnabled) return;
-    while (rollD(20)<=4) {
+    while (rollD(6)<=2) {
       this.pendingInjuries.push({
         quarter: rollD(4),                       // regulation quarters only
         clock:   Math.floor(Math.random()*720),  // 0-719 seconds remaining
@@ -515,15 +515,18 @@ class Game {
     if (!team.court.length) return;
     const player=team.court[Math.floor(Math.random()*team.court.length)];
     player.injured=true;
-    const severe=rollD(100)<=2;
-    const raw=severe ? (50+randNormal(20)) : (10+randNormal(10));
+    const roll=rollD(100);
+    const severity = roll<=1 ? 'Severe' : roll<=10 ? 'Medium' : 'Light';
+    const raw = severity==='Severe' ? (60+randNormal(15))
+              : severity==='Medium' ? (10+randNormal(10))
+              : (5+randNormal(5));
     const games=Math.max(0,Math.round(raw));
-    playerInjuries[player.name]={team:team.abbr,gamesRemaining:games,severe};
+    playerInjuries[player.name]={team:team.abbr,gamesRemaining:games,severity};
     const gameNum=inj.team==='t1'?this.homeGameNum:this.awayGameNum;
     const evt={player:player.name,team:team.abbr,opp:opp.abbr,phase:this.phase,
-               quarter:this.quarter,clock:this.fmt(),games,severe,gameNum};
+               quarter:this.quarter,clock:this.fmt(),games,severity,gameNum};
     this.injuryEvents.push(evt); seasonInjuryLog.push(evt);
-    this.log(`${player.name} is injured${severe?' (SEVERE)':''} — out an estimated ${games} game${games===1?'':'s'}`);
+    this.log(`${player.name} is injured${severity==='Severe'?' (SEVERE)':''} — out an estimated ${games} game${games===1?'':'s'}`);
     this.subs(null,[player]);
   }
   fts(shooter,n) {
@@ -1051,12 +1054,12 @@ function renderInjuries() {
       <td>${esc(e.phase)} (G${e.gameNum})</td>
       <td>Q${e.quarter} ${esc(e.clock)}</td>
       <td>${e.games}</td>
-      <td>${e.severe ? 'Severe' : ''}</td>
+      <td>${esc(e.severity)}</td>
     </tr>`).join('');
   const tableHtml = filtered.length ? `
       <table class="leader-table">
         <thead><tr>
-          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th><th></th>
+          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th><th>Severity</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>` : `<div style="color:#748ffc;padding:.5rem 0">No injuries for this team.</div>`;
