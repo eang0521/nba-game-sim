@@ -515,11 +515,11 @@ class Game {
     if (!team.court.length) return;
     const player=team.court[Math.floor(Math.random()*team.court.length)];
     player.injured=true;
-    const roll=rollD(100);
-    const severity = roll<=1 ? 'Severe' : roll<=10 ? 'Medium' : 'Light';
-    const raw = severity==='Severe' ? (60+randNormal(15))
+    const roll=rollD(1000);
+    const severity = roll<=5 ? 'Severe' : roll<=50 ? 'Medium' : 'Light';
+    const raw = severity==='Severe' ? (50+randNormal(15))
               : severity==='Medium' ? (10+randNormal(10))
-              : (5+randNormal(5));
+              : (2+randNormal(5));
     const games=Math.max(0,Math.round(raw));
     playerInjuries[player.name]={team:team.abbr,gamesRemaining:games,severity};
     const gameNum=inj.team==='t1'?this.homeGameNum:this.awayGameNum;
