@@ -317,6 +317,7 @@ let playInDone      = false;
 let activeSimSettings = null;
 let playerInjuries   = {};   // name -> {team, gamesRemaining, severe}
 let seasonInjuryLog  = [];   // [{player, team, opp, phase, quarter, clock, games, severe, gameNum}]
+let injuryTeamFilter = '';
 let teamRegGameNum   = {};   // team -> regular-season games played so far
 let teamPostGameNum  = {};   // team -> postseason (play-in + playoffs) games played so far
 
@@ -1021,13 +1022,27 @@ function allTeamHTML(entries, label, statFn, startRank = 1) {
   </div>`;
 }
 
+function filterInjuries(team) {
+  injuryTeamFilter = team;
+  renderInjuries();
+}
+
 function renderInjuries() {
   const el = document.getElementById('injuriesContent');
   if (!seasonInjuryLog.length) {
     el.innerHTML = `<div style="color:#748ffc;padding:1rem 0">No injuries occurred this season.</div>`;
     return;
   }
-  const rows = [...seasonInjuryLog].reverse().map(e => `
+  const teams = [...new Set(seasonInjuryLog.map(e => e.team))].sort((a, b) => a.localeCompare(b));
+  if (injuryTeamFilter && !teams.includes(injuryTeamFilter)) injuryTeamFilter = '';
+  const teamFilterHtml = `
+    <label style="font-size:.8rem;color:#748ffc;margin-right:.4rem">Team:</label>
+    <select id="injuryTeamFilter" onchange="filterInjuries(this.value)" style="font-size:.82rem;margin-bottom:.5rem">
+      <option value="">All Teams</option>
+      ${teams.map(t => `<option value="${esc(t)}"${t===injuryTeamFilter?' selected':''}>${esc(t)}</option>`).join('')}
+    </select>`;
+  const filtered = injuryTeamFilter ? seasonInjuryLog.filter(e => e.team === injuryTeamFilter) : seasonInjuryLog;
+  const rows = [...filtered].reverse().map(e => `
     <tr>
       <td>${esc(e.player)}</td>
       <td>${esc(e.team)}</td>
@@ -1037,15 +1052,18 @@ function renderInjuries() {
       <td>${e.games}</td>
       <td>${e.severe ? 'Severe' : ''}</td>
     </tr>`).join('');
-  el.innerHTML = `
-    <details class="injury-details">
-      <summary>${seasonInjuryLog.length} injur${seasonInjuryLog.length===1?'y':'ies'} this season ▾</summary>
+  const tableHtml = filtered.length ? `
       <table class="leader-table">
         <thead><tr>
           <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th><th></th>
         </tr></thead>
         <tbody>${rows}</tbody>
-      </table>
+      </table>` : `<div style="color:#748ffc;padding:.5rem 0">No injuries for this team.</div>`;
+  el.innerHTML = `
+    <details class="injury-details">
+      <summary>${seasonInjuryLog.length} injur${seasonInjuryLog.length===1?'y':'ies'} this season ▾</summary>
+      ${teamFilterHtml}
+      ${tableHtml}
     </details>`;
 }
 
