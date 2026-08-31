@@ -1054,12 +1054,11 @@ function renderInjuries() {
       <td>${esc(e.phase)} (G${e.gameNum})</td>
       <td>Q${e.quarter} ${esc(e.clock)}</td>
       <td>${e.games}</td>
-      <td>${esc(e.severity)}</td>
     </tr>`).join('');
   const tableHtml = filtered.length ? `
       <table class="leader-table">
         <thead><tr>
-          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th><th>Severity</th>
+          <th>Player</th><th>Team</th><th>Opponent</th><th>Phase (Game #)</th><th>Time</th><th>Games Missed</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>` : `<div style="color:#748ffc;padding:.5rem 0">No injuries for this team.</div>`;
