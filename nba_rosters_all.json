@@ -124300,11 +124300,11 @@
         "t_reb": 12
       },
       {
-        "name": "Bez Mbeng",
-        "t_2pt": 10,
-        "t_3pt": 9,
+        "name": "Josh Green",
+        "t_2pt": 11,
+        "t_3pt": 16,
         "t_def": 13,
-        "t_reb": 10
+        "t_reb": 13
       }
     ],
     "MIL": [
@@ -124728,11 +124728,11 @@
         "name": "Ja'Kobi Gillespie"
       },
       {
-        "name": "Kelly Olynyk",
-        "t_2pt": 11,
-        "t_3pt": 12,
-        "t_def": 11,
-        "t_reb": 13
+        "name": "Maliq Brown",
+        "t_2pt": 12,
+        "t_3pt": 11,
+        "t_def": 17,
+        "t_reb": 14
       }
     ],
     "SAC": [
@@ -124835,11 +124835,11 @@
         "t_reb": 11
       },
       {
-        "name": "Daeqwon Plowden",
-        "t_2pt": 10,
-        "t_3pt": 13,
-        "t_def": 10,
-        "t_reb": 11
+        "name": "Ben Simmons",
+        "t_2pt": 13,
+        "t_3pt": 10,
+        "t_def": 14,
+        "t_reb": 15
       }
     ],
     "CLE": [
@@ -125556,13 +125556,6 @@
         "t_reb": 14
       },
       {
-        "name": "Josh Green",
-        "t_2pt": 11,
-        "t_3pt": 16,
-        "t_def": 13,
-        "t_reb": 13
-      },
-      {
         "name": "Trey Lyles",
         "t_3pt": 14,
         "t_reb": 14,
@@ -125589,6 +125582,13 @@
         "t_3pt": 13,
         "t_def": 12,
         "t_reb": 12
+      },
+      {
+        "name": "Cody Williams",
+        "t_2pt": 13,
+        "t_3pt": 8,
+        "t_def": 12,
+        "t_reb": 9
       }
     ],
     "MIA": [
@@ -125656,13 +125656,6 @@
         "t_reb": 12
       },
       {
-        "name": "Maliq Brown",
-        "t_2pt": 12,
-        "t_3pt": 11,
-        "t_def": 17,
-        "t_reb": 14
-      },
-      {
         "name": "Myron Gardner",
         "t_2pt": 12,
         "t_3pt": 14,
@@ -125695,6 +125688,13 @@
         "t_2pt": 11,
         "t_3pt": 15,
         "t_def": 11,
+        "t_reb": 12
+      },
+      {
+        "name": "Nick Richards",
+        "t_2pt": 9,
+        "t_3pt": 8,
+        "t_def": 8,
         "t_reb": 12
       }
     ],
